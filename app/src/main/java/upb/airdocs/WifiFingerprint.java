@@ -2,32 +2,16 @@ package upb.airdocs;
 
 import java.util.ArrayList;
 
-public class ScanItem {
-    // type = 1 for Wifi
-    // type = 2 for BLE
-    private int type;
+public class WifiFingerprint {
     private long timestamp;
     private String ssid;
-    private String hardwareAddress;
     private int frequency;
     private int rssi;
 
-    public ArrayList<Integer> getRssiList() {
-        return rssiList;
-    }
 
-    public void addToRssiList(int rssi) {
-        this.rssiList.add(new Integer(rssi));
-    }
-
-    private ArrayList<Integer> rssiList = new ArrayList<Integer>();
-
-
-    public ScanItem(int type, long timestamp, String ssid, String hardwareAddress, int frequency, int rssi) {
-        this.type = type;
+    public WifiFingerprint(long timestamp, String ssid, int frequency, int rssi) {
         this.timestamp = timestamp;
         this.ssid = ssid;
-        this.hardwareAddress = hardwareAddress;
         this.frequency = frequency;
         this.rssi = rssi;
     }
@@ -38,14 +22,6 @@ public class ScanItem {
 
     public void setFrequency(int frequency) {
         this.frequency = frequency;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public long getTimestamp() {
@@ -64,14 +40,6 @@ public class ScanItem {
         this.ssid = ssid;
     }
 
-    public String getHardwareAddress() {
-        return hardwareAddress;
-    }
-
-    public void setHardwareAddress(String hardwareAddress) {
-        this.hardwareAddress = hardwareAddress;
-    }
-
     public int getRssi() {
         return rssi;
     }
@@ -82,9 +50,7 @@ public class ScanItem {
 
     @Override
     public String toString() {
-        return "{" +
-                "type=" + type +
-                ", timestamp=" + timestamp +
+        return "{timestamp=" + timestamp +
                 ", ssid='" + ssid + '\'' +
                 ", frequency=" + frequency +
                 ", rssi=" + rssi +

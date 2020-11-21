@@ -65,19 +65,11 @@ public class WiFiScan {
             //        " MAC: "+result.BSSID+" Frequency: "+result.frequency+
             //        " RSSI: "+result.level);
 
-            ScanItem wifiItem = new ScanItem(1, result.timestamp, result.SSID,
-                    result.BSSID, result.frequency, result.level);
+            WifiFingerprint wifiItem = new WifiFingerprint(result.timestamp, result.SSID,
+                    result.frequency, result.level);
 
 
-            ArrayList<ScanItem> scanItemArrayList = ScanService.currentFingerprint.get(result.BSSID);
-
-            if (scanItemArrayList == null){
-                scanItemArrayList = new ArrayList<ScanItem>();
-            }
-
-            scanItemArrayList.add(wifiItem);
-
-            ScanService.currentFingerprint.put(result.BSSID, scanItemArrayList);
+            ScanService.currentFingerprint.addWifiFingerprint(result.BSSID, wifiItem);
         }
 
         ScanService.currentFingerprint.printToLogFingerprint();

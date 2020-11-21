@@ -5,13 +5,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -64,18 +59,10 @@ public class BLEScan {
                     //Log.d(LOG_TAG, "Timestamp: "+result.getTimestampNanos()+" Name: "+device.getName()+
                     //        " MAC: "+device.getAddress()+ " RSSI: "+result.getRssi());
 
-                    ScanItem bleItem = new ScanItem(2, result.getTimestampNanos(),
-                            device.getName(), device.getAddress(), 0, result.getRssi());
+                    BLEFingerprint bleItem = new BLEFingerprint(result.getTimestampNanos(),
+                            device.getName(), result.getRssi());
 
-                    ArrayList<ScanItem> scanItemArrayList = ScanService.currentFingerprint.get(device.getAddress());
-
-                    if (scanItemArrayList == null){
-                        scanItemArrayList = new ArrayList<ScanItem>();
-                    }
-
-                    scanItemArrayList.add(bleItem);
-
-                    ScanService.currentFingerprint.put(device.getAddress(), scanItemArrayList);
+                    ScanService.currentFingerprint.addBLEFingerprint(device.getAddress(), bleItem);
                 }
             };
 

@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void startService() {
         Intent serviceIntent = new Intent(this, ScanService.class);
-        serviceIntent.putExtra("inputExtra", "Scan Service");
+        //serviceIntent.putExtra("inputExtra", "Scan Service");
         ContextCompat.startForegroundService(this, serviceIntent);
     }
     public void stopService() {

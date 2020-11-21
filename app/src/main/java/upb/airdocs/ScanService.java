@@ -92,15 +92,20 @@ public class ScanService extends Service {
         Log.d(LOG_TAG, "Destroying Scan Service.");
         //telephonyScan.unregisterPhoneStateManager();
 
-        wiFiScan.unregisterReceiver();
-        bleScan.stopScan();
+        if (wiFiScan != null) {
+            wiFiScan.unregisterReceiver();
+        }
+        if (bleScan != null) {
+            bleScan.stopScan();
+        }
 
         stopForeground(true);
     }
 
     private void setForeground(Intent intent) {
         Log.d(LOG_TAG, "Set Foreground Service");
-        String input = intent.getStringExtra("inputExtra");
+        //String input = intent.getStringExtra("inputExtra");
+        String input = "Scan Service";
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,

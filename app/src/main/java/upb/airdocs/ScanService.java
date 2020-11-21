@@ -41,6 +41,9 @@ import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +61,8 @@ public class ScanService extends Service {
 
     public static List<Fingerprint> itemList = new ArrayList<Fingerprint>();
     public static Fingerprint currentFingerprint = new Fingerprint();
+
+    public static JSONArray fingerprintsJSON = new JSONArray();
 
     WiFiScan wiFiScan = new WiFiScan(this);
     BLEScan bleScan = new BLEScan(this);
@@ -101,6 +106,13 @@ public class ScanService extends Service {
         }
         if (gpsScan != null) {
             gpsScan.stopScan();
+        }
+
+        try {
+            Log.d(LOG_TAG, "Final JSON:");
+            Log.d(LOG_TAG, fingerprintsJSON.toString(4));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         stopForeground(true);

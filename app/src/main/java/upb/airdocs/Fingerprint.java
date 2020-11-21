@@ -2,6 +2,10 @@ package upb.airdocs;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -39,5 +43,72 @@ public class Fingerprint{
         Log.d(LOG_TAG, bleFingerprintHashtable.toString());
         Log.d(LOG_TAG, "GPS Fingerprint: ");
         Log.d(LOG_TAG, gpsFingerprintArrayList.toString());
+    }
+
+    public JSONObject wifiFingerprintHashtableToJSON(){
+        JSONObject wifiFingerprintJSON = new JSONObject();
+        Enumeration<String> keys = wifiFingerprintHashtable.keys();
+        while(keys.hasMoreElements()){
+            String hwAddr = keys.nextElement();
+            WifiFingerprint wifiFingerprint = wifiFingerprintHashtable.get(hwAddr);
+            try {
+                wifiFingerprintJSON.put(hwAddr, wifiFingerprint.toJSON());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return wifiFingerprintJSON;
+    }
+
+    public JSONObject bleFingerprintHashtableToJSON(){
+        JSONObject bleFingerprintJSON = new JSONObject();
+
+        Enumeration<String> keys = bleFingerprintHashtable.keys();
+        while(keys.hasMoreElements()){
+            String hwAddr = keys.nextElement();
+            ArrayList<BLEFingerprint> bleFingerprintArrayList = bleFingerprintHashtable.get(hwAddr);
+            JSONArray bleJSONArray = new JSONArray();
+            for (int i = 0; i < bleFingerprintArrayList.size(); i++) {
+                BLEFingerprint bleFingerprint = bleFingerprintArrayList.get(i);
+                bleJSONArray.put(bleFingerprint.toJSON());
+            }
+            try {
+                bleFingerprintJSON.put(hwAddr, bleJSONArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return bleFingerprintJSON;
+    }
+
+    public JSONArray gpsFingerprintHashtableToJSON(){
+        JSONArray gpsFingerprintJSON = new JSONArray();
+
+        for (int i = 0; i < gpsFingerprintArrayList.size(); i++) {
+            GPSFingerprint gpsFingerprint = gpsFingerprintArrayList.get(i);
+            gpsFingerprintJSON.put(gpsFingerprint.toJSON());
+        }
+
+        return gpsFingerprintJSON;
+    }
+
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONObject wifiFingerprintJSON = wifiFingerprintHashtableToJSON();
+            JSONObject bleFingerprintJSON = bleFingerprintHashtableToJSON();
+            JSONArray gpsFingerprintJSON = gpsFingerprintHashtableToJSON();
+
+            jsonObject.put("wifi", wifiFingerprintJSON);
+            jsonObject.put("ble", bleFingerprintJSON);
+            jsonObject.put("gps", gpsFingerprintJSON);
+
+            Log.d(LOG_TAG, "Fingerprint JSON: "+ jsonObject.toString(4));
+
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

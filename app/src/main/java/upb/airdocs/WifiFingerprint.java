@@ -1,5 +1,8 @@
 package upb.airdocs;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class WifiFingerprint {
@@ -55,5 +58,19 @@ public class WifiFingerprint {
                 ", frequency=" + frequency +
                 ", rssi=" + rssi +
                 '}';
+    }
+
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("timestamp", String.valueOf(timestamp));
+            jsonObject.put("ssid", ssid);
+            jsonObject.put("frequency", String.valueOf(frequency));
+            jsonObject.put("rssi", String.valueOf(rssi));
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

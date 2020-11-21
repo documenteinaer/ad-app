@@ -1,15 +1,20 @@
 package upb.airdocs;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class BLEFingerprint {
     private long timestamp;
-    private String ssid;
+    private String name;
     private int rssi;
 
-    public BLEFingerprint(long timestamp, String ssid, int rssi) {
+    public BLEFingerprint(long timestamp, String name, int rssi) {
         this.timestamp = timestamp;
-        this.ssid = ssid;
+        this.name = name;
         this.rssi = rssi;
     }
 
@@ -21,12 +26,12 @@ public class BLEFingerprint {
         this.timestamp = timestamp;
     }
 
-    public String getSsid() {
-        return ssid;
+    public String getName() {
+        return name;
     }
 
-    public void setSsid(String ssid) {
-        this.ssid = ssid;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getRssi() {
@@ -40,8 +45,21 @@ public class BLEFingerprint {
     @Override
     public String toString() {
         return "{timestamp=" + timestamp +
-                ", ssid='" + ssid + '\'' +
+                ", name='" + name + '\'' +
                 ", rssi=" + rssi +
                 '}';
+    }
+
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("timestamp", String.valueOf(timestamp));
+            jsonObject.put("name", name);
+            jsonObject.put("rssi", String.valueOf(rssi));
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

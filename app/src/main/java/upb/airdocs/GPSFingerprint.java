@@ -1,6 +1,9 @@
 package upb.airdocs;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 class GPSFingerprint {
     private long timestamp;
     private double latitude;
@@ -43,5 +46,18 @@ class GPSFingerprint {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 '}';
+    }
+
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("timestamp", String.valueOf(timestamp));
+            jsonObject.put("latitude", String.valueOf(latitude));
+            jsonObject.put("longitude", String.valueOf(longitude));
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

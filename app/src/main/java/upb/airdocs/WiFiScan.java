@@ -8,6 +8,8 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +76,8 @@ public class WiFiScan {
 
         ScanService.currentFingerprint.printToLogFingerprint();
         ScanService.itemList.add(ScanService.currentFingerprint);
+        JSONObject fingerprintJSON = ScanService.currentFingerprint.toJSON();
+        ScanService.fingerprintsJSON.put(fingerprintJSON);
         ScanService.currentFingerprint = new Fingerprint();
     }
 

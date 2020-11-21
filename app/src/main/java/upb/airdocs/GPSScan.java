@@ -41,11 +41,12 @@ public class GPSScan implements LocationListener {
 
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        String str ="Last GPS location was: " + lastLocation.getTime() + " "
-                + lastLocation.getLatitude() + " " + lastLocation.getLongitude();
-        Log.d(LOG_TAG, str);
-        Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
-
+        /*if (lastLocation != null) {
+            String str = "Last GPS location was: " + lastLocation.getElapsedRealtimeNanos() + " "
+                    + lastLocation.getLatitude() + " " + lastLocation.getLongitude();
+            Log.d(LOG_TAG, str);
+        } */
+        //Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000,   // 1 sec
@@ -54,11 +55,14 @@ public class GPSScan implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        String str = "GPS location: " + location.getTime() + " "
+        /*String str = "GPS location: " + location.getElapsedRealtimeNanos() + " "
                 + location.getLatitude() + " " + location.getLongitude();
 
-        Log.d(LOG_TAG, str);
-        Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
+        Log.d(LOG_TAG, str);*/
+        //Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
+
+        GPSFingerprint gpsItem = new GPSFingerprint(location.getElapsedRealtimeNanos(), location.getLatitude(), location.getLongitude());
+        ScanService.currentFingerprint.addGPSFingerprint(gpsItem);
     }
 
     @Override
@@ -74,5 +78,9 @@ public class GPSScan implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         Toast.makeText(mContext.getApplicationContext(), "Gps turned off ", Toast.LENGTH_LONG).show();
+    }
+
+    public void stopScan(){
+        locationManager.removeUpdates(this);
     }
 }

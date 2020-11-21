@@ -61,6 +61,7 @@ public class ScanService extends Service {
 
     WiFiScan wiFiScan = new WiFiScan(this);
     BLEScan bleScan = new BLEScan(this);
+    GPSScan gpsScan = new GPSScan(this);
 
 
     public ScanService() {
@@ -98,6 +99,9 @@ public class ScanService extends Service {
         if (bleScan != null) {
             bleScan.stopScan();
         }
+        if (gpsScan != null) {
+            gpsScan.stopScan();
+        }
 
         stopForeground(true);
     }
@@ -134,14 +138,14 @@ public class ScanService extends Service {
 
         wiFiScan.startScan();
 
-
         bleScan.startScan();
+
+        gpsScan.startScan();
 
         //telephonyScan = new TelephonyScan(this);
         //telephonyScan.startScan();
 
-        //GPSScan gpsScan = new GPSScan(this);
-        //gpsScan.startScan();
+
 
     }
 

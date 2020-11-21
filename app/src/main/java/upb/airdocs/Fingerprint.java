@@ -11,6 +11,7 @@ public class Fingerprint{
 
     private Hashtable<String,WifiFingerprint> wifiFingerprintHashtable = new Hashtable<String,WifiFingerprint>();
     private Hashtable<String,ArrayList<BLEFingerprint>> bleFingerprintHashtable = new Hashtable<String,ArrayList<BLEFingerprint>>();
+    private ArrayList<GPSFingerprint> gpsFingerprintArrayList = new ArrayList<GPSFingerprint>();
 
     public void addWifiFingerprint(String hwAddress, WifiFingerprint wifiFingerprint){
         wifiFingerprintHashtable.put(hwAddress, wifiFingerprint);
@@ -23,6 +24,10 @@ public class Fingerprint{
         bleFingerprintHashtable.put(hwAddress, bleList);
     }
 
+    public void addGPSFingerprint(GPSFingerprint gpsFingerprint){
+        gpsFingerprintArrayList.add(gpsFingerprint);
+    }
+
 
 
 
@@ -32,5 +37,7 @@ public class Fingerprint{
         Log.d(LOG_TAG, wifiFingerprintHashtable.toString());
         Log.d(LOG_TAG, "BLE Fingerprint: ");
         Log.d(LOG_TAG, bleFingerprintHashtable.toString());
+        Log.d(LOG_TAG, "GPS Fingerprint: ");
+        Log.d(LOG_TAG, gpsFingerprintArrayList.toString());
     }
 }

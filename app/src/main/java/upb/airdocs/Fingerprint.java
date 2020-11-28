@@ -16,6 +16,7 @@ public class Fingerprint{
     private Hashtable<String,WifiFingerprint> wifiFingerprintHashtable = new Hashtable<String,WifiFingerprint>();
     private Hashtable<String,ArrayList<BLEFingerprint>> bleFingerprintHashtable = new Hashtable<String,ArrayList<BLEFingerprint>>();
     private ArrayList<GPSFingerprint> gpsFingerprintArrayList = new ArrayList<GPSFingerprint>();
+    private ArrayList<TelephonyFingerprint> telephonyFingerprintArrayList = new ArrayList<TelephonyFingerprint>();
 
     public void addWifiFingerprint(String hwAddress, WifiFingerprint wifiFingerprint){
         wifiFingerprintHashtable.put(hwAddress, wifiFingerprint);
@@ -32,6 +33,10 @@ public class Fingerprint{
         gpsFingerprintArrayList.add(gpsFingerprint);
     }
 
+    public void addTelephonyFingerprint(TelephonyFingerprint telephonyFingerprint){
+        telephonyFingerprintArrayList.add(telephonyFingerprint);
+    }
+
 
 
 
@@ -43,6 +48,8 @@ public class Fingerprint{
         Log.d(LOG_TAG, bleFingerprintHashtable.toString());
         Log.d(LOG_TAG, "GPS Fingerprint: ");
         Log.d(LOG_TAG, gpsFingerprintArrayList.toString());
+        Log.d(LOG_TAG, "Telephony Fingerprint: ");
+        Log.d(LOG_TAG, telephonyFingerprintArrayList.toString());
     }
 
     public JSONObject wifiFingerprintHashtableToJSON(){
@@ -81,7 +88,7 @@ public class Fingerprint{
         return bleFingerprintJSON;
     }
 
-    public JSONArray gpsFingerprintHashtableToJSON(){
+    public JSONArray gpsFingerprintArrayListToJSON(){
         JSONArray gpsFingerprintJSON = new JSONArray();
 
         for (int i = 0; i < gpsFingerprintArrayList.size(); i++) {
@@ -92,18 +99,31 @@ public class Fingerprint{
         return gpsFingerprintJSON;
     }
 
+    public JSONArray telephonyFingerprintArrayListToJSON(){
+        JSONArray telephonyFingerprintJSON = new JSONArray();
+
+        for (int i = 0; i < telephonyFingerprintArrayList.size(); i++) {
+            TelephonyFingerprint telephonyFingerprint = telephonyFingerprintArrayList.get(i);
+            telephonyFingerprintJSON.put(telephonyFingerprint.toJSON());
+        }
+
+        return telephonyFingerprintJSON;
+    }
+
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject wifiFingerprintJSON = wifiFingerprintHashtableToJSON();
             JSONObject bleFingerprintJSON = bleFingerprintHashtableToJSON();
-            JSONArray gpsFingerprintJSON = gpsFingerprintHashtableToJSON();
+            JSONArray gpsFingerprintJSON = gpsFingerprintArrayListToJSON();
+            JSONArray telephonyFingerprintJSON = telephonyFingerprintArrayListToJSON();
 
             jsonObject.put("wifi", wifiFingerprintJSON);
             jsonObject.put("ble", bleFingerprintJSON);
             jsonObject.put("gps", gpsFingerprintJSON);
+            jsonObject.put("telephony",telephonyFingerprintJSON);
 
-            Log.d(LOG_TAG, "Fingerprint JSON: "+ jsonObject.toString(4));
+            //Log.d(LOG_TAG, "Fingerprint JSON: "+ jsonObject.toString(4));
 
         }
         catch(JSONException e){

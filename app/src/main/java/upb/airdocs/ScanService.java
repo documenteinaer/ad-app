@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -44,6 +45,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,8 +66,6 @@ public class ScanService extends Service {
 
     private final int PHONE_STATE_REQUEST = 1;
 
-    TelephonyScan telephonyScan;
-
     public static List<Fingerprint> itemList = new ArrayList<Fingerprint>();
     public static Fingerprint currentFingerprint = new Fingerprint();
 
@@ -67,6 +74,7 @@ public class ScanService extends Service {
     WiFiScan wiFiScan = new WiFiScan(this);
     BLEScan bleScan = new BLEScan(this);
     GPSScan gpsScan = new GPSScan(this);
+    TelephonyScan telephonyScan = new TelephonyScan(this);
 
 
     public ScanService() {
@@ -96,7 +104,7 @@ public class ScanService extends Service {
     @Override
     public void onDestroy() {
         Log.d(LOG_TAG, "Destroying Scan Service.");
-        //telephonyScan.unregisterPhoneStateManager();
+        telephonyScan.unregisterPhoneStateManager();
 
         if (wiFiScan != null) {
             wiFiScan.unregisterReceiver();
@@ -114,6 +122,13 @@ public class ScanService extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
+        /*new Thread(new Runnable() {
+            public void run() {
+                sendJSONtoServer();
+            }
+        }).start();*/
 
         stopForeground(true);
     }
@@ -154,8 +169,44 @@ public class ScanService extends Service {
 
         gpsScan.startScan();
 
-        //telephonyScan = new TelephonyScan(this);
-        //telephonyScan.startScan();
+        telephonyScan.startScan();
+
+    }
+
+    /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
+
+    public void sendJSONtoServer(){
+
+        try {
+            InetAddress addr = InetAddress.getByName("192.168.142.115");
+            URL url = new URL("http://"+addr.getHostAddress()+":8009");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+            //String jsonInputString = "{\"this\": \"is a test\", \"received\": \"ok\"}";
+            String jsonInputString = fingerprintsJSON.toString()+"\n";
+            try(OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            try(BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Log.d(LOG_TAG, response.toString());
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
 

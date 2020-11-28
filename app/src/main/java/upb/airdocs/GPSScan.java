@@ -61,7 +61,7 @@ public class GPSScan implements LocationListener {
         Log.d(LOG_TAG, str);*/
         //Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
 
-        GPSFingerprint gpsItem = new GPSFingerprint(location.getElapsedRealtimeNanos(), location.getLatitude(), location.getLongitude());
+        GPSFingerprint gpsItem = new GPSFingerprint(location.getLatitude(), location.getLongitude());
         ScanService.currentFingerprint.addGPSFingerprint(gpsItem);
     }
 

@@ -67,7 +67,7 @@ public class WiFiScan {
             //        " MAC: "+result.BSSID+" Frequency: "+result.frequency+
             //        " RSSI: "+result.level);
 
-            WifiFingerprint wifiItem = new WifiFingerprint(result.timestamp, result.SSID,
+            WifiFingerprint wifiItem = new WifiFingerprint(result.SSID,
                     result.frequency, result.level);
 
 

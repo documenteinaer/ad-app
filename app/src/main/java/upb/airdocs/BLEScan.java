@@ -59,7 +59,7 @@ public class BLEScan {
                     //Log.d(LOG_TAG, "Timestamp: "+result.getTimestampNanos()+" Name: "+device.getName()+
                     //        " MAC: "+device.getAddress()+ " RSSI: "+result.getRssi());
 
-                    BLEFingerprint bleItem = new BLEFingerprint(result.getTimestampNanos(),
+                    BLEFingerprint bleItem = new BLEFingerprint(
                             device.getName(), result.getRssi());
 
                     ScanService.currentFingerprint.addBLEFingerprint(device.getAddress(), bleItem);

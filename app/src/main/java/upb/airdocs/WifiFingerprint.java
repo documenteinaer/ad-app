@@ -6,14 +6,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class WifiFingerprint {
-    private long timestamp;
     private String ssid;
     private int frequency;
     private int rssi;
 
 
-    public WifiFingerprint(long timestamp, String ssid, int frequency, int rssi) {
-        this.timestamp = timestamp;
+    public WifiFingerprint(String ssid, int frequency, int rssi) {
         this.ssid = ssid;
         this.frequency = frequency;
         this.rssi = rssi;
@@ -25,14 +23,6 @@ public class WifiFingerprint {
 
     public void setFrequency(int frequency) {
         this.frequency = frequency;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getSsid() {
@@ -53,8 +43,7 @@ public class WifiFingerprint {
 
     @Override
     public String toString() {
-        return "{timestamp=" + timestamp +
-                ", ssid='" + ssid + '\'' +
+        return "{ssid='" + ssid + '\'' +
                 ", frequency=" + frequency +
                 ", rssi=" + rssi +
                 '}';
@@ -63,7 +52,6 @@ public class WifiFingerprint {
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("timestamp", String.valueOf(timestamp));
             jsonObject.put("ssid", ssid);
             jsonObject.put("frequency", String.valueOf(frequency));
             jsonObject.put("rssi", String.valueOf(rssi));

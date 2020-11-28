@@ -8,22 +8,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class BLEFingerprint {
-    private long timestamp;
     private String name;
     private int rssi;
 
-    public BLEFingerprint(long timestamp, String name, int rssi) {
-        this.timestamp = timestamp;
+    public BLEFingerprint(String name, int rssi) {
         this.name = name;
         this.rssi = rssi;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getName() {
@@ -44,8 +34,7 @@ public class BLEFingerprint {
 
     @Override
     public String toString() {
-        return "{timestamp=" + timestamp +
-                ", name='" + name + '\'' +
+        return "{name='" + name + '\'' +
                 ", rssi=" + rssi +
                 '}';
     }
@@ -53,7 +42,6 @@ public class BLEFingerprint {
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("timestamp", String.valueOf(timestamp));
             jsonObject.put("name", name);
             jsonObject.put("rssi", String.valueOf(rssi));
         }

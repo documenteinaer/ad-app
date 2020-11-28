@@ -5,18 +5,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 class GPSFingerprint {
-    private long timestamp;
     private double latitude;
     private double longitude;
 
-    public GPSFingerprint(long timestamp, double latitude, double longitude) {
-        this.timestamp = timestamp;
+    public GPSFingerprint( double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
     }
 
     public double getLatitude() {
@@ -25,10 +19,6 @@ class GPSFingerprint {
 
     public double getLongitude() {
         return longitude;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public void setLatitude(double latitude) {
@@ -41,9 +31,7 @@ class GPSFingerprint {
 
     @Override
     public String toString() {
-        return "{" +
-                "timestamp=" + timestamp +
-                ", latitude=" + latitude +
+        return "{latitude=" + latitude +
                 ", longitude=" + longitude +
                 '}';
     }
@@ -51,7 +39,6 @@ class GPSFingerprint {
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("timestamp", String.valueOf(timestamp));
             jsonObject.put("latitude", String.valueOf(latitude));
             jsonObject.put("longitude", String.valueOf(longitude));
         }

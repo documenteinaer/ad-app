@@ -12,6 +12,7 @@ import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
+//import android.telephony.CellInfoTdscdma;
 import android.telephony.CellInfoTdscdma;
 import android.telephony.CellInfoWcdma;
 import android.telephony.CellSignalStrengthLte;
@@ -20,6 +21,8 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class TelephonyScan {
@@ -28,7 +31,7 @@ public class TelephonyScan {
 
     private TelephonyManager telephonyManager;
     private PhoneStateListener mPhoneStateListener;
-    TelephonyManager.CellInfoCallback cellInfoCallback;
+    //TelephonyManager.CellInfoCallback cellInfoCallback;
 
 
     public TelephonyScan(Context context){
@@ -66,26 +69,79 @@ public class TelephonyScan {
         mPhoneStateListener = new PhoneStateListener() {
             @Override
             public void onSignalStrengthsChanged(final SignalStrength signalStrength) {
-                telephonyManager.requestCellInfoUpdate(mContext.getMainExecutor(), cellInfoCallback);
-            }
 
-        };
+                if(Build.VERSION.SDK_INT < 29 ) {
+                    Log.d(LOG_TAG, signalStrength.toString());
 
-        cellInfoCallback = new TelephonyManager.CellInfoCallback() {
-            @Override
-            public void onCellInfo(List<CellInfo> cellInfo) {
-                //Log.d(LOG_TAG, "New data set:");
-                for (CellInfo info : cellInfo) {
-                    //Log.d(LOG_TAG, "Cell info: " + info.toString());
-                    int cid = getCid(info);
-                    int rssi = getRssi(info);
-                    int type = getType(info);
-                    //Log.d(LOG_TAG, "type="+ type +" cid="+ cid +" rssi=" + rssi);
-                    TelephonyFingerprint telephonyFingerprint = new TelephonyFingerprint(type, cid, rssi);
-                    ScanService.currentFingerprint.addTelephonyFingerprint(telephonyFingerprint);
+                    Log.i(LOG_TAG, "onSignalStrengthsChanged: " + signalStrength);
+                    if (signalStrength.isGsm()) {
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getGsmBitErrorRate "
+                                + signalStrength.getGsmBitErrorRate());
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getGsmSignalStrength "
+                                + signalStrength.getGsmSignalStrength());
+                    } else if (signalStrength.getCdmaDbm() > 0) {
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getCdmaDbm "
+                                + signalStrength.getCdmaDbm());
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getCdmaEcio "
+                                + signalStrength.getCdmaEcio());
+                    } else {
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoDbm "
+                                + signalStrength.getEvdoDbm());
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoEcio "
+                                + signalStrength.getEvdoEcio());
+                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoSnr "
+                                + signalStrength.getEvdoSnr());
+                    }
+                    // Reflection code starts from here
+                    try {
+                        Method[] methods = android.telephony.SignalStrength.class
+                                .getMethods();
+                        for (Method mthd : methods) {
+                            if (mthd.getName().equals("getLteSignalStrength")
+                                    || mthd.getName().equals("getLteRsrp")
+                                    || mthd.getName().equals("getLteRsrq")
+                                    || mthd.getName().equals("getLteRssnr")
+                                    || mthd.getName().equals("getLteCqi")) {
+                                Log.i(LOG_TAG,
+                                        "onSignalStrengthsChanged: " + mthd.getName() + " "
+                                                + mthd.invoke(signalStrength));
+                            }
+                        }
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                if(Build.VERSION.SDK_INT >= 29 ) {
+                    TelephonyManager.CellInfoCallback cellInfoCallback = new TelephonyManager.CellInfoCallback() {
+                        @Override
+                        public void onCellInfo(List<CellInfo> cellInfo) {
+                            //Log.d(LOG_TAG, "New data set:");
+                            for (CellInfo info : cellInfo) {
+                                //Log.d(LOG_TAG, "Cell info: " + info.toString());
+                                int cid = getCid(info);
+                                int rssi = getRssi(info);
+                                int type = getType(info);
+                                //Log.d(LOG_TAG, "type="+ type +" cid="+ cid +" rssi=" + rssi);
+                                TelephonyFingerprint telephonyFingerprint = new TelephonyFingerprint(type, cid, rssi);
+                                ScanService.currentFingerprint.addTelephonyFingerprint(telephonyFingerprint);
+                            }
+                        }
+                    };
+
+                    telephonyManager.requestCellInfoUpdate(mContext.getMainExecutor(), cellInfoCallback);
                 }
             }
+
         };
+
+
 
         /**
          *	Register TelephonyManager updates
@@ -119,10 +175,10 @@ public class TelephonyScan {
                 } else if (cellInfo instanceof CellInfoCdma) {
                     CellInfoCdma cellInfoCdma = (CellInfoCdma) cellInfo;
                     cid = cellInfoCdma.getCellIdentity().getBasestationId();
-                } else if (cellInfo instanceof CellInfoTdscdma) {
+                } /*else if (cellInfo instanceof CellInfoTdscdma) {
                     CellInfoTdscdma cellInfoTdscdma = (CellInfoTdscdma) cellInfo;
                     cid = cellInfoTdscdma.getCellIdentity().getCid();
-                }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,7 +197,7 @@ public class TelephonyScan {
                     rssi = cellInfoGsm.getCellSignalStrength().getDbm();
                 } else if (cellInfo instanceof CellInfoLte) {
                     CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
-                    rssi = cellInfoLte.getCellSignalStrength().getRssi();
+                    //rssi = cellInfoLte.getCellSignalStrength().getRssi();
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
                         && cellInfo instanceof CellInfoWcdma) {
                     CellInfoWcdma cellInfoLte = (CellInfoWcdma) cellInfo;
@@ -149,10 +205,10 @@ public class TelephonyScan {
                 } else if (cellInfo instanceof CellInfoCdma) {
                     CellInfoCdma cellInfoCdma = (CellInfoCdma) cellInfo;
                     rssi = cellInfoCdma.getCellSignalStrength().getDbm();
-                } else if (cellInfo instanceof CellInfoTdscdma) {
+                } /*else if (cellInfo instanceof CellInfoTdscdma) {
                     CellInfoTdscdma cellInfoTdscdma = (CellInfoTdscdma) cellInfo;
                     rssi = cellInfoTdscdma.getCellSignalStrength().getDbm();
-                }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,9 +237,9 @@ public class TelephonyScan {
                     return 3;
                 } else if (cellInfo instanceof CellInfoCdma) {
                     return 4;
-                } else if (cellInfo instanceof CellInfoTdscdma) {
+                } /*else if (cellInfo instanceof CellInfoTdscdma) {
                     return 5;
-                }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();

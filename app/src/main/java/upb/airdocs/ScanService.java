@@ -124,11 +124,11 @@ public class ScanService extends Service {
         }
 
 
-        /*new Thread(new Runnable() {
+        new Thread(new Runnable() {
             public void run() {
                 sendJSONtoServer();
             }
-        }).start();*/
+        }).start();
 
         stopForeground(true);
     }
@@ -178,15 +178,15 @@ public class ScanService extends Service {
     public void sendJSONtoServer(){
 
         try {
-            InetAddress addr = InetAddress.getByName("192.168.142.115");
-            URL url = new URL("http://"+addr.getHostAddress()+":8009");
+            //InetAddress addr = InetAddress.getByName("192.168.142.115");
+            URL url = new URL("http://192.168.142.115:8000");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
             //String jsonInputString = "{\"this\": \"is a test\", \"received\": \"ok\"}";
-            String jsonInputString = fingerprintsJSON.toString()+"\n";
+            String jsonInputString = fingerprintsJSON.toString();
             try(OutputStream os = con.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);

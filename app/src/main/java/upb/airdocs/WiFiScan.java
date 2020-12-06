@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.json.JSONObject;
 
@@ -70,8 +72,9 @@ public class WiFiScan {
             WifiFingerprint wifiItem = new WifiFingerprint(result.SSID,
                     result.frequency, result.level);
 
-
             ScanService.currentFingerprint.addWifiFingerprint(result.BSSID, wifiItem);
+
+            ScanService.currentFingerprint.addTimestamp(getTimestamp());
         }
 
         ScanService.currentFingerprint.printToLogFingerprint();
@@ -84,4 +87,12 @@ public class WiFiScan {
     public void unregisterReceiver(){
         mContext.unregisterReceiver(wifiScanReceiver);
     }
+
+    private String getTimestamp(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return formatter.format(date);
+    }
+
+
 }

@@ -13,10 +13,16 @@ import java.util.Hashtable;
 public class Fingerprint{
     private static final String LOG_TAG = "Fingerprint";
 
+    private String timestamp;
+
     private Hashtable<String,WifiFingerprint> wifiFingerprintHashtable = new Hashtable<String,WifiFingerprint>();
     private Hashtable<String,ArrayList<BLEFingerprint>> bleFingerprintHashtable = new Hashtable<String,ArrayList<BLEFingerprint>>();
     private ArrayList<GPSFingerprint> gpsFingerprintArrayList = new ArrayList<GPSFingerprint>();
     private ArrayList<TelephonyFingerprint> telephonyFingerprintArrayList = new ArrayList<TelephonyFingerprint>();
+
+    public void addTimestamp(String timestamp){
+        this.timestamp = timestamp;
+    }
 
     public void addWifiFingerprint(String hwAddress, WifiFingerprint wifiFingerprint){
         wifiFingerprintHashtable.put(hwAddress, wifiFingerprint);
@@ -42,6 +48,7 @@ public class Fingerprint{
 
     void printToLogFingerprint(){
         Log.d(LOG_TAG, "Fingerprint: ");
+        Log.d(LOG_TAG, "Timestamp: "+ timestamp);
         Log.d(LOG_TAG, "Wifi Fingerprint: ");
         Log.d(LOG_TAG, wifiFingerprintHashtable.toString());
         Log.d(LOG_TAG, "BLE Fingerprint: ");
@@ -118,6 +125,7 @@ public class Fingerprint{
             JSONArray gpsFingerprintJSON = gpsFingerprintArrayListToJSON();
             JSONArray telephonyFingerprintJSON = telephonyFingerprintArrayListToJSON();
 
+            jsonObject.put("timestamp", timestamp);
             jsonObject.put("wifi", wifiFingerprintJSON);
             jsonObject.put("ble", bleFingerprintJSON);
             jsonObject.put("gps", gpsFingerprintJSON);

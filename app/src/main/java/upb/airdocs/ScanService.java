@@ -179,7 +179,7 @@ public class ScanService extends Service {
 
         try {
             //InetAddress addr = InetAddress.getByName("192.168.142.115");
-            URL url = new URL("http://192.168.142.115:8000");
+            URL url = new URL("http://192.168.142.102:8000");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");

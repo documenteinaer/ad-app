@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +47,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        final Button sendButton = (Button) findViewById(R.id.send_fingerprints);
+        final EditText addressEditText = (EditText) findViewById(R.id.address);
+        final EditText portEditText = (EditText) findViewById(R.id.port);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String address = addressEditText.getText().toString();
+                String port = portEditText.getText().toString();
+                Log.d(LOG_TAG, "address= " + address + " port=" + port);
+            }
+        });
+
+
     }
 
 

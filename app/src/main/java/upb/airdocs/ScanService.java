@@ -19,6 +19,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,6 +42,9 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
+import android.widget.Toast;
+import android.os.Handler;
+import android.os.Message;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,6 +80,11 @@ public class ScanService extends Service {
     GPSScan gpsScan = new GPSScan(this);
     TelephonyScan telephonyScan = new TelephonyScan(this);
 
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    public static final int MSG_SEND = 1;
+    public static final int MSG_START_SCAN = 2;
+    public static final int MSG_STOP_SCAN = 3;
 
     public ScanService() {
     }
@@ -83,7 +92,7 @@ public class ScanService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mMessenger.getBinder();
     }
 
     @Override
@@ -94,42 +103,12 @@ public class ScanService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         setForeground(intent);
-
-        Log.d(LOG_TAG, "Scan service works hard here");
-        doWork();
-
         return (START_STICKY);
     }
 
     @Override
     public void onDestroy() {
         Log.d(LOG_TAG, "Destroying Scan Service.");
-        telephonyScan.unregisterPhoneStateManager();
-
-        if (wiFiScan != null) {
-            wiFiScan.unregisterReceiver();
-        }
-        if (bleScan != null) {
-            bleScan.stopScan();
-        }
-        if (gpsScan != null) {
-            gpsScan.stopScan();
-        }
-
-        try {
-            Log.d(LOG_TAG, "Final JSON:");
-            Log.d(LOG_TAG, fingerprintsJSON.toString(4));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        new Thread(new Runnable() {
-            public void run() {
-                sendJSONtoServer();
-            }
-        }).start();
-
         stopForeground(true);
     }
 
@@ -161,7 +140,7 @@ public class ScanService extends Service {
         }
     }
 
-    private void doWork() {
+    private void doScan() {
 
         wiFiScan.startScan();
 
@@ -173,13 +152,45 @@ public class ScanService extends Service {
 
     }
 
+    private void stopScan(){
+        if (telephonyScan != null) {
+            telephonyScan.unregisterPhoneStateManager();
+        }
+
+        if (wiFiScan != null) {
+            wiFiScan.unregisterReceiver();
+        }
+        if (bleScan != null) {
+            bleScan.stopScan();
+        }
+        if (gpsScan != null) {
+            gpsScan.stopScan();
+        }
+    }
+
+    private void sendFingerprintsToServer(){
+        try {
+            Log.d(LOG_TAG, "Final JSON:");
+            Log.d(LOG_TAG, fingerprintsJSON.toString(4));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        new Thread(new Runnable() {
+            public void run() {
+                sendJSONtoServer();
+            }
+        }).start();
+    }
+
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
     public void sendJSONtoServer(){
 
         try {
             //InetAddress addr = InetAddress.getByName("192.168.142.115");
-            URL url = new URL("http://192.168.142.102:8000");
+            URL url = new URL("http://192.168.142.105:8000");
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -208,8 +219,29 @@ public class ScanService extends Service {
             e.printStackTrace();
         }
 
+    }
 
-
+    // Handler of incoming messages from clients.
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_SEND:
+                    String address = ((ServerAddress)msg.obj).getAddress();
+                    String port = ((ServerAddress)msg.obj).getPort();
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
+                    sendFingerprintsToServer();
+                    break;
+                case MSG_START_SCAN:
+                    doScan();
+                    break;
+                case MSG_STOP_SCAN:
+                    stopScan();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
     }
 
 

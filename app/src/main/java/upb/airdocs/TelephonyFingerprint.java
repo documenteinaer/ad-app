@@ -5,19 +5,23 @@ import org.json.JSONObject;
 
 public class TelephonyFingerprint {
     /* TYPE = 1 for GSM
-TYPE = 2 for LTE
-TYPE = 3 for WCDMA
-TYPE = 4 for CDMA
-TYPE = 5 for TDSCDMA
+TYPE = 2 for WCDMA
+TYPE = 3 for CDMA
+TYPE = 4 for TDSCDMA
+TYPE = 5 for LTE
  */
     private int type;
     private int cid;
     private int rssi;
+    private int mcc;
+    private int mnc;
 
-    public TelephonyFingerprint(int type, int cid, int rssi) {
+    public TelephonyFingerprint(int type, int cid, int rssi, int mcc, int mnc) {
         this.type = type;
         this.cid = cid;
         this.rssi = rssi;
+        this.mcc = mcc;
+        this.mnc = mnc;
     }
 
     public int getType() {
@@ -45,12 +49,30 @@ TYPE = 5 for TDSCDMA
         this.rssi = rssi;
     }
 
+    public int getMcc() {
+        return mcc;
+    }
+
+    public void setMcc(int mcc) {
+        this.mcc = mcc;
+    }
+
+    public int getMnc() {
+        return mnc;
+    }
+
+    public void setMnc(int mnc) {
+        this.mnc = mnc;
+    }
+
     @Override
     public String toString() {
-        return "{" +
+        return "TelephonyFingerprint{" +
                 "type=" + type +
                 ", cid=" + cid +
                 ", rssi=" + rssi +
+                ", mcc=" + mcc +
+                ", mnc=" + mnc +
                 '}';
     }
 
@@ -60,6 +82,8 @@ TYPE = 5 for TDSCDMA
             jsonObject.put("type", String.valueOf(type));
             jsonObject.put("cid", String.valueOf(cid));
             jsonObject.put("rssi", String.valueOf(rssi));
+            jsonObject.put("mcc", String.valueOf(mcc));
+            jsonObject.put("mnc", String.valueOf(mnc));
         }
         catch(JSONException e){
             e.printStackTrace();

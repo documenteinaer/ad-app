@@ -168,7 +168,7 @@ public class ScanService extends Service {
         }
     }
 
-    private void sendFingerprintsToServer(){
+    private void sendFingerprintsToServer(final String address, final String port){
         try {
             Log.d(LOG_TAG, "Final JSON:");
             Log.d(LOG_TAG, fingerprintsJSON.toString(4));
@@ -179,18 +179,17 @@ public class ScanService extends Service {
 
         new Thread(new Runnable() {
             public void run() {
-                sendJSONtoServer();
+                sendJSONtoServer(address, port);
             }
         }).start();
     }
 
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
-    public void sendJSONtoServer(){
+    public void sendJSONtoServer(String address, String port){
 
         try {
-            //InetAddress addr = InetAddress.getByName("192.168.142.115");
-            URL url = new URL("http://192.168.142.105:8000");
+            URL url = new URL("http://"+address+":"+port);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -230,7 +229,7 @@ public class ScanService extends Service {
                     String address = ((ServerAddress)msg.obj).getAddress();
                     String port = ((ServerAddress)msg.obj).getPort();
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
-                    sendFingerprintsToServer();
+                    sendFingerprintsToServer(address, port);
                     break;
                 case MSG_START_SCAN:
                     doScan();

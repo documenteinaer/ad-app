@@ -37,14 +37,19 @@ public class BLEScan {
             }, SCAN_PERIOD);*/
 
             mScanning = true;
-            bluetoothLeScanner.startScan(leScanCallback);
+
+            if (leScanCallback != null) {
+                bluetoothLeScanner.startScan(leScanCallback);
+            }
         }
     }
 
     public void stopScan(){
         if (mScanning == true){
             mScanning = false;
-            bluetoothLeScanner.stopScan(leScanCallback);
+            if (leScanCallback != null) {
+                bluetoothLeScanner.stopScan(leScanCallback);
+            }
         }
 
     }

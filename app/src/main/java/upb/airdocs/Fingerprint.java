@@ -14,6 +14,7 @@ public class Fingerprint{
     private static final String LOG_TAG = "Fingerprint";
 
     private String timestamp;
+    private String imei;
 
     private Hashtable<String,WifiFingerprint> wifiFingerprintHashtable = new Hashtable<String,WifiFingerprint>();
     private Hashtable<String,ArrayList<BLEFingerprint>> bleFingerprintHashtable = new Hashtable<String,ArrayList<BLEFingerprint>>();
@@ -22,6 +23,9 @@ public class Fingerprint{
 
     public void addTimestamp(String timestamp){
         this.timestamp = timestamp;
+    }
+    public void addImei(String imei){
+        this.imei = imei;
     }
 
     public void addWifiFingerprint(String hwAddress, WifiFingerprint wifiFingerprint){
@@ -49,6 +53,7 @@ public class Fingerprint{
     void printToLogFingerprint(){
         Log.d(LOG_TAG, "Fingerprint: ");
         Log.d(LOG_TAG, "Timestamp: "+ timestamp);
+        Log.d(LOG_TAG, "IMEI: "+ imei);
         Log.d(LOG_TAG, "Wifi Fingerprint: ");
         Log.d(LOG_TAG, wifiFingerprintHashtable.toString());
         Log.d(LOG_TAG, "BLE Fingerprint: ");
@@ -126,6 +131,7 @@ public class Fingerprint{
             JSONArray telephonyFingerprintJSON = telephonyFingerprintArrayListToJSON();
 
             jsonObject.put("timestamp", timestamp);
+            jsonObject.put("imei", imei);
             jsonObject.put("wifi", wifiFingerprintJSON);
             jsonObject.put("ble", bleFingerprintJSON);
             jsonObject.put("gps", gpsFingerprintJSON);

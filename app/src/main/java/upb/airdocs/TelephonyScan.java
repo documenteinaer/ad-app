@@ -60,7 +60,7 @@ public class TelephonyScan {
             //Log.d(LOG_TAG, "New data set:");
 
             for (CellInfo cellInfo : cellInfos) {
-                //Log.d(LOG_TAG, "Cell info: " + cellInfo.toString());
+                Log.d(LOG_TAG, "Cell info: " + cellInfo.toString());
                 int cid = getCid(cellInfo);
                 if (cid != 2147483647) {
                     int rssi = getRssi(cellInfo);
@@ -91,33 +91,13 @@ public class TelephonyScan {
                         Log.d(LOG_TAG, "dbm of current connection: " + mSignalStrength);
                     }
 
-                    /*
-                    //if (signalStrength.isGsm()) {
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getGsmBitErrorRate "
-                                + signalStrength.getGsmBitErrorRate());
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getGsmSignalStrength "
-                                + signalStrength.getGsmSignalStrength());
-                    //} else if (signalStrength.getCdmaDbm() > 0) {
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getCdmaDbm "
-                                + signalStrength.getCdmaDbm());
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getCdmaEcio "
-                                + signalStrength.getCdmaEcio());
-                    //} else {
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoDbm "
-                                + signalStrength.getEvdoDbm());
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoEcio "
-                                + signalStrength.getEvdoEcio());
-                        Log.i(LOG_TAG, "onSignalStrengthsChanged: getEvdoSnr "
-                                + signalStrength.getEvdoSnr());
-                   // }*/
-
                     if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
 
                         List<CellInfo> cellInfos = telephonyManager.getAllCellInfo();
 
                         for (CellInfo cellInfo : cellInfos) {
-                            //Log.d(LOG_TAG, "Cell info: " + cellInfo.toString());
+                            Log.d(LOG_TAG, "Cell info: " + cellInfo.toString());
                             int cid = getCid(cellInfo);
                             if (cid != 2147483647) {
                                 int rssi = getRssi(cellInfo);
@@ -140,7 +120,7 @@ public class TelephonyScan {
                         public void onCellInfo(List<CellInfo> cellInfo) {
 
                             for (CellInfo info : cellInfo) {
-                                //Log.d(LOG_TAG, "Cell info: " + info.toString());
+                                Log.d(LOG_TAG, "Cell info: " + info.toString());
                                 int cid = getCid(info);
 
                                 if (cid != 2147483647) {
@@ -319,6 +299,16 @@ public class TelephonyScan {
         }
 
         return mnc;
+    }
+
+    public String getIMEI(){
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (telephonyManager != null) {
+                return telephonyManager.getDeviceId();
+            }
+        }
+        return null;
     }
 
 }

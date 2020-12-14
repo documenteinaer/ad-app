@@ -75,6 +75,7 @@ public class WiFiScan {
             ScanService.currentFingerprint.addWifiFingerprint(result.BSSID, wifiItem);
 
             ScanService.currentFingerprint.addTimestamp(getTimestamp());
+            ScanService.currentFingerprint.addImei(ScanService.IMEI);
         }
 
         ScanService.currentFingerprint.printToLogFingerprint();

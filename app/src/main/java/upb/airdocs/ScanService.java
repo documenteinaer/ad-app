@@ -86,6 +86,8 @@ public class ScanService extends Service {
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
 
+    public static String IMEI=null;
+
     public ScanService() {
     }
 
@@ -149,6 +151,9 @@ public class ScanService extends Service {
         gpsScan.startScan();
 
         telephonyScan.startScan();
+
+        IMEI = telephonyScan.getIMEI();
+        Log.d(LOG_TAG, "IMEI="+IMEI);
 
     }
 

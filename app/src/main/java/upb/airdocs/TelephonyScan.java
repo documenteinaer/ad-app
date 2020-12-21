@@ -301,14 +301,4 @@ public class TelephonyScan {
         return mnc;
     }
 
-    public String getIMEI(){
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED) {
-            if (telephonyManager != null) {
-                return telephonyManager.getDeviceId();
-            }
-        }
-        return null;
-    }
-
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -19,6 +20,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.io.IOException;
+import com.google.android.gms.ads.*;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "MainActivity";
@@ -38,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestAllPermissions();
 
-        startService();
+        AsyncTaskRunner runner = new AsyncTaskRunner();
+        runner.execute();
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
@@ -147,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    public void startService() {
+    public void startService(String devID) {
         Intent serviceIntent = new Intent(this, ScanService.class);
-        //serviceIntent.putExtra("inputExtra", "Scan Service");
+        serviceIntent.putExtra("devID", devID);
         ContextCompat.startForegroundService(this, serviceIntent);
         bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -175,4 +185,49 @@ public class MainActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    private String  getID(){
+        if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            //Google Play Services are available
+            AdvertisingIdClient.Info adInfo = null;
+
+            try {
+                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(this);
+                if (adInfo != null) {
+                    String AdId = adInfo.getId();
+                    return AdId;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (GooglePlayServicesRepairableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String id;
+            try {
+                id = getID();
+            } catch (Exception e) {
+                e.printStackTrace();
+                id = null;
+            }
+            return id;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            startService(result);
+        }
+    }
+
 }

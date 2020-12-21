@@ -1,48 +1,17 @@
 package upb.airdocs;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.telephony.AccessNetworkConstants;
-import android.telephony.CellIdentityCdma;
-import android.telephony.CellIdentityGsm;
-import android.telephony.CellIdentityLte;
-import android.telephony.CellIdentityWcdma;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellInfoWcdma;
-import android.telephony.NeighboringCellInfo;
-import android.telephony.NetworkScanRequest;
-import android.telephony.PhoneStateListener;
-import android.telephony.RadioAccessSpecifier;
-import android.telephony.ServiceState;
-import android.telephony.SignalStrength;
-import android.telephony.TelephonyManager;
-import android.telephony.TelephonyScanManager;
 import android.util.Log;
-import android.widget.Toast;
 import android.os.Handler;
 import android.os.Message;
 
@@ -54,13 +23,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public class ScanService extends Service {
@@ -86,7 +51,7 @@ public class ScanService extends Service {
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
 
-    public static String IMEI=null;
+    public static String id = null;
 
     public ScanService() {
     }
@@ -104,6 +69,8 @@ public class ScanService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        id = intent.getStringExtra("devID");
+        Log.d(LOG_TAG,"DeviceID=" + id);
         setForeground(intent);
         return (START_STICKY);
     }
@@ -151,9 +118,6 @@ public class ScanService extends Service {
         gpsScan.startScan();
 
         telephonyScan.startScan();
-
-        IMEI = telephonyScan.getIMEI();
-        Log.d(LOG_TAG, "IMEI="+IMEI);
 
     }
 

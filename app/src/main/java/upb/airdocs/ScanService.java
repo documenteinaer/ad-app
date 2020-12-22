@@ -17,6 +17,7 @@ import android.os.Message;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,10 +36,10 @@ public class ScanService extends Service {
 
     private final int PHONE_STATE_REQUEST = 1;
 
-    public static List<Fingerprint> itemList = new ArrayList<Fingerprint>();
     public static Fingerprint currentFingerprint = new Fingerprint();
+    public static FingerprintCollection currentFingerprintCollection = new FingerprintCollection();
+    public static List<FingerprintCollection> collectionsList = new ArrayList<FingerprintCollection>();
 
-    public static JSONArray fingerprintsJSON = new JSONArray();
 
     WiFiScan wiFiScan = new WiFiScan(this);
     BLEScan bleScan = new BLEScan(this);
@@ -51,7 +52,7 @@ public class ScanService extends Service {
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
 
-    public static String id = null;
+    public static String devId = null;
 
     public ScanService() {
     }
@@ -69,8 +70,8 @@ public class ScanService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        id = intent.getStringExtra("devID");
-        Log.d(LOG_TAG,"DeviceID=" + id);
+        devId = intent.getStringExtra("devID");
+        Log.d(LOG_TAG,"DeviceID=" + devId);
         setForeground(intent);
         return (START_STICKY);
     }
@@ -110,6 +111,7 @@ public class ScanService extends Service {
     }
 
     private void doScan() {
+        currentFingerprintCollection.setDevId(devId);
 
         wiFiScan.startScan();
 
@@ -122,6 +124,8 @@ public class ScanService extends Service {
     }
 
     private void stopScan(){
+        saveAndRenewCollection();
+
         if (telephonyScan != null) {
             telephonyScan.unregisterPhoneStateManager();
         }
@@ -138,9 +142,10 @@ public class ScanService extends Service {
     }
 
     private void sendFingerprintsToServer(final String address, final String port){
+        final JSONObject fingerprintCollectionsJSON = buildFinalJSON();
         try {
             Log.d(LOG_TAG, "Final JSON:");
-            Log.d(LOG_TAG, fingerprintsJSON.toString(4));
+            Log.d(LOG_TAG, fingerprintCollectionsJSON.toString(4));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -148,14 +153,14 @@ public class ScanService extends Service {
 
         new Thread(new Runnable() {
             public void run() {
-                sendJSONtoServer(address, port);
+                sendJSONtoServer(address, port, fingerprintCollectionsJSON);
             }
         }).start();
     }
 
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
-    public void sendJSONtoServer(String address, String port){
+    public void sendJSONtoServer(String address, String port, JSONObject jsonObject){
 
         try {
             URL url = new URL("http://"+address+":"+port);
@@ -165,7 +170,7 @@ public class ScanService extends Service {
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
             //String jsonInputString = "{\"this\": \"is a test\", \"received\": \"ok\"}";
-            String jsonInputString = fingerprintsJSON.toString();
+            String jsonInputString = jsonObject.toString();
             try(OutputStream os = con.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
@@ -179,6 +184,8 @@ public class ScanService extends Service {
                     response.append(responseLine.trim());
                 }
                 Log.d(LOG_TAG, response.toString());
+
+                collectionsList = new ArrayList<FingerprintCollection>();
             }
 
         } catch (MalformedURLException e) {
@@ -211,6 +218,43 @@ public class ScanService extends Service {
             }
         }
     }
+    private void saveAndRenewCollection(){
+        if (currentFingerprintCollection != null){
+                //Log.d(LOG_TAG, "-------Saving collection-------");
+                //currentFingerprintCollection.printToLogFingerprint();
+                //Log.d(LOG_TAG, "-------------------------------");
+                collectionsList.add(currentFingerprintCollection);
+                currentFingerprintCollection = new FingerprintCollection();
+                currentFingerprint = new Fingerprint();
 
+        }
+
+        //printCollectionsList();
+    }
+
+    private JSONObject buildFinalJSON(){
+        JSONObject jsonObject = new JSONObject();
+
+        try{
+            for (int i = 0; i < collectionsList.size(); i++) {
+                FingerprintCollection fingerprintCollection = collectionsList.get(i);
+                jsonObject.put("collection"+i, fingerprintCollection.toJSON());
+            }
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return jsonObject;
+
+    }
+
+    private void printCollectionsList(){
+        for (int i = 0; i < collectionsList.size(); i++) {
+            Log.d(LOG_TAG, "------Print colection "+ i+"----------");
+            FingerprintCollection fingerprintCollection = collectionsList.get(i);
+            fingerprintCollection.printToLogFingerprint();
+            Log.d(LOG_TAG, "---------------------------");
+        }
+    }
 
 }

@@ -73,14 +73,11 @@ public class WiFiScan {
                     result.frequency, result.level);
 
             ScanService.currentFingerprint.addWifiFingerprint(result.BSSID, wifiItem);
-            ScanService.currentFingerprint.addID(ScanService.id);
             ScanService.currentFingerprint.addTimestamp(getTimestamp());
         }
 
         ScanService.currentFingerprint.printToLogFingerprint();
-        ScanService.itemList.add(ScanService.currentFingerprint);
-        JSONObject fingerprintJSON = ScanService.currentFingerprint.toJSON();
-        ScanService.fingerprintsJSON.put(fingerprintJSON);
+        ScanService.currentFingerprintCollection.addFingerprintToCollection(ScanService.currentFingerprint);
         ScanService.currentFingerprint = new Fingerprint();
     }
 

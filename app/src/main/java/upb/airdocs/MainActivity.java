@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     // Flag indicating whether we have called bind on the service.
     boolean mBound;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +52,15 @@ public class MainActivity extends AppCompatActivity {
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
 
+        final EditText comment = (EditText) findViewById(R.id.comment);;
+
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 if (scanActive == false){
                     if (permissionGranted == true) {
-                        onStartScan();
+                        onStartScan(comment.getText().toString());
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
                     }
@@ -104,10 +108,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onStartScan(){
+    public void onStartScan(String comment){
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0);
+            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, comment);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {

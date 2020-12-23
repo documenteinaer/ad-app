@@ -13,7 +13,7 @@ public class FingerprintCollection{
     private static final String LOG_TAG = "FingerprintCollection";
 
     private String devId="-";
-    private String devName="-";
+    private String devName=android.os.Build.MODEL;;
     private String comment="-";
     private String map="-";
     private int x=-1;

@@ -60,6 +60,8 @@ public class MapGalleryActivity extends Activity
             public void onItemClick(AdapterView parent,
                                     View v, int position, long id)
             {
+                ImageView imageView = (ImageView) findViewById(R.id.image1);
+                imageView.setImageResource(imageIDs[position]);
                 Toast.makeText(getBaseContext(),
                         "Map " + names[position] + " selected",
                         Toast.LENGTH_SHORT).show();

@@ -14,16 +14,17 @@ android:layout_height="fill_parent"
     android:id="@+id/gallery1"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" />
-<ImageView
-    android:id="@+id/image1"
-    android:layout_width="320px"
-    android:layout_height="250px"
-    android:scaleType="fitXY" />
+
+    <ImageView
+        android:id="@+id/image1"
+        android:layout_width="match_parent"
+        android:layout_height="331dp"
+        android:scaleType="fitXY" />
 
     <Button
         android:id="@+id/back_from_gallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back" />
+        android:text="Button" />
 
 </LinearLayout>

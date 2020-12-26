@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean scanActive = false;
     private boolean permissionGranted = false;
 
+    public static String selectedMap = null;
+
+
+
     //  Messenger for communicating with the service.
     Messenger mMessenger = null;
     // Flag indicating whether we have called bind on the service.
@@ -52,7 +56,17 @@ public class MainActivity extends AppCompatActivity {
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
 
-        final EditText comment = (EditText) findViewById(R.id.comment);;
+        final Button selectMapButton = (Button) findViewById(R.id.select_map);
+        selectMapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), MapGalleryActivity.class));
+            }
+        });
+
+
+
+
+        final EditText comment = (EditText) findViewById(R.id.comment);
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
@@ -234,4 +248,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (selectedMap != null) {
+            final EditText mapName = (EditText) findViewById(R.id.map_name);
+            mapName.setText(selectedMap);
+        }
+    }
 }

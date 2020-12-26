@@ -25,6 +25,6 @@ android:layout_height="fill_parent"
         android:id="@+id/back_from_gallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Back" />
 
 </LinearLayout>

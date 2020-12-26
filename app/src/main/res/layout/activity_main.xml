@@ -99,7 +99,7 @@
         android:inputType="textPersonName"
         android:text="Comentariu"
         app:layout_constraintBottom_toTopOf="@+id/start_scan"
-        app:layout_constraintStart_toStartOf="@+id/button3" />
+        app:layout_constraintStart_toStartOf="@+id/select_point" />
 
     <Button
         android:id="@+id/select_map"
@@ -118,7 +118,7 @@
         app:layout_constraintVertical_bias="0.017" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/select_point"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -140,7 +140,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="precis_parter.png"
+        android:text="precis_subsol.png.png"
         app:layout_constraintBottom_toBottomOf="@+id/select_map"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -153,7 +153,7 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="X"
-        app:layout_constraintBottom_toBottomOf="@+id/button3"
+        app:layout_constraintBottom_toBottomOf="@+id/select_point"
         app:layout_constraintEnd_toStartOf="@+id/coordinate_y" />
 
 </android.support.constraint.ConstraintLayout>

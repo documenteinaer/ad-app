@@ -45,6 +45,9 @@
 
         <activity android:name="MapGalleryActivity"
             android:label="@string/app_name" />
+
+        <activity android:name="SelectPointActivity"
+            android:label="AirDocs" />
     </application>
 
 </manifest>

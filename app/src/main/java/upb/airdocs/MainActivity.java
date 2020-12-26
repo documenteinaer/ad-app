@@ -35,7 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean scanActive = false;
     private boolean permissionGranted = false;
 
-    public static String selectedMap = null;
+    public static String selectedMap = "precis_subsol.png";
+    public static int selectedMapID = R.drawable.precis_subsol;
+    public static int x = -1;
+    public static int y = -1;
 
 
 
@@ -63,7 +66,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        final Button selectPointButton = (Button) findViewById(R.id.select_point);
+        selectPointButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), SelectPointActivity.class));
+            }
+        });
 
 
         final EditText comment = (EditText) findViewById(R.id.comment);

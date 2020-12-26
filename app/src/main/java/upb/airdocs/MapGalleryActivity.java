@@ -67,6 +67,7 @@ public class MapGalleryActivity extends Activity
                         Toast.LENGTH_SHORT).show();
 
                 MainActivity.selectedMap = names[position];
+                MainActivity.selectedMapID = imageIDs[position];
             }
         });
 

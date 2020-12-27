@@ -16,8 +16,8 @@ public class FingerprintCollection{
     private String devName=android.os.Build.MODEL;;
     private String comment="-";
     private String map="-";
-    private int x=-1;
-    private int y=-1;
+    private float x=-1;
+    private float y=-1;
     public List<Fingerprint> itemList = new ArrayList<Fingerprint>();
 
     public void setDevId(String devId) {
@@ -36,11 +36,11 @@ public class FingerprintCollection{
         this.map = map;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 

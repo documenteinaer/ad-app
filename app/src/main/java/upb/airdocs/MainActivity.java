@@ -132,8 +132,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStartScan(String comment){
         if (mBound) {
+            AuxObj auxObj = new AuxObj(comment, selectedMap, x, y);
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, comment);
+            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, auxObj);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {

@@ -208,8 +208,11 @@ public class ScanService extends Service {
                     sendFingerprintsToServer(address, port);
                     break;
                 case MSG_START_SCAN:
-                    String comment = (String)msg.obj;
-                    currentFingerprintCollection.setComment(comment);
+                    AuxObj auxObj = (AuxObj)msg.obj;
+                    currentFingerprintCollection.setComment(auxObj.comment);
+                    currentFingerprintCollection.setMap(auxObj.map);
+                    currentFingerprintCollection.setX(auxObj.x);
+                    currentFingerprintCollection.setY(auxObj.y);
                     doScan();
                     break;
                 case MSG_STOP_SCAN:

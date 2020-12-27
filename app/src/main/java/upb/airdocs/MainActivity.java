@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static String selectedMap = "precis_subsol.png";
     public static int selectedMapID = R.drawable.precis_subsol;
-    public static int x = -1;
-    public static int y = -1;
+    public static float x = -1;
+    public static float y = -1;
 
 
 
@@ -262,6 +262,12 @@ public class MainActivity extends AppCompatActivity {
         if (selectedMap != null) {
             final EditText mapName = (EditText) findViewById(R.id.map_name);
             mapName.setText(selectedMap);
+        }
+        if (x >= 0 && y >= 0){
+            final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
+            coordinateX.setText(Float.toString(x));
+            final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
+            coordinateY.setText(Float.toString(y));
         }
     }
 }

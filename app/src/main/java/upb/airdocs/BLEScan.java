@@ -7,14 +7,15 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.os.Handler;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class BLEScan {
     Context mContext;
     private static final String LOG_TAG = "BLEScan";
-    private BluetoothLeScanner bluetoothLeScanner =
-            BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
+    private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothLeScanner bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
     private boolean mScanning = false;
     private Handler handler = new Handler();
 
@@ -26,8 +27,9 @@ public class BLEScan {
     private static final long SCAN_PERIOD = 180000;
 
     public void startScan() {
-        if (mScanning == false) {
-            // Stops scanning after a pre-defined scan period.
+        if (mBluetoothAdapter.isEnabled()) {
+            if (mScanning == false) {
+                // Stops scanning after a pre-defined scan period.
             /*handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -36,11 +38,17 @@ public class BLEScan {
                 }
             }, SCAN_PERIOD);*/
 
-            mScanning = true;
+                mScanning = true;
 
-            if (leScanCallback != null) {
-                bluetoothLeScanner.startScan(leScanCallback);
+                if (leScanCallback != null) {
+                    bluetoothLeScanner.startScan(leScanCallback);
+                }
             }
+        }
+        else{
+            Toast.makeText(mContext,
+                    "Bluetooth is not enabled. BLE will be excluded from the scan.",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

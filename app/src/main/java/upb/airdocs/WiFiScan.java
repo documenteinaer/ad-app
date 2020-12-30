@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -24,17 +26,26 @@ public class WiFiScan {
         mContext = context;
     }
 
-    public void startScan(){
+    public boolean startScan(){
         //Log.d(LOG_TAG, "Obtaining the WiFi Manager");
         mWifiManager = (WifiManager)
                 mContext.getSystemService(Context.WIFI_SERVICE);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        mContext.registerReceiver(wifiScanReceiver, intentFilter);
+        if (mWifiManager.isWifiEnabled()) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+            mContext.registerReceiver(wifiScanReceiver, intentFilter);
 
-        if (mWifiManager != null) {
-            //Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
-            mWifiManager.startScan();
+            if (mWifiManager != null) {
+                //Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
+                mWifiManager.startScan();
+            }
+            return true;
+        }
+        else{
+            Toast.makeText(mContext,
+                    "WiFi is not enabled. Scan will not start.",
+                    Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 

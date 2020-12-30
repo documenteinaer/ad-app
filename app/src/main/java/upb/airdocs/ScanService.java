@@ -54,6 +54,8 @@ public class ScanService extends Service {
 
     public static String devId = null;
 
+    private boolean scanning = false;
+
     public ScanService() {
     }
 
@@ -113,31 +115,35 @@ public class ScanService extends Service {
     private void doScan() {
         currentFingerprintCollection.setDevId(devId);
 
-        wiFiScan.startScan();
+        scanning = wiFiScan.startScan();
 
-        bleScan.startScan();
-
-        gpsScan.startScan();
-
-        telephonyScan.startScan();
+        if (scanning) {
+            bleScan.startScan();
+            gpsScan.startScan();
+            telephonyScan.startScan();
+        }
 
     }
 
     private void stopScan(){
-        saveAndRenewCollection();
 
-        if (telephonyScan != null) {
-            telephonyScan.unregisterPhoneStateManager();
-        }
+        if (scanning) {
+            scanning = false;
+            saveAndRenewCollection();
 
-        if (wiFiScan != null) {
-            wiFiScan.unregisterReceiver();
-        }
-        if (bleScan != null) {
-            bleScan.stopScan();
-        }
-        if (gpsScan != null) {
-            gpsScan.stopScan();
+            if (telephonyScan != null) {
+                telephonyScan.unregisterPhoneStateManager();
+            }
+
+            if (wiFiScan != null) {
+                wiFiScan.unregisterReceiver();
+            }
+            if (bleScan != null) {
+                bleScan.stopScan();
+            }
+            if (gpsScan != null) {
+                gpsScan.stopScan();
+            }
         }
     }
 

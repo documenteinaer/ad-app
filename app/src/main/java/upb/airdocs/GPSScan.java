@@ -36,21 +36,33 @@ public class GPSScan implements LocationListener {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             Log.d(LOG_TAG, "Not enought permissions");
+            Toast.makeText(mContext,
+                    "Location permission is not granted.",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+            Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         /*if (lastLocation != null) {
             String str = "Last GPS location was: " + lastLocation.getElapsedRealtimeNanos() + " "
                     + lastLocation.getLatitude() + " " + lastLocation.getLongitude();
             Log.d(LOG_TAG, str);
         } */
-        //Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
+            //Toast.makeText(mContext.getApplicationContext(), str, Toast.LENGTH_LONG).show();
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000,   // 1 sec
-                0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    1000,   // 1 sec
+                    0, this);
+
+        }
+        else{
+            Toast.makeText(mContext,
+                    "GPS is not enabled. GPS will be excluded from the scan.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

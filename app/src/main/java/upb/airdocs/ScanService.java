@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Message;
@@ -51,6 +53,8 @@ public class ScanService extends Service {
     public static final int MSG_SEND = 1;
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
+
+    public static final int ACT_STOP_SCAN = 1;
 
     public static String devId = null;
 
@@ -121,6 +125,9 @@ public class ScanService extends Service {
             bleScan.startScan();
             gpsScan.startScan();
             telephonyScan.startScan();
+        }
+        else{
+            stopScanInActivity();
         }
 
     }
@@ -266,6 +273,14 @@ public class ScanService extends Service {
             fingerprintCollection.printToLogFingerprint();
             Log.d(LOG_TAG, "---------------------------");
         }
+    }
+
+    private void stopScanInActivity(){
+        // The string "my-integer" will be used to filer the intent
+        Intent intent = new Intent("msg");
+        // Adding some data
+        intent.putExtra("message", ACT_STOP_SCAN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 }

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -27,6 +28,16 @@ public class WiFiScan {
     }
 
     public boolean startScan(){
+
+        LocationManager locationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            Toast.makeText(mContext,
+                    "Network Provider disabled. Cannot start scan. Please enable Location Services.",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+
         //Log.d(LOG_TAG, "Obtaining the WiFi Manager");
         mWifiManager = (WifiManager)
                 mContext.getSystemService(Context.WIFI_SERVICE);
@@ -36,7 +47,7 @@ public class WiFiScan {
             mContext.registerReceiver(wifiScanReceiver, intentFilter);
 
             if (mWifiManager != null) {
-                //Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
+                Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
                 mWifiManager.startScan();
             }
             return true;
@@ -57,7 +68,7 @@ public class WiFiScan {
             boolean success = intent.getBooleanExtra(
                     WifiManager.EXTRA_RESULTS_UPDATED, false);
             if (success) {
-                //Log.d(LOG_TAG, "WiFi Scanned successfully");
+                Log.d(LOG_TAG, "WiFi Scanned successfully");
                 scanSuccess();
             } else {
                 // scan failure handling
@@ -65,7 +76,7 @@ public class WiFiScan {
             }
 
             if (mWifiManager != null) {
-                //Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
+                Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
                 mWifiManager.startScan();
             }
 

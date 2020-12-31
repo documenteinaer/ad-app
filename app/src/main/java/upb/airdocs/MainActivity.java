@@ -1,18 +1,22 @@
 package upb.airdocs;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     boolean mBound;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final EditText comment = (EditText) findViewById(R.id.comment);
+
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +264,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("msg"));
+
         if (selectedMap != null) {
             final EditText mapName = (EditText) findViewById(R.id.map_name);
             mapName.setText(selectedMap);
@@ -270,5 +277,27 @@ public class MainActivity extends AppCompatActivity {
             final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
             coordinateY.setText(Float.toString(y));
         }
+    }
+
+
+    // Handling the received Intents for the "my-integer" event
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            int msg = intent.getIntExtra("message",-1/*default value*/);
+            if (msg == ScanService.ACT_STOP_SCAN){
+                scanActive = false;
+                Button startScanButton = (Button) findViewById(R.id.start_scan);
+                startScanButton.setText("Start Scan");
+            }
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        // Unregister since the activity is not visible
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+        super.onPause();
     }
 }

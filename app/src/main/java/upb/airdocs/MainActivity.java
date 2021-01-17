@@ -301,6 +301,20 @@ public class MainActivity extends AppCompatActivity {
                         numberOfTotalScans + " scans in total\n"+
                         collections + " collections");
             }
+            if (msg == ScanService.UPDATE_SEND_STATUS){
+                Log.d(LOG_TAG, "Intent received");
+                int sent = intent.getIntExtra("sent", -1);
+                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
+                if (sent == 1) {
+                    sendStatus.setText("Sent successfully");
+                }
+                else if (sent == 0){
+                    sendStatus.setText("Send failed");
+                }
+                else{
+                    sendStatus.setText("Unsent");
+                }
+            }
         }
     };
 

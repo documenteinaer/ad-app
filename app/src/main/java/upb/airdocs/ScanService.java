@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,6 +57,7 @@ public class ScanService extends Service {
 
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
+    public static final int UPDATE_SEND_STATUS = 3;
 
     public static String devId = null;
 
@@ -64,7 +66,7 @@ public class ScanService extends Service {
     public static int numberOfScansInCollection = 0;
     public static int numberOfTotalScans = 0;
     public static int numberOfCollections = 0;
-    public static int sent = 0;
+    public static int sent = -1;
 
     public ScanService() {
     }
@@ -198,6 +200,13 @@ public class ScanService extends Service {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
+            catch(ConnectException e) {
+                sent = 0;
+                e.printStackTrace();
+                Log.d(LOG_TAG, "Failed");
+                displaySendStatus();
+                return;
+            }
 
             try(BufferedReader br = new BufferedReader(
                     new InputStreamReader(con.getInputStream(), "utf-8"))) {
@@ -208,17 +217,30 @@ public class ScanService extends Service {
                 }
                 Log.d(LOG_TAG, response.toString());
 
-                collectionsList = new ArrayList<FingerprintCollection>();
-                numberOfCollections = 0;
-                numberOfScansInCollection = 0;
-                numberOfTotalScans = 0;
-                displayNumberOfScans();
-                sent = 1;
+                if (response.toString().equals("<html><body><h1>Successful POST</h1></body></html>")){
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                    displayNumberOfScans();
+                    sent = 1;
+                    Log.d(LOG_TAG, "Success");
+                    displaySendStatus();
+                }
+                else{
+                    Log.d(LOG_TAG, "Failed");
+                    sent = 0;
+                    displaySendStatus();
+                }
+
+
             }
 
         } catch (MalformedURLException e) {
+            sent = 0;
             e.printStackTrace();
         } catch (IOException e) {
+            sent = 0;
             e.printStackTrace();
         }
 
@@ -305,6 +327,15 @@ public class ScanService extends Service {
         intent.putExtra("totalscans", ScanService.numberOfTotalScans);
         intent.putExtra("collections", ScanService.numberOfCollections);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void displaySendStatus(){
+        Intent intent = new Intent("msg");
+        intent.putExtra("message", UPDATE_SEND_STATUS);
+        intent.putExtra("sent", sent);
+        Log.d(LOG_TAG, "Trying to send Intent");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
     }
 
 }

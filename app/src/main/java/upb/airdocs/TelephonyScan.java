@@ -199,7 +199,12 @@ public class TelephonyScan {
                     rssi = cellInfoGsm.getCellSignalStrength().getDbm();
                 } else if (cellInfo instanceof CellInfoLte) {
                     CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
-                    rssi = cellInfoLte.getCellSignalStrength().getRssi();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        rssi = cellInfoLte.getCellSignalStrength().getRssi();
+                    }
+                    else{
+                        rssi = cellInfoLte.getCellSignalStrength().getDbm();
+                    }
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
                         && cellInfo instanceof CellInfoWcdma) {
                     CellInfoWcdma cellInfoLte = (CellInfoWcdma) cellInfo;

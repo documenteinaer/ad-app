@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -290,6 +291,15 @@ public class MainActivity extends AppCompatActivity {
                 scanActive = false;
                 Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
+            }
+            if (msg == ScanService.UPDATE_SCAN_NUMBERS){
+                int numberOfScansInCollection = intent.getIntExtra("collectionscans", 0);
+                int numberOfTotalScans = intent.getIntExtra("totalscans", 0);
+                int collections = intent.getIntExtra("collections", 0);
+                final TextView scans = (TextView) findViewById(R.id.number_of_scans);
+                scans.setText(numberOfScansInCollection+" scans in the current collection\n"+
+                        numberOfTotalScans + " scans in total\n"+
+                        collections + " collections");
             }
         }
     };

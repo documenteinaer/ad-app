@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ public class WiFiScan {
     private static final String LOG_TAG = "WiFiScan";
     private WifiManager mWifiManager;
     private Context mContext;
+
 
     public WiFiScan(Context context){
         mContext = context;
@@ -100,6 +102,9 @@ public class WiFiScan {
 
         ScanService.currentFingerprint.printToLogFingerprint();
         ScanService.currentFingerprintCollection.addFingerprintToCollection(ScanService.currentFingerprint);
+        ScanService.numberOfScansInCollection++;
+        ScanService.numberOfTotalScans++;
+        displayNumberOfScans();
         ScanService.currentFingerprint = new Fingerprint();
     }
 
@@ -111,6 +116,15 @@ public class WiFiScan {
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return formatter.format(date);
+    }
+
+    public void displayNumberOfScans(){
+        Intent intent = new Intent("msg");
+        intent.putExtra("message", ScanService.UPDATE_SCAN_NUMBERS);
+        intent.putExtra("collectionscans", ScanService.numberOfScansInCollection);
+        intent.putExtra("totalscans", ScanService.numberOfTotalScans);
+        intent.putExtra("collections", ScanService.numberOfCollections);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
 

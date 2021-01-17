@@ -156,4 +156,14 @@
         app:layout_constraintBottom_toBottomOf="@+id/select_point"
         app:layout_constraintEnd_toStartOf="@+id/coordinate_y" />
 
+    <TextView
+        android:id="@+id/number_of_scans"
+        android:layout_width="385dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="24dp"
+        android:inputType="textMultiLine"
+        android:text="0 scans in the current collection \n0 scans in total \n0 collections"
+        app:layout_constraintStart_toStartOf="@+id/start_scan"
+        app:layout_constraintTop_toBottomOf="@+id/start_scan" />
+
 </android.support.constraint.ConstraintLayout>

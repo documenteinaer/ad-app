@@ -55,10 +55,16 @@ public class ScanService extends Service {
     public static final int MSG_STOP_SCAN = 3;
 
     public static final int ACT_STOP_SCAN = 1;
+    public static final int UPDATE_SCAN_NUMBERS = 2;
 
     public static String devId = null;
 
     private boolean scanning = false;
+
+    public static int numberOfScansInCollection = 0;
+    public static int numberOfTotalScans = 0;
+    public static int numberOfCollections = 0;
+    public static int sent = 0;
 
     public ScanService() {
     }
@@ -117,7 +123,9 @@ public class ScanService extends Service {
     }
 
     private void doScan() {
+        numberOfScansInCollection = 0;
         currentFingerprintCollection.setDevId(devId);
+        numberOfCollections++;
 
         scanning = wiFiScan.startScan();
 
@@ -151,6 +159,8 @@ public class ScanService extends Service {
             if (gpsScan != null) {
                 gpsScan.stopScan();
             }
+            numberOfScansInCollection = 0;
+            displayNumberOfScans();
         }
     }
 
@@ -199,6 +209,11 @@ public class ScanService extends Service {
                 Log.d(LOG_TAG, response.toString());
 
                 collectionsList = new ArrayList<FingerprintCollection>();
+                numberOfCollections = 0;
+                numberOfScansInCollection = 0;
+                numberOfTotalScans = 0;
+                displayNumberOfScans();
+                sent = 1;
             }
 
         } catch (MalformedURLException e) {
@@ -280,6 +295,15 @@ public class ScanService extends Service {
         Intent intent = new Intent("msg");
         // Adding some data
         intent.putExtra("message", ACT_STOP_SCAN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void displayNumberOfScans(){
+        Intent intent = new Intent("msg");
+        intent.putExtra("message", ScanService.UPDATE_SCAN_NUMBERS);
+        intent.putExtra("collectionscans", ScanService.numberOfScansInCollection);
+        intent.putExtra("totalscans", ScanService.numberOfTotalScans);
+        intent.putExtra("collections", ScanService.numberOfCollections);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

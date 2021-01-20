@@ -201,6 +201,7 @@ public class TelephonyScan {
                     CellInfoLte cellInfoLte = (CellInfoLte) cellInfo;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         rssi = cellInfoLte.getCellSignalStrength().getRssi();
+                        Log.d(LOG_TAG, "getRssi: "+rssi+" getDbm: "+cellInfoLte.getCellSignalStrength().getDbm());
                     }
                     else{
                         rssi = cellInfoLte.getCellSignalStrength().getDbm();

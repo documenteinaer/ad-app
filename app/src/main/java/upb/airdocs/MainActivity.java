@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     public static float y = -1;
 
 
-
     //  Messenger for communicating with the service.
     Messenger mMessenger = null;
     // Flag indicating whether we have called bind on the service.
@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         requestAllPermissions();
+
+        restoreFields();
 
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
@@ -85,17 +87,15 @@ public class MainActivity extends AppCompatActivity {
         startScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                if (scanActive == false){
+                if (scanActive == false) {
                     if (permissionGranted == true) {
                         onStartScan(comment.getText().toString());
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
-                    }
-                    else{
+                    } else {
                         Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
                     }
-                }
-                else{
+                } else {
                     onStopScan();
                     scanActive = false;
                     startScanButton.setText("Start Scan");
@@ -116,12 +116,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        stopService();
-        super.onDestroy();
-    }
-
     public void onSendButton(String address, String port) {
         ServerAddress serverAddress = new ServerAddress(address, port);
         if (mBound) {
@@ -135,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onStartScan(String comment){
+    public void onStartScan(String comment) {
         if (mBound) {
             AuxObj auxObj = new AuxObj(comment, selectedMap, x, y);
             // Create and send a message to the service, using a supported 'what' value
@@ -148,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onStopScan(){
+    public void onStopScan() {
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_STOP_SCAN, 0, 0);
@@ -160,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void requestAllPermissions(){
+    private void requestAllPermissions() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST);
@@ -189,12 +183,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     public void startService(String devID) {
         Intent serviceIntent = new Intent(this, ScanService.class);
         serviceIntent.putExtra("devID", devID);
         ContextCompat.startForegroundService(this, serviceIntent);
         bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
+
     public void stopService() {
         Intent serviceIntent = new Intent(this, ScanService.class);
         stopService(serviceIntent);
@@ -218,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private String  getID(){
-        if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+    private String getID() {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             //Google Play Services are available
             AdvertisingIdClient.Info adInfo = null;
 
@@ -256,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return id;
         }
+
         @Override
         protected void onPostExecute(String result) {
             startService(result);
@@ -272,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             final EditText mapName = (EditText) findViewById(R.id.map_name);
             mapName.setText(selectedMap);
         }
-        if (x >= 0 && y >= 0){
+        if (x >= 0 && y >= 0) {
             final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
             coordinateX.setText(Float.toString(x));
             final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
@@ -286,32 +283,30 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
-            int msg = intent.getIntExtra("message",-1/*default value*/);
-            if (msg == ScanService.ACT_STOP_SCAN){
+            int msg = intent.getIntExtra("message", -1/*default value*/);
+            if (msg == ScanService.ACT_STOP_SCAN) {
                 scanActive = false;
                 Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
             }
-            if (msg == ScanService.UPDATE_SCAN_NUMBERS){
+            if (msg == ScanService.UPDATE_SCAN_NUMBERS) {
                 int numberOfScansInCollection = intent.getIntExtra("collectionscans", 0);
                 int numberOfTotalScans = intent.getIntExtra("totalscans", 0);
                 int collections = intent.getIntExtra("collections", 0);
                 final TextView scans = (TextView) findViewById(R.id.number_of_scans);
-                scans.setText(numberOfScansInCollection+" fingerprints in the current collection\n"+
-                        numberOfTotalScans + " fingerprints in total\n"+
+                scans.setText(numberOfScansInCollection + " fingerprints in the current collection\n" +
+                        numberOfTotalScans + " fingerprints in total\n" +
                         collections + " collections");
             }
-            if (msg == ScanService.UPDATE_SEND_STATUS){
+            if (msg == ScanService.UPDATE_SEND_STATUS) {
                 Log.d(LOG_TAG, "Intent received");
                 int sent = intent.getIntExtra("sent", -1);
                 final TextView sendStatus = (TextView) findViewById(R.id.send_status);
                 if (sent == 1) {
                     sendStatus.setText("Sent successfully");
-                }
-                else if (sent == 0){
+                } else if (sent == 0) {
                     sendStatus.setText("Send failed");
-                }
-                else{
+                } else {
                     sendStatus.setText("Unsent");
                 }
             }
@@ -324,4 +319,42 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
         super.onPause();
     }
+
+    @Override
+    protected void onDestroy() {
+        stopService();
+        saveFields();
+        super.onDestroy();
+    }
+
+    private void saveFields(){
+        final EditText addressEditText = (EditText) findViewById(R.id.address);
+        final EditText portEditText = (EditText) findViewById(R.id.port);
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("ip", addressEditText.getText().toString());
+        editor.putString("port", portEditText.getText().toString());
+        editor.putString("selectedMap", selectedMap);
+        editor.putFloat("x", x);
+        editor.putFloat("y", y);
+        editor.apply();
+    }
+
+    private void restoreFields(){
+        final EditText addressEditText = (EditText) findViewById(R.id.address);
+        final EditText portEditText = (EditText) findViewById(R.id.port);
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        String ip = sharedPref.getString("ip", "192.168.142.105");
+        addressEditText.setText(ip);
+        String port = sharedPref.getString("port", "8001");
+        portEditText.setText(port);
+        selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
+        x = sharedPref.getFloat("x", Float.parseFloat("-1"));
+        y = sharedPref.getFloat("y", Float.parseFloat("-1"));
+
+
+    }
+
 }

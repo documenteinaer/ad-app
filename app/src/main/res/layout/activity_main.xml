@@ -162,7 +162,7 @@
         android:layout_height="66dp"
         android:layout_marginTop="24dp"
         android:inputType="textMultiLine"
-        android:text="0 scans in the current collection \n0 scans in total \n0 collections"
+        android:text="0 fingerprints in the current collection \n0 fingerprints in total \n0 collections"
         app:layout_constraintStart_toStartOf="@+id/start_scan"
         app:layout_constraintTop_toBottomOf="@+id/start_scan" />
 

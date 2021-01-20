@@ -297,8 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 int numberOfTotalScans = intent.getIntExtra("totalscans", 0);
                 int collections = intent.getIntExtra("collections", 0);
                 final TextView scans = (TextView) findViewById(R.id.number_of_scans);
-                scans.setText(numberOfScansInCollection+" scans in the current collection\n"+
-                        numberOfTotalScans + " scans in total\n"+
+                scans.setText(numberOfScansInCollection+" fingerprints in the current collection\n"+
+                        numberOfTotalScans + " fingerprints in total\n"+
                         collections + " collections");
             }
             if (msg == ScanService.UPDATE_SEND_STATUS){

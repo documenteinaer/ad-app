@@ -275,6 +275,26 @@ public class MainActivity extends AppCompatActivity {
             final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
             coordinateY.setText(Float.toString(y));
         }
+        if (mBound){ //Obtain information from the service and update the activity
+            int numberOfScansInCollection = ScanService.numberOfScansInCollection;
+            int numberOfTotalScans = ScanService.numberOfTotalScans;
+            int collections = ScanService.numberOfCollections;
+            final TextView scans = (TextView) findViewById(R.id.number_of_scans);
+            scans.setText(numberOfScansInCollection + " fingerprints in the current collection\n" +
+                    numberOfTotalScans + " fingerprints in total\n" +
+                    collections + " collections");
+
+            int sent = ScanService.sent;
+            final TextView sendStatus = (TextView) findViewById(R.id.send_status);
+            if (sent == 1) {
+                sendStatus.setText("Sent successfully");
+            } else if (sent == 0) {
+                sendStatus.setText("Send failed");
+            } else {
+                sendStatus.setText("Unsent");
+            }
+        }
+
     }
 
 
@@ -290,9 +310,9 @@ public class MainActivity extends AppCompatActivity {
                 startScanButton.setText("Start Scan");
             }
             if (msg == ScanService.UPDATE_SCAN_NUMBERS) {
-                int numberOfScansInCollection = intent.getIntExtra("collectionscans", 0);
-                int numberOfTotalScans = intent.getIntExtra("totalscans", 0);
-                int collections = intent.getIntExtra("collections", 0);
+                int numberOfScansInCollection = ScanService.numberOfScansInCollection;
+                int numberOfTotalScans = ScanService.numberOfTotalScans;
+                int collections = ScanService.numberOfCollections;
                 final TextView scans = (TextView) findViewById(R.id.number_of_scans);
                 scans.setText(numberOfScansInCollection + " fingerprints in the current collection\n" +
                         numberOfTotalScans + " fingerprints in total\n" +
@@ -300,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
             }
             if (msg == ScanService.UPDATE_SEND_STATUS) {
                 Log.d(LOG_TAG, "Intent received");
-                int sent = intent.getIntExtra("sent", -1);
+                int sent = ScanService.sent;
                 final TextView sendStatus = (TextView) findViewById(R.id.send_status);
                 if (sent == 1) {
                     sendStatus.setText("Sent successfully");

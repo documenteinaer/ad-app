@@ -323,17 +323,12 @@ public class ScanService extends Service {
     private void displayNumberOfScans(){
         Intent intent = new Intent("msg");
         intent.putExtra("message", ScanService.UPDATE_SCAN_NUMBERS);
-        intent.putExtra("collectionscans", ScanService.numberOfScansInCollection);
-        intent.putExtra("totalscans", ScanService.numberOfTotalScans);
-        intent.putExtra("collections", ScanService.numberOfCollections);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void displaySendStatus(){
         Intent intent = new Intent("msg");
         intent.putExtra("message", UPDATE_SEND_STATUS);
-        intent.putExtra("sent", sent);
-        Log.d(LOG_TAG, "Trying to send Intent");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
     }

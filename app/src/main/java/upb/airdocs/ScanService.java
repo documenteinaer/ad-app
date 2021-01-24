@@ -148,13 +148,14 @@ public class ScanService extends Service {
             scanning = false;
             saveAndRenewCollection();
 
+            if (wiFiScan != null) {
+                wiFiScan.unregisterReceiver();
+            }
+
             if (telephonyScan != null) {
                 telephonyScan.unregisterPhoneStateManager();
             }
 
-            if (wiFiScan != null) {
-                wiFiScan.unregisterReceiver();
-            }
             if (bleScan != null) {
                 bleScan.stopScan();
             }

@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                         onStartScan(comment.getText().toString());
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     } else {
                         Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
                     }
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     onStopScan();
                     scanActive = false;
                     startScanButton.setText("Start Scan");
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
         });

@@ -121,9 +121,6 @@ public class WiFiScan {
     public void displayNumberOfScans(){
         Intent intent = new Intent("msg");
         intent.putExtra("message", ScanService.UPDATE_SCAN_NUMBERS);
-        intent.putExtra("collectionscans", ScanService.numberOfScansInCollection);
-        intent.putExtra("totalscans", ScanService.numberOfTotalScans);
-        intent.putExtra("collections", ScanService.numberOfCollections);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 

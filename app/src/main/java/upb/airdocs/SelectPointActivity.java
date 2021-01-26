@@ -2,8 +2,13 @@ package upb.airdocs;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -35,11 +40,6 @@ public class SelectPointActivity extends Activity {
     private ScaleGestureDetector scaleGestureDetector;
     private AndroidGesturesManager gesturesManager;
     private float mScaleFactor = 1.0f;
-    //private int moveX = 0;
-    //private int moveY = 0;
-    //private boolean first = false;
-    //private int initialX = 0;
-    //private int initialY = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,46 +48,6 @@ public class SelectPointActivity extends Activity {
 
         setupGesturesManager();
         setupViews();
-
-        //scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
-        /*imageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    //Log.d(LOG_TAG,"X: "+String.valueOf(event.getRawX())+ " "+
-                    //        "Y: "+String.valueOf(event.getRawY()));
-                    // Get the coordinates of the touch point x, y
-                    float x = event.getX();
-                    float y = event.getY();
-                    // The coordinates of the target point
-                    float dst[] = new float[2];
-                    // Get the matrix of ImageView
-                    Matrix imageMatrix = imageView.getImageMatrix();
-                    // Create an inverse matrix
-                    Matrix inverseMatrix = new Matrix();
-                    // Inverse, the inverse matrix is ​​assigned
-                    imageMatrix.invert(inverseMatrix);
-                    // Get the value of the target point dst through the inverse matrix mapping
-                    inverseMatrix.mapPoints(dst, new float[]{x, y});
-                    float dstX = dst[0];
-                    float dstY = dst[1];
-                    Log.d(LOG_TAG, "X: " + dstX + " Y: " + dstY);
-                    if (dstX < 0 || dstY  < 0){
-                        Toast.makeText(getBaseContext(),
-                                "Touched outside the map.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        Toast.makeText(getBaseContext(),
-                                "X: " + dstX + " Y: " + dstY,
-                                Toast.LENGTH_SHORT).show();
-                        MainActivity.x = dstX;
-                        MainActivity.y = dstY;
-                    }
-                }
-                return true;
-            }
-        });*/
     }
 
     private void setupGesturesManager(){
@@ -111,7 +71,6 @@ public class SelectPointActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        //scaleGestureDetector.onTouchEvent(event);
         return gesturesManager.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
@@ -124,22 +83,10 @@ public class SelectPointActivity extends Activity {
             int coord[] = new int[2];
             imageView.getLocationOnScreen(coord);
 
-            /*if (first == false) {
-                initialX = coord[0]; initialY = coord[1];
-                Log.d(LOG_TAG, "initial x: "+initialX+" initial y: "+initialY);
-                first = true;
-            }*/
 
             Log.d(LOG_TAG, "img x: "+coord[0]+" img y: "+coord[1]);
 
-            /*int height = imageView.getHeight();
-            int width = imageView.getWidth();
-            int left = imageView.getLeft();
-            int top = imageView.getTop();
-
-            Log.d(LOG_TAG, "h: "+height+" w: "+width+" left: "+left+" top: "+top);*/
             Log.d(LOG_TAG, "event x: "+e.getX()+" event y: "+e.getY());
-            //Log.d(LOG_TAG, "raw x: "+e.getRawX()+" raw y: "+e.getRawY());
 
             float x = (e.getX() - coord[0])/mScaleFactor;
             float y = (e.getY() - coord[1])/mScaleFactor;
@@ -158,6 +105,7 @@ public class SelectPointActivity extends Activity {
             float dstX = dst[0];
             float dstY = dst[1];
             Log.d(LOG_TAG, "Image X: " + dstX + " Y: " + dstY);
+            drawPoint(dstX, dstY);
             if (dstX < 0 || dstY < 0) {
                 Toast.makeText(getBaseContext(),
                         "Touched outside the map.",
@@ -215,16 +163,20 @@ public class SelectPointActivity extends Activity {
         }
     }
 
+    private void drawPoint(float coordinateX, float coordinateY) {
+        Bitmap myBitmap = BitmapFactory.decodeResource(getResources(),MainActivity.selectedMapID);
 
-    /*private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas tempCanvas = new Canvas(tempBitmap);
 
-        @Override
-        public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            mScaleFactor *= scaleGestureDetector.getScaleFactor();
-            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
-            imageView.setScaleX(mScaleFactor);
-            imageView.setScaleY(mScaleFactor);
-            return true;
-        }
-    }*/
+        tempCanvas.drawBitmap(myBitmap, 0, 0, null);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(5);
+        tempCanvas.drawCircle(coordinateX, coordinateY, 15, paint);
+
+        imageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+    }
+
 }

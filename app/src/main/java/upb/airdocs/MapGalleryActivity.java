@@ -21,7 +21,16 @@ public class MapGalleryActivity extends Activity
 {
     //---the images to display---
     Integer[] imageIDs = {
-            R.drawable.precis_subsol,
+            R.drawable.arch_precis_parter,
+            R.drawable.arch_precis_etaj1,
+            R.drawable.arch_precis_etaj2,
+            R.drawable.arch_precis_etaj3,
+            R.drawable.arch_precis_etaj4,
+            R.drawable.arch_precis_etaj5,
+            R.drawable.arch_precis_etaj6,
+            R.drawable.arch_precis_etaj7,
+            R.drawable.arch_precis_subsol,
+            R.drawable.arch_precis_terasa,
             R.drawable.precis_parter,
             R.drawable.precis_etaj1,
             R.drawable.precis_etaj2,
@@ -30,11 +39,21 @@ public class MapGalleryActivity extends Activity
             R.drawable.precis_etaj5,
             R.drawable.precis_etaj6,
             R.drawable.precis_etaj7,
+            R.drawable.precis_subsol,
             R.drawable.precis_terasa
     };
 
     String[] names = {
-            "precis_subsol.png",
+            "arch_precis_parter.png",
+            "arch_precis_etaj1.png",
+            "arch_precis_etaj2.png",
+            "arch_precis_etaj3.png",
+            "arch_precis_etaj4.png",
+            "arch_precis_etaj5.png",
+            "arch_precis_etaj6.png",
+            "arch_precis_etaj7.png",
+            "arch_precis_subsol.png",
+            "arch_precis_terasa.png",
             "precis_parter.png",
             "precis_etaj1.png",
             "precis_etaj2.png",
@@ -43,6 +62,7 @@ public class MapGalleryActivity extends Activity
             "precis_etaj5.png",
             "precis_etaj6.png",
             "precis_etaj7.png",
+            "precis_subsol.png",
             "precis_terasa.png",
     };
 

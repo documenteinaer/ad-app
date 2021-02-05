@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
@@ -106,6 +107,8 @@ public class SelectPointActivity extends Activity {
             float dstY = dst[1];
             Log.d(LOG_TAG, "Image X: " + dstX + " Y: " + dstY);
             drawPoint(dstX, dstY);
+            TextView textView = findViewById(R.id.coordinates);
+            textView.setText("X: " + dstX + " Y: " + dstY);
             if (dstX < 0 || dstY < 0) {
                 Toast.makeText(getBaseContext(),
                         "Touched outside the map.",

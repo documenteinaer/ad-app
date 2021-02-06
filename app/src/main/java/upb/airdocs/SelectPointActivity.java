@@ -107,18 +107,20 @@ public class SelectPointActivity extends Activity {
             float dstY = dst[1];
             Log.d(LOG_TAG, "Image X: " + dstX + " Y: " + dstY);
             drawPoint(dstX, dstY);
+            int pixelX = (int)(dstX / 2.62);
+            int pixelY = (int)(dstY / 2.62);
             TextView textView = findViewById(R.id.coordinates);
-            textView.setText("X: " + dstX + " Y: " + dstY);
+            textView.setText("X: " + pixelX + " Y: " + pixelY);
             if (dstX < 0 || dstY < 0) {
                 Toast.makeText(getBaseContext(),
                         "Touched outside the map.",
                         Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getBaseContext(),
-                        "X: " + dstX + " Y: " + dstY,
+                        "X: " + pixelX + " Y: " + pixelY,
                         Toast.LENGTH_SHORT).show();
-                MainActivity.x = dstX;
-                MainActivity.y = dstY;
+                MainActivity.x = pixelX;
+                MainActivity.y = pixelY;
             }
 
             return super.onSingleTapConfirmed(e);

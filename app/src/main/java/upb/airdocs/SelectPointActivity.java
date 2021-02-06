@@ -111,6 +111,7 @@ public class SelectPointActivity extends Activity {
             int pixelY = (int)(dstY / 2.62);
             TextView textView = findViewById(R.id.coordinates);
             textView.setText("X: " + pixelX + " Y: " + pixelY);
+            Log.d(LOG_TAG, "Pixel X: " + pixelX + " Pixel Y: " + pixelY);
             if (dstX < 0 || dstY < 0) {
                 Toast.makeText(getBaseContext(),
                         "Touched outside the map.",
@@ -178,8 +179,10 @@ public class SelectPointActivity extends Activity {
 
         Paint paint = new Paint();
         paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(5);
-        tempCanvas.drawCircle(coordinateX, coordinateY, 15, paint);
+        paint.setStrokeWidth(2);
+        //tempCanvas.drawCircle(coordinateX, coordinateY, 15, paint);
+        tempCanvas.drawLine(coordinateX-20, coordinateY, coordinateX+20, coordinateY, paint);
+        tempCanvas.drawLine(coordinateX, coordinateY-20, coordinateX, coordinateY+20, paint);
 
         imageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
     }

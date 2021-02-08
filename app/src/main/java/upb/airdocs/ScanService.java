@@ -48,6 +48,7 @@ public class ScanService extends Service {
     BLEScan bleScan = new BLEScan(this);
     GPSScan gpsScan = new GPSScan(this);
     TelephonyScan telephonyScan = new TelephonyScan(this);
+    AudioScan audioScan = new AudioScan(this);
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
@@ -132,6 +133,7 @@ public class ScanService extends Service {
         scanning = wiFiScan.startScan();
 
         if (scanning) {
+            audioScan.startScan();
             bleScan.startScan();
             gpsScan.startScan();
             telephonyScan.startScan();
@@ -150,6 +152,10 @@ public class ScanService extends Service {
 
             if (wiFiScan != null) {
                 wiFiScan.unregisterReceiver();
+            }
+
+            if (audioScan != null){
+                audioScan.stopScan();
             }
 
             if (telephonyScan != null) {

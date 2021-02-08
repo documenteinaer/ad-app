@@ -24,13 +24,11 @@ public class WiFiScan {
     private static final String LOG_TAG = "WiFiScan";
     private WifiManager mWifiManager;
     private Context mContext;
-    private ScanService mService;
     boolean stop = false;
 
 
-    public WiFiScan(Context context, ScanService service){
+    public WiFiScan(Context context){
         mContext = context;
-        mService = service;
     }
 
     public boolean startScan(){

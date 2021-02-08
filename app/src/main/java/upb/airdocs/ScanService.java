@@ -44,7 +44,7 @@ public class ScanService extends Service {
     public static List<FingerprintCollection> collectionsList = new ArrayList<FingerprintCollection>();
 
 
-    WiFiScan wiFiScan = new WiFiScan(this, this);
+    WiFiScan wiFiScan = new WiFiScan(this);
     BLEScan bleScan = new BLEScan(this);
     GPSScan gpsScan = new GPSScan(this);
     TelephonyScan telephonyScan = new TelephonyScan(this);

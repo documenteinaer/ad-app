@@ -1,5 +1,6 @@
 package upb.airdocs;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,13 +24,18 @@ public class WiFiScan {
     private static final String LOG_TAG = "WiFiScan";
     private WifiManager mWifiManager;
     private Context mContext;
+    private ScanService mService;
+    boolean stop = false;
 
 
-    public WiFiScan(Context context){
+    public WiFiScan(Context context, ScanService service){
         mContext = context;
+        mService = service;
     }
 
     public boolean startScan(){
+
+        stop = false;
 
         LocationManager locationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
@@ -77,7 +83,7 @@ public class WiFiScan {
                 Log.d(LOG_TAG, "WiFi Scan failed");
             }
 
-            if (mWifiManager != null) {
+            if (mWifiManager != null && stop != true) {
                 Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
                 mWifiManager.startScan();
             }
@@ -106,6 +112,12 @@ public class WiFiScan {
         ScanService.numberOfTotalScans++;
         displayNumberOfScans();
         ScanService.currentFingerprint = new Fingerprint();
+        if (ScanService.numberOfScansInCollection >= ScanService.scanLimit){
+            stop = true;
+            Log.d(LOG_TAG, "The number of fingerprints reached the configured limit. Stopping now.");
+            ((ScanService)mContext).stopScan();
+            ((ScanService)mContext).stopScanInActivity();
+        }
     }
 
     public void unregisterReceiver(){

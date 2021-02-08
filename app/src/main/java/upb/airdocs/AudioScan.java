@@ -12,12 +12,12 @@ import java.util.Arrays;
 
 public class AudioScan {
     private static final String LOG_TAG = "AudioScan";
-    MediaRecorder recorder = new MediaRecorder();
+    MediaRecorder recorder;
     String fileName = null;
     int index = 0;
     Context mContext;
     Visualizer visualizer = null;
-    MediaPlayer player = new MediaPlayer();
+    MediaPlayer player;
 
     public AudioScan(Context context) {
         mContext = context;
@@ -35,6 +35,7 @@ public class AudioScan {
         fileName += "/audiorecordtest.wav";
         Log.d(LOG_TAG, "file: " + fileName);
 
+        recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -58,6 +59,7 @@ public class AudioScan {
 
     private void playAndProcessAudio() {
         Log.d(LOG_TAG, "Play audio: " + fileName);
+        player = new MediaPlayer();
         try {
             player.setDataSource(fileName);
             player.prepare();

@@ -44,7 +44,7 @@ public class ScanService extends Service {
     public static List<FingerprintCollection> collectionsList = new ArrayList<FingerprintCollection>();
 
 
-    WiFiScan wiFiScan = new WiFiScan(this);
+    WiFiScan wiFiScan = new WiFiScan(this, this);
     BLEScan bleScan = new BLEScan(this);
     GPSScan gpsScan = new GPSScan(this);
     TelephonyScan telephonyScan = new TelephonyScan(this);
@@ -68,6 +68,8 @@ public class ScanService extends Service {
     public static int numberOfTotalScans = 0;
     public static int numberOfCollections = 0;
     public static int sent = -1;
+
+    public static int scanLimit = 1;
 
     public ScanService() {
     }
@@ -144,7 +146,7 @@ public class ScanService extends Service {
 
     }
 
-    private void stopScan(){
+    public void stopScan(){
 
         if (scanning) {
             scanning = false;
@@ -270,6 +272,7 @@ public class ScanService extends Service {
                     currentFingerprintCollection.setMap(auxObj.map);
                     currentFingerprintCollection.setX(auxObj.x);
                     currentFingerprintCollection.setY(auxObj.y);
+                    scanLimit = auxObj.noScans;
                     doScan();
                     break;
                 case MSG_STOP_SCAN:
@@ -319,7 +322,7 @@ public class ScanService extends Service {
         }
     }
 
-    private void stopScanInActivity(){
+    public void stopScanInActivity(){
         // The string "my-integer" will be used to filer the intent
         Intent intent = new Intent("msg");
         // Adding some data

@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText comment = (EditText) findViewById(R.id.comment);
 
+        final EditText numberOfScans = (EditText) findViewById(R.id.number_scans);
+
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (scanActive == false) {
                     if (permissionGranted == true) {
-                        onStartScan(comment.getText().toString());
+                        onStartScan(comment.getText().toString(), numberOfScans.getText().toString());
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -132,9 +134,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onStartScan(String comment) {
+    public void onStartScan(String comment, String noSscans) {
         if (mBound) {
-            AuxObj auxObj = new AuxObj(comment, selectedMap, x, y);
+            int nos =Integer.parseInt(noSscans);
+            AuxObj auxObj = new AuxObj(comment, selectedMap, x, y, nos);
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, auxObj);
             try {

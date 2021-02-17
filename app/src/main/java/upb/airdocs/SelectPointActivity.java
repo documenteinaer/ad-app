@@ -42,6 +42,9 @@ public class SelectPointActivity extends Activity {
     private AndroidGesturesManager gesturesManager;
     private float mScaleFactor = 1.0f;
 
+    Matrix matrix = new Matrix();
+    Matrix savedMatrix = new Matrix();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,10 +143,32 @@ public class SelectPointActivity extends Activity {
         @Override
         public boolean onScale(StandardScaleGestureDetector detector) {
             Log.d(LOG_TAG, "scale gesture");
-            mScaleFactor *= detector.getScaleFactor();
+            float oldScaleFactor = mScaleFactor;
+            float newScaleFactor = detector.getScaleFactor();
+            mScaleFactor *= newScaleFactor;
             mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
+            float x = detector.getFocalPoint().x;
+            float y = detector.getFocalPoint().y;
+            //float width = imageView.;
+            //float height = imageView.getDrawable().;
+            Log.d(LOG_TAG, "x: "+x+" y: "+y);
+            //Log.d(LOG_TAG, "width: "+width+" height: "+height);
+            //imageView.setScaleType(ImageView.ScaleType.MATRIX);
+            //Matrix matrix = imageView.getImageMatrix();
+            //matrix.setScale(mScaleFactor, mScaleFactor, x, y);
+            //matrix.postScale(mScaleFactor, mScaleFactor, x, y);
+            //imageView.setImageMatrix(matrix);
+            //imageView.setTranslationX(imageView.getTranslationX() - x/10);
+            //imageView.setTranslationY(imageView.getTranslationY() + y/10);
+
+            imageView.setPivotX(x);
+            imageView.setPivotY(y);
+
             imageView.setScaleX(mScaleFactor);
             imageView.setScaleY(mScaleFactor);
+
+
+
             Log.d(LOG_TAG, "scale factor: "+mScaleFactor);
             return super.onScale(detector);
         }

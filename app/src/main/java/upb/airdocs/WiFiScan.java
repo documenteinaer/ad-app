@@ -103,6 +103,8 @@ public class WiFiScan {
             ScanService.currentFingerprint.addWifiFingerprint(result.BSSID, wifiItem);
             ScanService.currentFingerprint.addTimestamp(getTimestamp());
         }
+        WiFiRTTScan wiFiRTTScan = new WiFiRTTScan(mContext);
+        wiFiRTTScan.prepareForScan(results);
 
         ScanService.currentFingerprint.printToLogFingerprint();
         ScanService.currentFingerprintCollection.addFingerprintToCollection(ScanService.currentFingerprint);

@@ -1,5 +1,6 @@
 package upb.airdocs;
 
+import android.os.Build;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,7 +14,8 @@ public class FingerprintCollection{
     private static final String LOG_TAG = "FingerprintCollection";
 
     private String devId="-";
-    private String devName=android.os.Build.MODEL;;
+    private String devName=android.os.Build.MODEL;
+    private String androidVersion= Build.VERSION.RELEASE;
     private String comment="-";
     private String map="-";
     private float x=-1;
@@ -55,6 +57,7 @@ public class FingerprintCollection{
 
             collectionJSON.put("devId", devId);
             collectionJSON.put("devName", devName);
+            collectionJSON.put("AndroidVersion", androidVersion);
             collectionJSON.put("comment", comment);
             collectionJSON.put("map", map);
             collectionJSON.put("x", x);
@@ -80,11 +83,12 @@ public class FingerprintCollection{
         Log.d(LOG_TAG, "Fingerprint Collection: ");
         Log.d(LOG_TAG, "devID: " + devId);
         Log.d(LOG_TAG, "devName: " + devName);
+        Log.d(LOG_TAG, "AndroidVersion: " + androidVersion);
         Log.d(LOG_TAG, "comment: " + comment);
         Log.d(LOG_TAG, "map: " + map);
         Log.d(LOG_TAG, "x: " + x);
         Log.d(LOG_TAG, "y: " + y);
-        Log.d(LOG_TAG, "figerprints: ");
+        Log.d(LOG_TAG, "fingerprints: ");
         for (int i = 0; i < itemList.size(); i++) {
             Fingerprint fingerprint = itemList.get(i);
             fingerprint.printToLogFingerprint();

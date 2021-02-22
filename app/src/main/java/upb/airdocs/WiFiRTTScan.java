@@ -44,10 +44,24 @@ public class WiFiRTTScan {
                     mRttRangingResultCallback = new RttRangingResultCallback();
 
                     RangingRequest.Builder builder = new RangingRequest.Builder();
-                    builder.addAccessPoints(scanResults);
+                    maxPeers = rangingRequest.getMaxPeers();
+                    int i = 0;
+                    try {
+                        for (ScanResult result: scanResults) {
+                            builder.addAccessPoint(result);
+                            i++;
+                            if (i >= maxPeers){
+                                break;
+                            }
+                        }
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                        return false;
+                    }
                     rangingRequest = builder.build();
 
-                    maxPeers = rangingRequest.getMaxPeers();
+
 
                     Log.d(LOG_TAG, "max peers: "+maxPeers);
 

@@ -49,6 +49,7 @@ public class ScanService extends Service {
     GPSScan gpsScan = new GPSScan(this);
     TelephonyScan telephonyScan = new TelephonyScan(this);
     AudioScan audioScan = new AudioScan(this);
+    //WiFiScanNew wiFiScanNew = new WiFiScanNew(this);
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
@@ -132,6 +133,13 @@ public class ScanService extends Service {
         currentFingerprintCollection.setDevId(devId);
         numberOfCollections++;
 
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            scanning = wiFiScanNew.startScan();
+        }
+        else{
+            scanning = wiFiScan.startScan();
+        }*/
+
         scanning = wiFiScan.startScan();
 
         if (scanning) {
@@ -151,6 +159,17 @@ public class ScanService extends Service {
         if (scanning) {
             scanning = false;
             saveAndRenewCollection();
+
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (wiFiScanNew != null) {
+                    wiFiScanNew.unregisterReceiver();
+                }
+            }
+            else{
+                if (wiFiScan != null) {
+                    wiFiScan.unregisterReceiver();
+                }
+            }*/
 
             if (wiFiScan != null) {
                 wiFiScan.unregisterReceiver();

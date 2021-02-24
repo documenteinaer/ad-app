@@ -1,6 +1,5 @@
 package upb.airdocs;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,29 +7,29 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class WiFiScan {
-    private static final String LOG_TAG = "WiFiScan";
+public class WiFiScanNew {
+    private static final String LOG_TAG = "WiFiScanNew";
     private WifiManager mWifiManager;
     private Context mContext;
     boolean stop = false;
+    MyScanResultsCallback callback;
 
 
-    public WiFiScan(Context context){
+    public WiFiScanNew(Context context){
         mContext = context;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public boolean startScan(){
 
         stop = false;
@@ -48,13 +47,17 @@ public class WiFiScan {
         mWifiManager = (WifiManager)
                 mContext.getSystemService(Context.WIFI_SERVICE);
         if (mWifiManager.isWifiEnabled()) {
-            IntentFilter intentFilter = new IntentFilter();
+            /*IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-            mContext.registerReceiver(wifiScanReceiver, intentFilter);
+            mContext.registerReceiver(wifiScanReceiver, intentFilter);*/
+
+            callback = new MyScanResultsCallback();
+            mWifiManager.registerScanResultsCallback(mContext.getMainExecutor(),
+                    callback);
 
             if (mWifiManager != null) {
                 Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
-                mWifiManager.startScan();
+                //mWifiManager.startScan();
             }
             return true;
         }
@@ -66,8 +69,15 @@ public class WiFiScan {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private class MyScanResultsCallback extends WifiManager.ScanResultsCallback {
+        @Override
+        public void onScanResultsAvailable() {
+            scanSuccess();
+        }
+    }
 
-    public BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+    /*public BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
 
@@ -87,7 +97,7 @@ public class WiFiScan {
             }
 
         }
-    };
+    };*/
 
 
     private void scanSuccess() {
@@ -120,8 +130,10 @@ public class WiFiScan {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public void unregisterReceiver(){
-        mContext.unregisterReceiver(wifiScanReceiver);
+        //mContext.unregisterReceiver(wifiScanReceiver);
+        mWifiManager.unregisterScanResultsCallback (callback);
     }
 
     private String getTimestamp(){

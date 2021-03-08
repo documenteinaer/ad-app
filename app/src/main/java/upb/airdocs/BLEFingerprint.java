@@ -2,6 +2,7 @@ package upb.airdocs;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 
 public class BLEFingerprint {
     private String name;
-    private int rssi;
+    private ArrayList<Integer> rssiArray = new ArrayList<Integer>();
 
     public BLEFingerprint(String name, int rssi) {
         this.name = name;
-        this.rssi = rssi;
+        rssiArray.add(rssi);
     }
 
     public String getName() {
@@ -24,26 +25,30 @@ public class BLEFingerprint {
         this.name = name;
     }
 
-    public int getRssi() {
-        return rssi;
+    public ArrayList<Integer> getRssi() {
+        return rssiArray;
     }
 
-    public void setRssi(int rssi) {
-        this.rssi = rssi;
+    public void addRssi(int rssi) {
+        rssiArray.add(rssi);
     }
 
     @Override
     public String toString() {
         return "{name='" + name + '\'' +
-                ", rssi=" + rssi +
+                ", rssi=" + rssiArray.toString() +
                 '}';
     }
 
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
         try {
-            jsonObject.put("name", name);
-            jsonObject.put("rssi", String.valueOf(rssi));
+            if (name != null) jsonObject.put("name", name);
+            for (int i = 0; i < rssiArray.size(); i++) {
+                jsonArray.put(rssiArray.get(i).toString());
+            }
+            jsonObject.put("rssi", jsonArray);
         }
         catch(JSONException e){
             e.printStackTrace();

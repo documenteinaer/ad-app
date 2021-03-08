@@ -16,7 +16,7 @@ public class Fingerprint{
     private String timestamp;
 
     private Hashtable<String,WifiFingerprint> wifiFingerprintHashtable = new Hashtable<String,WifiFingerprint>();
-    private Hashtable<String,ArrayList<BLEFingerprint>> bleFingerprintHashtable = new Hashtable<String,ArrayList<BLEFingerprint>>();
+    private Hashtable<String,BLEFingerprint> bleFingerprintHashtable = new Hashtable<String,BLEFingerprint>();
     private ArrayList<GPSFingerprint> gpsFingerprintArrayList = new ArrayList<GPSFingerprint>();
     private ArrayList<TelephonyFingerprint> telephonyFingerprintArrayList = new ArrayList<TelephonyFingerprint>();
 
@@ -28,11 +28,15 @@ public class Fingerprint{
         wifiFingerprintHashtable.put(hwAddress, wifiFingerprint);
     }
 
-    public void addBLEFingerprint(String hwAddress, BLEFingerprint bleFingerprint){
-        ArrayList<BLEFingerprint> bleList = bleFingerprintHashtable.get(hwAddress);
-        if (bleList == null)  bleList = new ArrayList<BLEFingerprint>();
-        bleList.add(bleFingerprint);
-        bleFingerprintHashtable.put(hwAddress, bleList);
+    public void addBLEFingerprint(String hwAddress, String deviceName, int rssi){
+        BLEFingerprint bleFingerprint = bleFingerprintHashtable.get(hwAddress);
+        if (bleFingerprint == null) {
+            bleFingerprint = new BLEFingerprint(deviceName, rssi);
+        }
+        else {
+            bleFingerprint.addRssi(rssi);
+        }
+        bleFingerprintHashtable.put(hwAddress, bleFingerprint);
     }
 
     public void addGPSFingerprint(GPSFingerprint gpsFingerprint){
@@ -80,14 +84,9 @@ public class Fingerprint{
         Enumeration<String> keys = bleFingerprintHashtable.keys();
         while(keys.hasMoreElements()){
             String hwAddr = keys.nextElement();
-            ArrayList<BLEFingerprint> bleFingerprintArrayList = bleFingerprintHashtable.get(hwAddr);
-            JSONArray bleJSONArray = new JSONArray();
-            for (int i = 0; i < bleFingerprintArrayList.size(); i++) {
-                BLEFingerprint bleFingerprint = bleFingerprintArrayList.get(i);
-                bleJSONArray.put(bleFingerprint.toJSON());
-            }
+            BLEFingerprint bleFingerprint = bleFingerprintHashtable.get(hwAddr);
             try {
-                bleFingerprintJSON.put(hwAddr, bleJSONArray);
+                bleFingerprintJSON.put(hwAddr, bleFingerprint.toJSON());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

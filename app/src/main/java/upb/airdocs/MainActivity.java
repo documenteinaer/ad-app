@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity {
                 onSendButton(address, port);
             }
         });
+
+        final Button switchToUsermodeButton = (Button) findViewById(R.id.switch_to_usermode);
+        switchToUsermodeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), UserActivity.class));
+            }
+        });
     }
 
     public void onSendButton(String address, String port) {

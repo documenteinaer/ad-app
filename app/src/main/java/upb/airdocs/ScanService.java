@@ -56,6 +56,8 @@ public class ScanService extends Service {
     public static final int MSG_SEND = 1;
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
+    public static final int MSG_SCAN_SEND_DOC = 4;
+    public static final int MSG_SCAN_SEARCH_DOC = 5;
 
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
@@ -297,6 +299,14 @@ public class ScanService extends Service {
                 case MSG_STOP_SCAN:
                     stopScan();
                     break;
+                case MSG_SCAN_SEND_DOC:
+                    Log.d(LOG_TAG, "Scan and send document");
+                    stopScanInActivity();
+                    break;
+                case MSG_SCAN_SEARCH_DOC:
+                    Log.d(LOG_TAG, "Scan and search document");
+                    stopScanInActivity();
+                    break;
                 default:
                     super.handleMessage(msg);
             }
@@ -342,9 +352,8 @@ public class ScanService extends Service {
     }
 
     public void stopScanInActivity(){
-        // The string "my-integer" will be used to filer the intent
+        Log.d(LOG_TAG, "Stop Scan in Activity");
         Intent intent = new Intent("msg");
-        // Adding some data
         intent.putExtra("message", ACT_STOP_SCAN);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

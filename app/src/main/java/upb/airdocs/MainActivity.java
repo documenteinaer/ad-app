@@ -311,7 +311,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Handling the received Intents for the "my-integer" event
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

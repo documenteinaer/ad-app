@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.IBinder;
@@ -23,6 +24,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -48,16 +51,34 @@ public class UserActivity extends Activity {
 
     Button scanSendDocButton;
     Button scanSearchDocButton;
+    EditText sendDocumentURL;
+    EditText receivedDocumentURL;
+    TextView scanSendStatus;
+    TextView scanSearchStatus;
+
+    String address;
+    String port;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
+        address = getIntent().getStringExtra("address");
+        port = getIntent().getStringExtra("port");
+        Log.d(LOG_TAG, "address= " + address + " port=" + port);
+
         requestAllPermissions();
 
         AsyncTaskRunner runner = new AsyncTaskRunner();
         runner.execute();
+
+        scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
+        scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
+
+        sendDocumentURL = (EditText) findViewById(R.id.send_document_url);
+        receivedDocumentURL = (EditText) findViewById(R.id.received_document_url);
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
         scanSendDocButton.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +131,18 @@ public class UserActivity extends Activity {
     protected void onDestroy() {
         stopService();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        restoreFields();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        saveFields();
+        super.onStop();
     }
 
     private void onStartScanSendDoc() {
@@ -251,12 +284,73 @@ public class UserActivity extends Activity {
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 Log.d(LOG_TAG, "In broadcast receiver");
                 if (send == true){
+                    scanSendStatus.setText("Scan complete");
+                    sendDocumentToServer();
+                }
+                if (search == true){
+                    scanSearchStatus.setText("Scan complete");
+                    searchDocumentOnServer();
+                }
+            }
+            else if (msg == ScanService.MSG_SEND_DONE){
+                if (send == true){
                     scanSendDocButton.setEnabled(true);
+                    scanSendStatus.setText("Sent successfuly");
+                    send = false;
                 }
                 if (search == true){
                     scanSearchDocButton.setEnabled(true);
+                    scanSearchStatus.setText("Sent successfuly");
+                    search = false;
                 }
             }
         }
     };
+
+    private void sendDocumentToServer() {
+        String documentURL = sendDocumentURL.getText().toString();
+        ServerAddress serverAddress = new ServerAddress(address, port, documentURL);
+        if (mBound) {
+            // Create and send a message to the service, using a supported 'what' value
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0, serverAddress);
+            try {
+                mMessenger.send(msg);
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+    }
+
+    private void searchDocumentOnServer() {
+        ServerAddress serverAddress = new ServerAddress(address, port, null);
+        if (mBound) {
+            // Create and send a message to the service, using a supported 'what' value
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEARCH_DOC, 0, 0, serverAddress);
+            try {
+                mMessenger.send(msg);
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+    }
+
+    private void saveFields(){
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("ip", address);
+        editor.putString("port", port);
+        editor.apply();
+    }
+
+    private void restoreFields(){
+        if (address == null) {
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            address = sharedPref.getString("ip", "192.168.142.105");
+            port = sharedPref.getString("port", "8001");
+        }
+    }
+
+
+
+
 }

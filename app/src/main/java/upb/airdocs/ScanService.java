@@ -58,6 +58,9 @@ public class ScanService extends Service {
     public static final int MSG_STOP_SCAN = 3;
     public static final int MSG_SCAN_SEND_DOC = 4;
     public static final int MSG_SCAN_SEARCH_DOC = 5;
+    public static final int MSG_SEND_DONE = 6;
+    public static final int MSG_ACTUAL_SEND_DOC = 7;
+    public static final int MSG_ACTUAL_SEARCH_DOC = 8;
 
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
@@ -73,6 +76,12 @@ public class ScanService extends Service {
     public static int sent = -1;
 
     public static int scanLimit = 1;
+
+    //Message type
+    private static final int TYPE_TESTING = 0;
+    private static final int TYPE_SEND_DOC = 1;
+    private static final int TYPE_SEARCH_DOC = 2;
+
 
     public ScanService() {
     }
@@ -196,26 +205,46 @@ public class ScanService extends Service {
         }
     }
 
-    private void sendFingerprintsToServer(final String address, final String port){
+    private void sendFingerprintsToServer(final String address, final String port, final int type, String documentURL){
         final JSONObject fingerprintCollectionsJSON = buildFinalJSON();
+        final JSONObject jsonObjectFinal = new JSONObject();
         try {
-            Log.d(LOG_TAG, "Final JSON:");
-            Log.d(LOG_TAG, fingerprintCollectionsJSON.toString(4));
+            if (type == TYPE_TESTING) {
+                jsonObjectFinal.put("type", String.valueOf(TYPE_TESTING));
+                jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
+            }
+            else if (type == TYPE_SEND_DOC){
+                jsonObjectFinal.put("type", String.valueOf(TYPE_SEND_DOC));
+                jsonObjectFinal.put("document", documentURL);
+                jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
+            }
+            else if (type == TYPE_SEARCH_DOC){
+                jsonObjectFinal.put("type", String.valueOf(TYPE_SEARCH_DOC));
+                jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        try {
+            Log.d(LOG_TAG, "Final JSON:");
+            Log.d(LOG_TAG, jsonObjectFinal.toString(4));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         new Thread(new Runnable() {
             public void run() {
-                sendJSONtoServer(address, port, fingerprintCollectionsJSON);
+                sendJSONtoServer(address, port, jsonObjectFinal, type);
             }
         }).start();
     }
 
+
+
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
-    public void sendJSONtoServer(String address, String port, JSONObject jsonObject){
+    public void sendJSONtoServer(String address, String port, JSONObject jsonObject, int type){
 
         try {
             URL url = new URL("http://"+address+":"+port);
@@ -248,14 +277,32 @@ public class ScanService extends Service {
                 Log.d(LOG_TAG, response.toString());
 
                 if (response.toString().equals("<html><body><h1>Successful POST</h1></body></html>")){
-                    collectionsList = new ArrayList<FingerprintCollection>();
-                    numberOfCollections = 0;
-                    numberOfScansInCollection = 0;
-                    numberOfTotalScans = 0;
-                    displayNumberOfScans();
-                    sent = 1;
-                    Log.d(LOG_TAG, "Success");
-                    displaySendStatus();
+                    if (type == TYPE_TESTING) {
+                        collectionsList = new ArrayList<FingerprintCollection>();
+                        numberOfCollections = 0;
+                        numberOfScansInCollection = 0;
+                        numberOfTotalScans = 0;
+                        displayNumberOfScans();
+                        sent = 1;
+                        Log.d(LOG_TAG, "Success");
+                        displaySendStatus();
+                    }
+                    else if (type == TYPE_SEND_DOC){
+                        collectionsList = new ArrayList<FingerprintCollection>();
+                        numberOfCollections = 0;
+                        numberOfScansInCollection = 0;
+                        numberOfTotalScans = 0;
+                        sent = 1;
+                        announceSendDone();
+                    }
+                    else if (type == TYPE_SEARCH_DOC){
+                        collectionsList = new ArrayList<FingerprintCollection>();
+                        numberOfCollections = 0;
+                        numberOfScansInCollection = 0;
+                        numberOfTotalScans = 0;
+                        sent = 1;
+                        announceSendDone();
+                    }
                 }
                 else{
                     Log.d(LOG_TAG, "Failed");
@@ -280,12 +327,14 @@ public class ScanService extends Service {
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
+            String address;
+            String port;
             switch (msg.what) {
                 case MSG_SEND:
-                    String address = ((ServerAddress)msg.obj).getAddress();
-                    String port = ((ServerAddress)msg.obj).getPort();
+                    address = ((ServerAddress)msg.obj).getAddress();
+                    port = ((ServerAddress)msg.obj).getPort();
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
-                    sendFingerprintsToServer(address, port);
+                    sendFingerprintsToServer(address, port, TYPE_TESTING, null);
                     break;
                 case MSG_START_SCAN:
                     AuxObj auxObj = (AuxObj)msg.obj;
@@ -301,11 +350,28 @@ public class ScanService extends Service {
                     break;
                 case MSG_SCAN_SEND_DOC:
                     Log.d(LOG_TAG, "Scan and send document");
-                    stopScanInActivity();
+                    scanLimit = 1;
+                    doScan();
                     break;
                 case MSG_SCAN_SEARCH_DOC:
                     Log.d(LOG_TAG, "Scan and search document");
-                    stopScanInActivity();
+                    scanLimit = 1;
+                    doScan();
+                    break;
+                case MSG_ACTUAL_SEND_DOC:
+                    Log.d(LOG_TAG, "Actual send document");
+                    address = ((ServerAddress)msg.obj).getAddress();
+                    port = ((ServerAddress)msg.obj).getPort();
+                    String documentURL = ((ServerAddress)msg.obj).getDocumentURL();
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + documentURL);
+                    sendFingerprintsToServer(address, port, TYPE_SEND_DOC, documentURL);
+                    break;
+                case MSG_ACTUAL_SEARCH_DOC:
+                    Log.d(LOG_TAG, "Actual search document");
+                    address = ((ServerAddress)msg.obj).getAddress();
+                    port = ((ServerAddress)msg.obj).getPort();
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
+                    sendFingerprintsToServer(address, port, TYPE_SEARCH_DOC, null);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -368,7 +434,13 @@ public class ScanService extends Service {
         Intent intent = new Intent("msg");
         intent.putExtra("message", UPDATE_SEND_STATUS);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
+    public void announceSendDone(){
+        Log.d(LOG_TAG, "Announce Send Done to Activity");
+        Intent intent = new Intent("msg");
+        intent.putExtra("message", MSG_SEND_DONE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
 }

@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
     // Flag indicating whether we have called bind on the service.
     boolean mBound;
 
+    String address;
+    String port;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
         final EditText portEditText = (EditText) findViewById(R.id.port);
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String address = addressEditText.getText().toString();
-                String port = portEditText.getText().toString();
+                address = addressEditText.getText().toString();
+                port = portEditText.getText().toString();
                 Log.d(LOG_TAG, "address= " + address + " port=" + port);
                 onSendButton(address, port);
             }
@@ -123,13 +126,18 @@ public class MainActivity extends AppCompatActivity {
         final Button switchToUsermodeButton = (Button) findViewById(R.id.switch_to_usermode);
         switchToUsermodeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), UserActivity.class));
+                Intent intent = new Intent(getBaseContext(), UserActivity.class);
+                address = addressEditText.getText().toString();
+                port = portEditText.getText().toString();
+                intent.putExtra("address", address);
+                intent.putExtra("port", port);
+                startActivity(intent);
             }
         });
     }
 
     public void onSendButton(String address, String port) {
-        ServerAddress serverAddress = new ServerAddress(address, port);
+        ServerAddress serverAddress = new ServerAddress(address, port, null);
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_SEND, 0, 0, serverAddress);
@@ -353,6 +361,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        restoreFields();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        saveFields();
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
         stopService();
         saveFields();
@@ -378,15 +398,13 @@ public class MainActivity extends AppCompatActivity {
         final EditText portEditText = (EditText) findViewById(R.id.port);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        String ip = sharedPref.getString("ip", "192.168.142.105");
-        addressEditText.setText(ip);
-        String port = sharedPref.getString("port", "8001");
+        address = sharedPref.getString("ip", "192.168.142.105");
+        addressEditText.setText(address);
+        port = sharedPref.getString("port", "8001");
         portEditText.setText(port);
         selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
         x = sharedPref.getFloat("x", Float.parseFloat("-1"));
         y = sharedPref.getFloat("y", Float.parseFloat("-1"));
-
-
     }
 
 }

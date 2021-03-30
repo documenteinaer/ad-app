@@ -357,19 +357,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
-        super.onPause();
-    }
-
-    @Override
-    protected void onStart() {
-        restoreFields();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
         saveFields();
-        super.onStop();
+        super.onPause();
     }
 
     @Override

@@ -276,8 +276,7 @@ public class ScanService extends Service {
                 }
                 Log.d(LOG_TAG, response.toString());
 
-                if (response.toString().equals("<html><body><h1>Successful POST</h1></body></html>")){
-                    if (type == TYPE_TESTING) {
+                if (response.toString().equals("<html><body><h1>Successful Testing</h1></body></html>") && (type == TYPE_TESTING)){
                         collectionsList = new ArrayList<FingerprintCollection>();
                         numberOfCollections = 0;
                         numberOfScansInCollection = 0;
@@ -286,23 +285,22 @@ public class ScanService extends Service {
                         sent = 1;
                         Log.d(LOG_TAG, "Success");
                         displaySendStatus();
-                    }
-                    else if (type == TYPE_SEND_DOC){
+                }
+                else if (response.toString().equals("<html><body><h1>Successful Sending</h1></body></html>") && (type == TYPE_SEND_DOC)){
                         collectionsList = new ArrayList<FingerprintCollection>();
                         numberOfCollections = 0;
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
                         announceSendDone();
-                    }
-                    else if (type == TYPE_SEARCH_DOC){
+                }
+                else if (type == TYPE_SEARCH_DOC){
                         collectionsList = new ArrayList<FingerprintCollection>();
                         numberOfCollections = 0;
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
                         announceSendDone();
-                    }
                 }
                 else{
                     Log.d(LOG_TAG, "Failed");

@@ -116,7 +116,6 @@ public class UserActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("msg"));
     }
 

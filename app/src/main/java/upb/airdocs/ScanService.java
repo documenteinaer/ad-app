@@ -292,7 +292,7 @@ public class ScanService extends Service {
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
-                        announceSendDone();
+                        announceSendDone(null);
                 }
                 else if (type == TYPE_SEARCH_DOC){
                         collectionsList = new ArrayList<FingerprintCollection>();
@@ -300,7 +300,11 @@ public class ScanService extends Service {
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
-                        announceSendDone();
+                        String delims = "[<>]+";
+                        String[] tokens = response.toString().split(delims);
+                        String receivedURL = tokens[4];
+                        Log.d(LOG_TAG, receivedURL);
+                        announceSendDone(receivedURL);
                 }
                 else{
                     Log.d(LOG_TAG, "Failed");
@@ -434,10 +438,11 @@ public class ScanService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public void announceSendDone(){
+    public void announceSendDone(String receivedURL){
         Log.d(LOG_TAG, "Announce Send Done to Activity");
         Intent intent = new Intent("msg");
         intent.putExtra("message", MSG_SEND_DONE);
+        if (receivedURL != null) intent.putExtra("receivedURL", receivedURL);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

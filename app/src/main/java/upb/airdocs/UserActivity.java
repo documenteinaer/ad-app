@@ -300,6 +300,8 @@ public class UserActivity extends Activity {
                 if (search == true){
                     scanSearchDocButton.setEnabled(true);
                     scanSearchStatus.setText("Sent successfuly");
+                    String receivedURL = intent.getStringExtra("receivedURL");
+                    receivedDocumentURL.setText(receivedURL);
                     search = false;
                 }
             }

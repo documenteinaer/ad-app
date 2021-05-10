@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     String address;
     String port;
 
+    String devID;
+    boolean serviceStarted = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         restoreFields();
 
-        AsyncTaskRunner runner = new AsyncTaskRunner();
-        runner.execute();
+        getDevIDAndStartService();
 
         final Button selectMapButton = (Button) findViewById(R.id.select_map);
         selectMapButton.setOnClickListener(new View.OnClickListener() {
@@ -92,8 +94,15 @@ public class MainActivity extends AppCompatActivity {
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                if (scanActive == false) {
+                if (devID == null && serviceStarted == false){
+                    getDevIDAndStartService();
+                    Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
+                }
+                else if (devID != null && serviceStarted == false){
+                    startService();
+                    Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
+                }
+                else if (scanActive == false) {
                     if (permissionGranted == true) {
                         onStartScan(comment.getText().toString(), numberOfScans.getText().toString());
                         scanActive = true;
@@ -134,6 +143,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void getDevIDAndStartService(){
+        if (devID == null) {
+            AsyncTaskRunner runner = new AsyncTaskRunner();
+            runner.execute();
+        }
+        else{
+            final TextView devIDTextView = (TextView) findViewById(R.id.devID);
+            devIDTextView.setText("Device "+devID);
+            startService();
+        }
     }
 
     public void onSendButton(String address, String port) {
@@ -205,11 +226,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void startService(String devID) {
-        Intent serviceIntent = new Intent(this, ScanService.class);
-        serviceIntent.putExtra("devID", devID);
-        ContextCompat.startForegroundService(this, serviceIntent);
-        bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
+    public void startService() {
+        if (devID != null) {
+            Intent serviceIntent = new Intent(this, ScanService.class);
+            serviceIntent.putExtra("devID", devID);
+            ContextCompat.startForegroundService(this, serviceIntent);
+            bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
+            serviceStarted = true;
+        }
+        else{
+            serviceStarted = false;
+        }
     }
 
     public void stopService() {
@@ -267,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
             String id;
             try {
                 id = getID();
+                devID = id;
             } catch (Exception e) {
                 e.printStackTrace();
                 id = null;
@@ -276,7 +304,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            startService(result);
+            final TextView devIDTextView = (TextView) findViewById(R.id.devID);
+            devIDTextView.setText("Device "+devID);
+            startService();
         }
     }
 
@@ -379,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("selectedMap", selectedMap);
         editor.putFloat("x", x);
         editor.putFloat("y", y);
+        editor.putString("devID", devID);
         editor.apply();
     }
 
@@ -394,6 +425,7 @@ public class MainActivity extends AppCompatActivity {
         selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
         x = sharedPref.getFloat("x", Float.parseFloat("-1"));
         y = sharedPref.getFloat("y", Float.parseFloat("-1"));
+        devID = sharedPref.getString("devID", null);
     }
 
 }

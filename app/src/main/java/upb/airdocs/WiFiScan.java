@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -112,11 +115,22 @@ public class WiFiScan {
         ScanService.numberOfTotalScans++;
         displayNumberOfScans();
         ScanService.currentFingerprint = new Fingerprint();
+        beep();
         if (ScanService.numberOfScansInCollection >= ScanService.scanLimit){
             stop = true;
             Log.d(LOG_TAG, "The number of fingerprints reached the configured limit. Stopping now.");
             ((ScanService)mContext).stopScan();
             ((ScanService)mContext).stopScanInActivity();
+        }
+    }
+
+    private void beep(){
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(mContext, notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

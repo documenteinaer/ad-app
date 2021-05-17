@@ -50,10 +50,6 @@ public class FingerprintCollection{
         this.y_p = y_p;
     }
 
-    public void setZ_P(float y_p) {
-        this.y_p = y_p;
-    }
-
     public void setX(float x) {
         this.x = x;
     }
@@ -82,7 +78,6 @@ public class FingerprintCollection{
             collectionJSON.put("map", map);
             collectionJSON.put("x_p", x_p);
             collectionJSON.put("y_p", y_p);
-            collectionJSON.put("z_p", z_p);
             collectionJSON.put("x", x);
             collectionJSON.put("y", y);
             collectionJSON.put("z", z);
@@ -112,7 +107,6 @@ public class FingerprintCollection{
         Log.d(LOG_TAG, "map: " + map);
         Log.d(LOG_TAG, "x_p: " + x_p);
         Log.d(LOG_TAG, "y_p: " + y_p);
-        Log.d(LOG_TAG, "z_p: " + z_p);
         Log.d(LOG_TAG, "x: " + x);
         Log.d(LOG_TAG, "y: " + y);
         Log.d(LOG_TAG, "z: " + z);

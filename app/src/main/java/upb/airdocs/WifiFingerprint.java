@@ -1,5 +1,6 @@
 package upb.airdocs;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,10 +52,12 @@ public class WifiFingerprint {
 
     public JSONObject toJSON(){
         JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
         try {
             jsonObject.put("ssid", ssid);
             jsonObject.put("frequency", String.valueOf(frequency));
-            jsonObject.put("rssi", String.valueOf(rssi));
+            jsonArray.put(String.valueOf(rssi));
+            jsonObject.put("rssi", jsonArray);
         }
         catch(JSONException e){
             e.printStackTrace();

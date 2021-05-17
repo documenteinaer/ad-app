@@ -20,6 +20,10 @@ public class FingerprintCollection{
     private String map="-";
     private float x=-1;
     private float y=-1;
+    private float z=-1;
+    private float x_p=-1;
+    private float y_p=-1;
+    private float z_p=-1;
     public List<Fingerprint> itemList = new ArrayList<Fingerprint>();
 
     public void setDevId(String devId) {
@@ -38,11 +42,27 @@ public class FingerprintCollection{
         this.map = map;
     }
 
+    public void setX_P(float x_p) {
+        this.x_p = x_p;
+    }
+
+    public void setY_P(float y_p) {
+        this.y_p = y_p;
+    }
+
+    public void setZ_P(float y_p) {
+        this.y_p = y_p;
+    }
+
     public void setX(float x) {
         this.x = x;
     }
 
     public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float y) {
         this.y = y;
     }
 
@@ -60,8 +80,12 @@ public class FingerprintCollection{
             collectionJSON.put("AndroidVersion", androidVersion);
             collectionJSON.put("comment", comment);
             collectionJSON.put("map", map);
+            collectionJSON.put("x_p", x_p);
+            collectionJSON.put("y_p", y_p);
+            collectionJSON.put("z_p", z_p);
             collectionJSON.put("x", x);
             collectionJSON.put("y", y);
+            collectionJSON.put("z", z);
 
             JSONArray collectionFingerprintJSON = new JSONArray();
 
@@ -86,8 +110,12 @@ public class FingerprintCollection{
         Log.d(LOG_TAG, "AndroidVersion: " + androidVersion);
         Log.d(LOG_TAG, "comment: " + comment);
         Log.d(LOG_TAG, "map: " + map);
+        Log.d(LOG_TAG, "x_p: " + x_p);
+        Log.d(LOG_TAG, "y_p: " + y_p);
+        Log.d(LOG_TAG, "z_p: " + z_p);
         Log.d(LOG_TAG, "x: " + x);
         Log.d(LOG_TAG, "y: " + y);
+        Log.d(LOG_TAG, "z: " + z);
         Log.d(LOG_TAG, "fingerprints: ");
         for (int i = 0; i < itemList.size(); i++) {
             Fingerprint fingerprint = itemList.get(i);

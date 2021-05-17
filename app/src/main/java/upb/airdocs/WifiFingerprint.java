@@ -56,7 +56,7 @@ public class WifiFingerprint {
         try {
             jsonObject.put("ssid", ssid);
             jsonObject.put("frequency", String.valueOf(frequency));
-            jsonArray.put(String.valueOf(rssi));
+            jsonArray.put(rssi);
             jsonObject.put("rssi", jsonArray);
         }
         catch(JSONException e){

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -42,8 +43,11 @@ public class SelectPointActivity extends Activity {
     private AndroidGesturesManager gesturesManager;
     private float mScaleFactor = 1.0f;
 
-    Matrix matrix = new Matrix();
-    Matrix savedMatrix = new Matrix();
+    float bmapWidth = 0;
+    float bmapHeight = 0;
+    int screen_width = 0;
+    int screen_height = 0;
+    float initial_scale = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,26 @@ public class SelectPointActivity extends Activity {
 
         setupGesturesManager();
         setupViews();
+        getImageScale();
+    }
+
+    private void getImageScale(){
+        BitmapDrawable bmap = (BitmapDrawable) imageView.getDrawable();
+        bmapWidth = bmap.getBitmap().getWidth();
+        bmapHeight = bmap.getBitmap().getHeight();
+
+        Log.d(LOG_TAG, "image width (pixels): "+bmapWidth+" height(pixels): "+bmapHeight);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        ((WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
+        screen_width = metrics.widthPixels;
+        screen_height = metrics.heightPixels;
+
+        Log.d(LOG_TAG, "screen width: "+screen_width+" screen height: "+screen_height);
+
+        initial_scale = screen_width/bmapWidth;
+
+        Log.d(LOG_TAG,"initial scale: " + initial_scale);
     }
 
     private void setupGesturesManager(){
@@ -87,14 +111,22 @@ public class SelectPointActivity extends Activity {
             int coord[] = new int[2];
             imageView.getLocationOnScreen(coord);
 
+            float event_x = e.getX();
+            float event_y = e.getY();
 
-            Log.d(LOG_TAG, "img x: "+coord[0]+" img y: "+coord[1]);
+            Log.d(LOG_TAG, "img location on screen: x: "+coord[0]+" y: "+coord[1]);
 
-            Log.d(LOG_TAG, "event x: "+e.getX()+" event y: "+e.getY());
+            Log.d(LOG_TAG, "event x: "+event_x+" event y: "+event_y);
 
             float x = (e.getX() - coord[0])/mScaleFactor;
             float y = (e.getY() - coord[1])/mScaleFactor;
-            Log.d(LOG_TAG, "adjusted x: "+x+" adjusted y: "+y);
+            //Log.d(LOG_TAG, "adjusted x: "+x+" adjusted y: "+y);
+
+            float adj_x = x / initial_scale;
+            float adj_y = y /initial_scale;
+
+            Log.d(LOG_TAG, "Pixel x: "+adj_x+" y: "+adj_y);
+
 
             // The coordinates of the target point
             float dst[] = new float[2];
@@ -108,23 +140,22 @@ public class SelectPointActivity extends Activity {
             inverseMatrix.mapPoints(dst, new float[]{x, y});
             float dstX = dst[0];
             float dstY = dst[1];
-            Log.d(LOG_TAG, "Image X: " + dstX + " Y: " + dstY);
+            //Log.d(LOG_TAG, "Image X: " + dstX + " Y: " + dstY);
             drawPoint(dstX, dstY);
-            int pixelX = (int)(dstX / 2.62);
-            int pixelY = (int)(dstY / 2.62);
-            TextView textView = findViewById(R.id.coordinates);
-            textView.setText("X: " + pixelX + " Y: " + pixelY);
-            Log.d(LOG_TAG, "Pixel X: " + pixelX + " Pixel Y: " + pixelY);
+
             if (dstX < 0 || dstY < 0) {
                 Toast.makeText(getBaseContext(),
                         "Touched outside the map.",
                         Toast.LENGTH_SHORT).show();
-            } else {
+            }
+            else{
+                TextView textView = findViewById(R.id.coordinates);
+                textView.setText("X: " + adj_x + " Y: " + adj_y);
                 Toast.makeText(getBaseContext(),
-                        "X: " + pixelX + " Y: " + pixelY,
+                        "X: " + adj_x + " Y: " + adj_y,
                         Toast.LENGTH_SHORT).show();
-                MainActivity.x = pixelX;
-                MainActivity.y = pixelY;
+                MainActivity.x = adj_x;
+                MainActivity.y = adj_y;
             }
 
             return super.onSingleTapConfirmed(e);

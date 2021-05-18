@@ -407,6 +407,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("ip", addressEditText.getText().toString());
         editor.putString("port", portEditText.getText().toString());
         editor.putString("selectedMap", selectedMap);
+        editor.putInt("selectedMapID", selectedMapID);
         editor.putFloat("x", x);
         editor.putFloat("y", y);
         editor.putString("devID", devID);
@@ -423,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
         port = sharedPref.getString("port", "8001");
         portEditText.setText(port);
         selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
+        selectedMapID = sharedPref.getInt("selectedMapID", R.drawable.precis_subsol);
         x = sharedPref.getFloat("x", Float.parseFloat("-1"));
         y = sharedPref.getFloat("y", Float.parseFloat("-1"));
         devID = sharedPref.getString("devID", null);

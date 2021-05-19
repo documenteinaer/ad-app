@@ -41,10 +41,6 @@ public class SelectPointActivity extends Activity {
     private float dx = 0f;
     private float dy = 0f;
 
-    private float translated_x = 0f;
-    private float translated_y = 0f;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,7 +225,6 @@ public class SelectPointActivity extends Activity {
         Paint paint = new Paint();
         paint.setColor(Color.BLUE);
         paint.setStrokeWidth(2);
-        //tempCanvas.drawCircle(coordinateX, coordinateY, 15, paint);
         tempCanvas.drawLine(coordinateX-20, coordinateY, coordinateX+20, coordinateY, paint);
         tempCanvas.drawLine(coordinateX, coordinateY-20, coordinateX, coordinateY+20, paint);
 

@@ -10,30 +10,20 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
-import com.mapbox.android.gestures.Constants;
-import com.mapbox.android.gestures.MoveGestureDetector;
-import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.StandardGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
-import com.mapbox.android.gestures.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class SelectPointActivity extends Activity {
     private static final String LOG_TAG = "SelectPointActivity";
@@ -48,6 +38,12 @@ public class SelectPointActivity extends Activity {
     int screen_width = 0;
     int screen_height = 0;
     float initial_scale = 0;
+    private float dx = 0f;
+    private float dy = 0f;
+
+    private float translated_x = 0f;
+    private float translated_y = 0f;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -177,27 +173,24 @@ public class SelectPointActivity extends Activity {
             float oldScaleFactor = mScaleFactor;
             float newScaleFactor = detector.getScaleFactor();
             mScaleFactor *= newScaleFactor;
-            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
+            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 20.0f));
             float x = detector.getFocalPoint().x;
             float y = detector.getFocalPoint().y;
-            //float width = imageView.;
-            //float height = imageView.getDrawable().;
             Log.d(LOG_TAG, "x: "+x+" y: "+y);
-            //Log.d(LOG_TAG, "width: "+width+" height: "+height);
-            //imageView.setScaleType(ImageView.ScaleType.MATRIX);
-            //Matrix matrix = imageView.getImageMatrix();
-            //matrix.setScale(mScaleFactor, mScaleFactor, x, y);
-            //matrix.postScale(mScaleFactor, mScaleFactor, x, y);
-            //imageView.setImageMatrix(matrix);
-            //imageView.setTranslationX(imageView.getTranslationX() - x/10);
-            //imageView.setTranslationY(imageView.getTranslationY() + y/10);
 
-            imageView.setPivotX(x);
-            imageView.setPivotY(y);
+            float adjustedScaleFactor = mScaleFactor / oldScaleFactor;
+            dx += (dx - x) * (adjustedScaleFactor - 1);
+            dy += (dy - y) * (adjustedScaleFactor - 1);
+
+
+            imageView.setPivotX(0f);
+            imageView.setPivotY(0f);
 
             imageView.setScaleX(mScaleFactor);
             imageView.setScaleY(mScaleFactor);
 
+            imageView.setTranslationX(dx);
+            imageView.setTranslationY(dy);
 
 
             Log.d(LOG_TAG, "scale factor: "+mScaleFactor);
@@ -208,6 +201,7 @@ public class SelectPointActivity extends Activity {
         public void onScaleEnd(StandardScaleGestureDetector detector, float velocityX, float velocityY) {
             gesturesManager.getMoveGestureDetector().setEnabled(true);
         }
+
     }
 
     private class MoveGestureDetector extends com.mapbox.android.gestures.MoveGestureDetector.SimpleOnMoveGestureListener {
@@ -217,9 +211,8 @@ public class SelectPointActivity extends Activity {
                 Log.d(LOG_TAG, "moving gesture: x: "+distanceX+" y: "+distanceY);
                 imageView.setTranslationX(imageView.getTranslationX() - distanceX);
                 imageView.setTranslationY(imageView.getTranslationY() - distanceY);
-                //moveX -= distanceX;
-                //moveY -= distanceY;
-                //Log.d(LOG_TAG, "moveX: "+moveX+" moveY: "+moveY);
+                dx -= distanceX;
+                dy -= distanceY;
             }
             return super.onMove(detector, distanceX, distanceY);
         }

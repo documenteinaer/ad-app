@@ -342,8 +342,11 @@ public class ScanService extends Service {
                     AuxObj auxObj = (AuxObj)msg.obj;
                     currentFingerprintCollection.setComment(auxObj.comment);
                     currentFingerprintCollection.setMap(auxObj.map);
-                    currentFingerprintCollection.setX_P(auxObj.x);
-                    currentFingerprintCollection.setY_P(auxObj.y);
+                    currentFingerprintCollection.setX_P(auxObj.x_p);
+                    currentFingerprintCollection.setY_P(auxObj.y_p);
+                    currentFingerprintCollection.setX(auxObj.x);
+                    currentFingerprintCollection.setY(auxObj.y);
+                    currentFingerprintCollection.setZ(auxObj.z);
                     scanLimit = auxObj.noScans;
                     doScan();
                     break;

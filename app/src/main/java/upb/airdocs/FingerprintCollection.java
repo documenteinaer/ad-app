@@ -23,7 +23,6 @@ public class FingerprintCollection{
     private float z=-1;
     private float x_p=-1;
     private float y_p=-1;
-    private float z_p=-1;
     public List<Fingerprint> itemList = new ArrayList<Fingerprint>();
 
     public void setDevId(String devId) {
@@ -58,8 +57,8 @@ public class FingerprintCollection{
         this.y = y;
     }
 
-    public void setZ(float y) {
-        this.y = y;
+    public void setZ(float z) {
+        this.z = z;
     }
 
     public void addFingerprintToCollection(Fingerprint fingerprint){

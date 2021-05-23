@@ -10,7 +10,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -29,7 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import com.google.android.gms.ads.*;
+import java.util.HashMap;
+
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -41,12 +41,15 @@ public class MainActivity extends AppCompatActivity {
     final private static int MY_PERMISSIONS_REQUEST = 126;
     private boolean scanActive = false;
     private boolean permissionGranted = false;
+    HashMap hashMap = new HashMap();
 
     public static String selectedMap = "precis_subsol.png";
     public static int selectedMapID = R.drawable.precis_subsol;
+    public static float x_p = -1;
+    public static float y_p = -1;
     public static float x = -1;
     public static float y = -1;
-
+    public static float z = -1;
 
     //  Messenger for communicating with the service.
     Messenger mMessenger = null;
@@ -64,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setMapData();
 
         requestAllPermissions();
 
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStartScan(String comment, String noSscans) {
         if (mBound) {
             int nos =Integer.parseInt(noSscans);
-            AuxObj auxObj = new AuxObj(comment, selectedMap, x, y, nos);
+            AuxObj auxObj = new AuxObj(comment, selectedMap, x_p, y_p, x, y, z, nos);
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, auxObj);
             try {
@@ -320,11 +325,12 @@ public class MainActivity extends AppCompatActivity {
             final EditText mapName = (EditText) findViewById(R.id.map_name);
             mapName.setText(selectedMap);
         }
-        if (x >= 0 && y >= 0) {
-            final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
-            coordinateX.setText(Float.toString(x));
-            final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
-            coordinateY.setText(Float.toString(y));
+        if (x_p >= 0 && y_p >= 0) {
+            final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
+            coordinateX_P.setText(Float.toString(x_p));
+            final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
+            coordinateY_P.setText(Float.toString(y_p));
+            compute_coordinates();
         }
         if (mBound){ //Obtain information from the service and update the activity
             int numberOfScansInCollection = ScanService.numberOfScansInCollection;
@@ -408,8 +414,11 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("port", portEditText.getText().toString());
         editor.putString("selectedMap", selectedMap);
         editor.putInt("selectedMapID", selectedMapID);
+        editor.putFloat("x_p", x_p);
+        editor.putFloat("y_p", y_p);
         editor.putFloat("x", x);
         editor.putFloat("y", y);
+        editor.putFloat("z", z);
         editor.putString("devID", devID);
         editor.apply();
     }
@@ -425,9 +434,124 @@ public class MainActivity extends AppCompatActivity {
         portEditText.setText(port);
         selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
         selectedMapID = sharedPref.getInt("selectedMapID", R.drawable.precis_subsol);
+        x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
+        y_p = sharedPref.getFloat("y_p", Float.parseFloat("-1"));
         x = sharedPref.getFloat("x", Float.parseFloat("-1"));
         y = sharedPref.getFloat("y", Float.parseFloat("-1"));
+        z = sharedPref.getFloat("z", Float.parseFloat("-1"));
         devID = sharedPref.getString("devID", null);
+
+        final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
+        coordinateX_P.setText(Float.toString(x_p));
+        final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
+        coordinateY_P.setText(Float.toString(y_p));
+        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
+        coordinateX.setText(Float.toString(x));
+        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
+        coordinateY.setText(Float.toString(y));
+        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
+        coordinateZ.setText(Float.toString(z));
+    }
+
+    private void setMapData(){
+
+        //e0 s=0.0509 r=0.000 tx=5.498 ty=-0.002 z=86.50
+        MapData mapData = new MapData();
+        mapData.s = 0.0509f;
+        mapData.r = 0.000f;
+        mapData.tx = 5.498f;
+        mapData.ty = -0.002f;
+        mapData.z = 86.50f;
+        hashMap.put("arch_precis_parter.png", mapData);
+
+        //e1 s=0.0512 r=0.000 tx=4.167 ty=-0.752 z=89.50
+        mapData = new MapData();
+        mapData.s = 0.0512f;
+        mapData.r = 0.000f;
+        mapData.tx = 4.167f;
+        mapData.ty = -0.752f;
+        mapData.z = 89.50f;
+        hashMap.put("arch_precis_etaj1.png", mapData);
+
+        //e2 s=0.0511 r=0.000 tx=19.804 ty=-0.391 z=92.50
+        mapData = new MapData();
+        mapData.s = 0.0511f;
+        mapData.r = 0.000f;
+        mapData.tx = 19.804f;
+        mapData.ty = -0.391f;
+        mapData.z = 92.50f;
+        hashMap.put("arch_precis_etaj2.png", mapData);
+
+        //e3 s=0.0510 r=0.000 tx=19.452 ty=0.046 z=95.50
+        mapData = new MapData();
+        mapData.s = 0.0510f;
+        mapData.r = 0.000f;
+        mapData.tx = 19.452f;
+        mapData.ty = 0.046f;
+        mapData.z = 95.50f;
+        hashMap.put("arch_precis_etaj3.png", mapData);
+
+        //e4 s=0.0511 r=0.000 tx=23.072 ty=0.988 z=98.50
+        mapData = new MapData();
+        mapData.s = 0.0511f;
+        mapData.r = 0.000f;
+        mapData.tx = 23.072f;
+        mapData.ty = 0.988f;
+        mapData.z = 98.50f;
+        hashMap.put("arch_precis_etaj4.png", mapData);
+
+        //e5 s=0.0509 r=0.000 tx=22.663 ty=0.430 z=101.50
+        mapData = new MapData();
+        mapData.s = 0.0509f;
+        mapData.r = 0.000f;
+        mapData.tx = 22.663f;
+        mapData.ty = 0.430f;
+        mapData.z = 101.50f;
+        hashMap.put("arch_precis_etaj5.png", mapData);
+
+        //e6 s=0.0512 r=0.000 tx=22.511 ty=0.246 z=104.50
+        mapData = new MapData();
+        mapData.s = 0.0512f;
+        mapData.r = 0.000f;
+        mapData.tx = 22.511f;
+        mapData.ty = 0.246f;
+        mapData.z = 104.50f;
+        hashMap.put("arch_precis_etaj6.png", mapData);
+
+        //e7 s=0.0511 r=0.000 tx=20.978 ty=-0.544 z=107.50
+        mapData = new MapData();
+        mapData.s = 0.0511f;
+        mapData.r = 0.000f;
+        mapData.tx = 20.978f;
+        mapData.ty = -0.544f;
+        mapData.z = 107.50f;
+        hashMap.put("arch_precis_etaj7.png", mapData);
+
+        //sub s=0.0509 r=0.000 tx=5.320 ty=0.735 z=83.50
+        mapData = new MapData();
+        mapData.s = 0.0509f;
+        mapData.r = 0.000f;
+        mapData.tx = 5.320f;
+        mapData.ty = 0.735f;
+        mapData.z = 83.50f;
+        hashMap.put("arch_precis_subsol.png", mapData);
+    }
+
+    public void compute_coordinates(){
+        MapData mapData = (MapData) hashMap.get(selectedMap);
+        x = x_p * mapData.s - y_p * mapData.r + mapData.tx;
+        y = x_p * mapData.r + y_p * mapData.s + mapData.ty;
+        z = mapData.z;
+
+        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
+        coordinateX.setText(Float.toString(x));
+        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
+        coordinateY.setText(Float.toString(y));
+        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
+        coordinateZ.setText(Float.toString(z));
+        saveFields();
+
+        //Log.d(LOG_TAG, "x = " + x + " y = " + y + " z = " + z);
     }
 
 }

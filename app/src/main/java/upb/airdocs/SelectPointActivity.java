@@ -146,8 +146,8 @@ public class SelectPointActivity extends Activity {
                 Toast.makeText(getBaseContext(),
                         "X: " + adj_x + " Y: " + adj_y,
                         Toast.LENGTH_SHORT).show();
-                MainActivity.x = adj_x;
-                MainActivity.y = adj_y;
+                MainActivity.x_p = adj_x;
+                MainActivity.y_p = adj_y;
             }
 
             return super.onSingleTapConfirmed(e);

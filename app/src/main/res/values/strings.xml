@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">AirDocs</string>
-    <string name="defaultIP">141.85.241.249</string>
+    <string name="defaultIP">192.168.42.105</string>
 </resources>

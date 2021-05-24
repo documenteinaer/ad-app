@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
                     onStopScan();
                     scanActive = false;
                     startScanButton.setText("Start Scan");
-
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
@@ -365,18 +364,6 @@ public class MainActivity extends AppCompatActivity {
                 scanActive = false;
                 Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
-                x = y = z = x_p = y_p = -1;
-                final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
-                coordinateX_P.setText(Float.toString(x_p));
-                final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
-                coordinateY_P.setText(Float.toString(y_p));
-                final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
-                coordinateX.setText(Float.toString(x));
-                final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
-                coordinateY.setText(Float.toString(y));
-                final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
-                coordinateZ.setText(Float.toString(z));
-
             }
             if (msg == ScanService.UPDATE_SCAN_NUMBERS) {
                 int numberOfScansInCollection = ScanService.numberOfScansInCollection;
@@ -441,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText portEditText = (EditText) findViewById(R.id.port);
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        address = sharedPref.getString("ip", "141.85.241.249");
+        address = sharedPref.getString("ip", "192.168.142.105");
         addressEditText.setText(address);
         port = sharedPref.getString("port", "8001");
         portEditText.setText(port);

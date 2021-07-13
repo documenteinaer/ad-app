@@ -5,7 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -99,8 +101,6 @@ public class ScanService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        devId = intent.getStringExtra("devID");
-        Log.d(LOG_TAG,"DeviceID=" + devId);
         setForeground(intent);
         return (START_STICKY);
     }
@@ -109,6 +109,13 @@ public class ScanService extends Service {
     public void onDestroy() {
         Log.d(LOG_TAG, "Destroying Scan Service.");
         stopForeground(true);
+    }
+
+    private void getDevId(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        devId = sharedPref.getString("devID", null);
+        Log.d(LOG_TAG, "devID="+devId);
     }
 
     private void setForeground(Intent intent) {
@@ -141,6 +148,7 @@ public class ScanService extends Service {
 
     private void doScan() {
         numberOfScansInCollection = 0;
+        getDevId();
         currentFingerprintCollection.setDevId(devId);
         numberOfCollections++;
 
@@ -240,8 +248,6 @@ public class ScanService extends Service {
         }).start();
     }
 
-
-
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
     public void sendJSONtoServer(String address, String port, JSONObject jsonObject, int type){
@@ -262,7 +268,7 @@ public class ScanService extends Service {
             catch(ConnectException e) {
                 sent = 0;
                 e.printStackTrace();
-                Log.d(LOG_TAG, "Failed");
+                Log.d(LOG_TAG, "Failed - connect exception");
                 displaySendStatus();
                 return;
             }
@@ -276,22 +282,23 @@ public class ScanService extends Service {
                 }
                 Log.d(LOG_TAG, response.toString() + " " + type);
 
-                if (response.toString().equals("<html><body><h1>Successful POST</h1></body></html>") && (type == TYPE_TESTING)){
+                if (response.toString().equals("<html><body><h1>Successful Testing</h1></body></html>") && (type == TYPE_TESTING)){
                         collectionsList = new ArrayList<FingerprintCollection>();
                         numberOfCollections = 0;
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         displayNumberOfScans();
                         sent = 1;
-                        Log.d(LOG_TAG, "Success");
+                        Log.d(LOG_TAG, "Success (testing)");
                         displaySendStatus();
                 }
-                else if (response.toString().equals("<html><body><h1>Successful POST</h1></body></html>") && type == TYPE_SEND_DOC ){
+                else if (response.toString().equals("<html><body><h1>Successful Sending</h1></body></html>") && type == TYPE_SEND_DOC ){
                         collectionsList = new ArrayList<FingerprintCollection>();
                         numberOfCollections = 0;
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
+                    Log.d(LOG_TAG, "Success (send doc)");
                         announceSendDone(null);
                 }
                 else if (type == TYPE_SEARCH_DOC){
@@ -300,6 +307,7 @@ public class ScanService extends Service {
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
+                        Log.d(LOG_TAG, "Success (search doc)");
                         String delims = "[<>]+";
                         String[] tokens = response.toString().split(delims);
                         String receivedURL = tokens[4];

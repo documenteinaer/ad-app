@@ -235,7 +235,6 @@ public class MainActivity extends AppCompatActivity {
     public void startService() {
         if (devID != null) {
             Intent serviceIntent = new Intent(this, ScanService.class);
-            serviceIntent.putExtra("devID", devID);
             ContextCompat.startForegroundService(this, serviceIntent);
             bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
             serviceStarted = true;
@@ -421,7 +420,9 @@ public class MainActivity extends AppCompatActivity {
         final EditText addressEditText = (EditText) findViewById(R.id.address);
         final EditText portEditText = (EditText) findViewById(R.id.port);
 
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("ip", addressEditText.getText().toString());
         editor.putString("port", portEditText.getText().toString());
@@ -440,8 +441,9 @@ public class MainActivity extends AppCompatActivity {
         final EditText addressEditText = (EditText) findViewById(R.id.address);
         final EditText portEditText = (EditText) findViewById(R.id.port);
 
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        address = sharedPref.getString("ip", "141.85.241.249");
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        address = sharedPref.getString("ip", "192.168.142.123");
         addressEditText.setText(address);
         port = sharedPref.getString("port", "8001");
         portEditText.setText(port);

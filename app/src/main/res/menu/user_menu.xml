@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/scan_no"
+        android:title="Number of scans">
+        <menu>
+            <group android:id="@+id/group1" android:checkableBehavior="single">
+            <item android:id="@+id/scan1" android:title="1"></item>
+            <item android:id="@+id/scan2" android:title="2"></item>
+            <item android:id="@+id/scan4" android:title="4"></item>
+            </group>
+        </menu>
+    </item>
+</menu>

@@ -363,12 +363,14 @@ public class ScanService extends Service {
                     break;
                 case MSG_SCAN_SEND_DOC:
                     Log.d(LOG_TAG, "Scan and send document");
-                    scanLimit = 1;
+                    scanLimit = msg.arg1;
+                    Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
                     break;
                 case MSG_SCAN_SEARCH_DOC:
                     Log.d(LOG_TAG, "Scan and search document");
-                    scanLimit = 1;
+                    scanLimit = msg.arg1;
+                    Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
                     break;
                 case MSG_ACTUAL_SEND_DOC:

@@ -138,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final Button saveAddressButton = (Button) findViewById(R.id.save_address);
+        saveAddressButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                saveFields();
+            }
+        });
+
         final Button switchToUsermodeButton = (Button) findViewById(R.id.switch_to_usermode);
         switchToUsermodeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -245,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopService() {
+        if (mBound)
+            unbindService(mConnection);
         Intent serviceIntent = new Intent(this, ScanService.class);
         stopService(serviceIntent);
     }

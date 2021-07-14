@@ -19,7 +19,11 @@ import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -27,15 +31,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
-import java.io.IOException;
-
-public class SearchDocumentActivity extends Activity {
+public class SearchDocumentActivity extends AppCompatActivity {
     private static final String LOG_TAG = "SearchDocumentActivity";
     final private static int MY_PERMISSIONS_REQUEST = 126;
     // Flag indicating whether we have called bind on the service.
@@ -54,6 +51,7 @@ public class SearchDocumentActivity extends Activity {
 
     String address;
     String port;
+    int scan_no;
 
 
     @Override
@@ -62,7 +60,8 @@ public class SearchDocumentActivity extends Activity {
         setContentView(R.layout.search_doc);
 
         requestAllPermissions();
-        restoreFields();
+        restoreAllFields();
+        Log.d(LOG_TAG, "IP=" + address + " scan_no=" + scan_no);
 
         startService();
 
@@ -108,19 +107,25 @@ public class SearchDocumentActivity extends Activity {
 
     @Override
     protected void onStart() {
-        restoreFields();
+        restoreAllFields();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        saveFields();
+        saveAllFields();
         super.onStop();
+    }
+
+    @Override
+    protected void onRestart() {
+        invalidateOptionsMenu();
+        super.onRestart();
     }
 
     private void onStartScanSearchDoc() {
         if (mBound) {
-            Message msg = Message.obtain(null, ScanService.MSG_SCAN_SEARCH_DOC, 4, 0, null);
+            Message msg = Message.obtain(null, ScanService.MSG_SCAN_SEARCH_DOC, scan_no, 0);
             try {
                 mMessenger.send(msg);
                 search = true;
@@ -167,6 +172,8 @@ public class SearchDocumentActivity extends Activity {
     }
 
     public void stopService() {
+        if (mBound)
+            unbindService(mConnection);
         Intent serviceIntent = new Intent(this, ScanService.class);
         stopService(serviceIntent);
     }
@@ -228,23 +235,94 @@ public class SearchDocumentActivity extends Activity {
         }
     }
 
-    private void saveFields(){
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_menu, menu);
+        restoreFieldScanNo();
+        switch (scan_no){
+            case 1:
+                MenuItem item1 = menu.findItem(R.id.scan1);
+                item1.setChecked(true);
+                return true;
+            case 2:
+                MenuItem item2 = menu.findItem(R.id.scan2);
+                item2.setChecked(true);
+                return true;
+            case 4:
+                MenuItem item4 = menu.findItem(R.id.scan4);
+                item4.setChecked(true);
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.scan_no:
+                return true;
+            case R.id.scan1:
+                item.setChecked(true);
+                scan_no = 1;
+                saveFieldScanNo();
+                return true;
+            case R.id.scan2:
+                item.setChecked(true);
+                scan_no = 2;
+                saveFieldScanNo();
+                return true;
+            case R.id.scan4:
+                item.setChecked(true);
+                scan_no = 4;
+                saveFieldScanNo();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void saveAllFields(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("ip", address);
         editor.putString("port", port);
+        editor.putInt("user_scan_no", scan_no);
+        Log.d(LOG_TAG, "Saved user scan no");
         editor.apply();
     }
 
-    private void restoreFields(){
+    private void restoreAllFields(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         if (address == null) {
-            Context context = getApplicationContext();
-            SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
             address = sharedPref.getString("ip", "192.168.142.105");
             port = sharedPref.getString("port", "8001");
         }
+        scan_no = sharedPref.getInt("user_scan_no", 1);
+        Log.d(LOG_TAG, "Restore user scan no");
     }
+
+    private void saveFieldScanNo(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("user_scan_no", scan_no);
+        Log.d(LOG_TAG, "Saved user scan no");
+        editor.apply();
+    }
+
+    private void restoreFieldScanNo(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        scan_no = sharedPref.getInt("user_scan_no", 1);
+        Log.d(LOG_TAG, "Restore user scan no");
+    }
+
 
 
 

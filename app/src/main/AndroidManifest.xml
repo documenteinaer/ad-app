@@ -30,15 +30,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name=".TestingActivity"
+            android:label="AirDocs" />
         <activity
             android:name=".UserActivity"
-            android:label="AirDocs"/>
+            android:label="AirDocs">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="AirDocs" />
         <activity
             android:name=".PostDocumentActivity"
             android:label="AirDocs" />
@@ -51,7 +56,6 @@
         <activity
             android:name=".SelectPointActivity"
             android:label="AirDocs" />
-
         <service
             android:name=".ScanService"
             android:enabled="true"

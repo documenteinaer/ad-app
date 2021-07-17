@@ -113,19 +113,20 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        restoreAllFields();
+        //restoreAllFields();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        saveAllFields();
+        //saveAllFields();
         super.onStop();
     }
 
     @Override
     protected void onRestart() {
-        invalidateOptionsMenu();
+        restoreAllFields();
+        //invalidateOptionsMenu();
         super.onRestart();
     }
 
@@ -248,51 +249,29 @@ public class PostDocumentActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
-        restoreFieldScanNo();
-        switch (scan_no){
-            case 1:
-                MenuItem item1 = menu.findItem(R.id.scan1);
-                item1.setChecked(true);
-                return true;
-            case 2:
-                MenuItem item2 = menu.findItem(R.id.scan2);
-                item2.setChecked(true);
-                return true;
-            case 4:
-                MenuItem item4 = menu.findItem(R.id.scan4);
-                item4.setChecked(true);
-                return true;
-            default:
-                return true;
-        }
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
-            case R.id.scan_no:
+            case R.id.settings:
+                //Go to settings activity
+                intent = new Intent(getBaseContext(), SettingsActivity.class);
+                startActivity(intent);
                 return true;
-            case R.id.scan1:
-                item.setChecked(true);
-                scan_no = 1;
-                saveFieldScanNo();
-                return true;
-            case R.id.scan2:
-                item.setChecked(true);
-                scan_no = 2;
-                saveFieldScanNo();
-                return true;
-            case R.id.scan4:
-                item.setChecked(true);
-                scan_no = 4;
-                saveFieldScanNo();
+            case R.id.testing_activity:
+                //Go to testing activity
+                intent = new Intent(getBaseContext(), TestingActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void saveAllFields(){
+    /*private void saveAllFields(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -301,7 +280,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         editor.putInt("user_scan_no", scan_no);
         Log.d(LOG_TAG, "Saved user scan no");
         editor.apply();
-    }
+    }*/
 
     private void restoreAllFields(){
         Context context = getApplicationContext();
@@ -310,22 +289,6 @@ public class PostDocumentActivity extends AppCompatActivity {
             address = sharedPref.getString("ip", "192.168.142.105");
             port = sharedPref.getString("port", "8001");
         }
-        scan_no = sharedPref.getInt("user_scan_no", 1);
-        Log.d(LOG_TAG, "Restore user scan no");
-    }
-
-    private void saveFieldScanNo(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("user_scan_no", scan_no);
-        Log.d(LOG_TAG, "Saved user scan no");
-        editor.apply();
-    }
-
-    private void restoreFieldScanNo(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         scan_no = sharedPref.getInt("user_scan_no", 1);
         Log.d(LOG_TAG, "Restore user scan no");
     }

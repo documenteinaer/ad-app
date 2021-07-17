@@ -80,7 +80,7 @@ public class SelectPointActivity extends Activity {
 
     private void setupViews(){
         imageView = (ImageView) findViewById(R.id.selected_map);
-        imageView.setImageResource(MainActivity.selectedMapID);
+        imageView.setImageResource(TestingActivity.selectedMapID);
         backButton = (Button) findViewById(R.id.back_from_select_point);
         backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -146,8 +146,8 @@ public class SelectPointActivity extends Activity {
                 Toast.makeText(getBaseContext(),
                         "X: " + adj_x + " Y: " + adj_y,
                         Toast.LENGTH_SHORT).show();
-                MainActivity.x_p = adj_x;
-                MainActivity.y_p = adj_y;
+                TestingActivity.x_p = adj_x;
+                TestingActivity.y_p = adj_y;
             }
 
             return super.onSingleTapConfirmed(e);
@@ -215,7 +215,7 @@ public class SelectPointActivity extends Activity {
     }
 
     private void drawPoint(float coordinateX, float coordinateY) {
-        Bitmap myBitmap = BitmapFactory.decodeResource(getResources(),MainActivity.selectedMapID);
+        Bitmap myBitmap = BitmapFactory.decodeResource(getResources(), TestingActivity.selectedMapID);
 
         Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(tempBitmap);

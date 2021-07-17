@@ -1,9 +1,15 @@
 package upb.airdocs;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -12,12 +18,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
+import java.io.IOException;
+
 
 public class UserActivity  extends AppCompatActivity {
     private static final String LOG_TAG = "UserActivity";
     Button postDocButton;
     Button searchDocButton;
     int scan_no = 1;
+    String devID;
+    boolean mBound = false;
+    boolean serviceStarted = false;
+    Messenger mMessenger = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +43,7 @@ public class UserActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_user);
 
         restoreAllFields();
+        getDevIDAndStartService();
 
 
         postDocButton = (Button) findViewById(R.id.post_doc_button);
@@ -63,47 +82,69 @@ public class UserActivity  extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        stopService();
+        saveAllFields();
+        super.onDestroy();
+    }
+
+    public void startService() {
+        if (devID != null) {
+            Intent serviceIntent = new Intent(this, ScanService.class);
+            ContextCompat.startForegroundService(this, serviceIntent);
+            bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
+            serviceStarted = true;
+        }
+        else{
+            serviceStarted = false;
+        }
+    }
+
+    public void stopService() {
+        if (mBound)
+            unbindService(mConnection);
+        Intent serviceIntent = new Intent(this, ScanService.class);
+        stopService(serviceIntent);
+    }
+
+    // Class for interacting with the main interface of the service.
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder iBinder) {
+            // This is called when the connection with the iBinder has been established, giving us the object we can use
+            // to interact with the iBinder.  We are communicating with the iBinder using a Messenger, so here we get a
+            // client-side representation of that from the raw IBinder object.
+            //mMessenger = new Messenger(iBinder);
+            mBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been unexpectedly disconnected -- that is,
+            // its process crashed.
+            //mMessenger = null;
+            mBound = false;
+        }
+    };
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
-        restoreFieldScanNo();
-        switch (scan_no){
-            case 1:
-                MenuItem item1 = menu.findItem(R.id.scan1);
-                item1.setChecked(true);
-                return true;
-            case 2:
-                MenuItem item2 = menu.findItem(R.id.scan2);
-                item2.setChecked(true);
-                return true;
-            case 4:
-                MenuItem item4 = menu.findItem(R.id.scan4);
-                item4.setChecked(true);
-                return true;
-            default:
-                return true;
-        }
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
-            case R.id.scan_no:
+            case R.id.settings:
+                //Go to settings activity
+                intent = new Intent(getBaseContext(), SettingsActivity.class);
+                startActivity(intent);
                 return true;
-            case R.id.scan1:
-                item.setChecked(true);
-                scan_no = 1;
-                saveFieldScanNo();
-                return true;
-            case R.id.scan2:
-                item.setChecked(true);
-                scan_no = 2;
-                saveFieldScanNo();
-                return true;
-            case R.id.scan4:
-                item.setChecked(true);
-                scan_no = 4;
-                saveFieldScanNo();
+            case R.id.testing_activity:
+                //Go to testing activity
+                intent = new Intent(getBaseContext(), TestingActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -125,19 +166,62 @@ public class UserActivity  extends AppCompatActivity {
         scan_no = sharedPref.getInt("user_scan_no", 1);
     }
 
-    private void saveFieldScanNo(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("user_scan_no", scan_no);
-        Log.d(LOG_TAG, "Saved user scan no");
-        editor.apply();
+    private void getDevIDAndStartService(){
+        if (devID == null) {
+            UserActivity.AsyncTaskRunner runner = new UserActivity.AsyncTaskRunner();
+            runner.execute();
+        }
+        else{
+            startService();
+        }
     }
 
-    private void restoreFieldScanNo(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        scan_no = sharedPref.getInt("user_scan_no", 1);
-        Log.d(LOG_TAG, "Restore user scan no");
+    private String getID() {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            //Google Play Services are available
+            AdvertisingIdClient.Info adInfo = null;
+
+            try {
+                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(this);
+                if (adInfo != null) {
+                    String AdId = adInfo.getId();
+                    return AdId;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (GooglePlayServicesRepairableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String id;
+            try {
+                id = getID();
+                devID = id;
+            } catch (Exception e) {
+                e.printStackTrace();
+                id = null;
+            }
+            return id;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            startService();
+        }
+    }
+
+
+
 }

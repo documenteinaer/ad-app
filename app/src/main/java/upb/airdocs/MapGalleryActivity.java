@@ -86,8 +86,8 @@ public class MapGalleryActivity extends Activity
                         "Map " + names[position] + " selected",
                         Toast.LENGTH_SHORT).show();
 
-                MainActivity.selectedMap = names[position];
-                MainActivity.selectedMapID = imageIDs[position];
+                TestingActivity.selectedMap = names[position];
+                TestingActivity.selectedMapID = imageIDs[position];
             }
         });
 

@@ -123,7 +123,7 @@ public class ScanService extends Service {
         //String input = intent.getStringExtra("inputExtra");
         String input = "Scan Service";
         createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, UserActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)

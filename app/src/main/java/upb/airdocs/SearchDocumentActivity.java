@@ -61,9 +61,9 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
         requestAllPermissions();
         restoreAllFields();
-        Log.d(LOG_TAG, "IP=" + address + " scan_no=" + scan_no);
+        //Log.d(LOG_TAG, "IP=" + address + " scan_no=" + scan_no);
 
-        startService();
+        bindScanService();
 
         scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
 
@@ -101,7 +101,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        stopService();
+        unbindScanService();
         super.onDestroy();
     }
 
@@ -166,17 +166,20 @@ public class SearchDocumentActivity extends AppCompatActivity {
         }
     }
 
-    public void startService() {
-        Intent serviceIntent = new Intent(this, ScanService.class);
-        ContextCompat.startForegroundService(this, serviceIntent);
+    public void bindScanService() {
+        //Intent serviceIntent = new Intent(this, ScanService.class);
+        //ContextCompat.startForegroundService(this, serviceIntent);
         bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(LOG_TAG, "Bind Scan Service");
     }
 
-    public void stopService() {
-        if (mBound)
+    public void unbindScanService() {
+        if (mBound) {
             unbindService(mConnection);
-        Intent serviceIntent = new Intent(this, ScanService.class);
-        stopService(serviceIntent);
+            Log.d(LOG_TAG, "Unbind Scan Service");
+        }
+        //Intent serviceIntent = new Intent(this, ScanService.class);
+        //stopService(serviceIntent);
     }
 
     // Class for interacting with the main interface of the service.
@@ -283,6 +286,5 @@ public class SearchDocumentActivity extends AppCompatActivity {
             port = sharedPref.getString("port", "8001");
         }
         scan_no = sharedPref.getInt("user_scan_no", 1);
-        Log.d(LOG_TAG, "Restore user scan no");
     }
 }

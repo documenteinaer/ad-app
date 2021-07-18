@@ -87,8 +87,10 @@ public class UserActivity  extends AppCompatActivity {
         if (devID != null) {
             Intent serviceIntent = new Intent(this, ScanService.class);
             ContextCompat.startForegroundService(this, serviceIntent);
+            Log.d(LOG_TAG, "Start Scan Service");
             bindService(new Intent(this, ScanService.class), mConnection, Context.BIND_AUTO_CREATE);
             serviceStarted = true;
+            Log.d(LOG_TAG, "Bind Scan Service");
         }
         else{
             serviceStarted = false;
@@ -96,10 +98,13 @@ public class UserActivity  extends AppCompatActivity {
     }
 
     public void stopService() {
-        if (mBound)
+        if (mBound) {
             unbindService(mConnection);
+            Log.d(LOG_TAG, "Unbind Scan Service");
+        }
         Intent serviceIntent = new Intent(this, ScanService.class);
         stopService(serviceIntent);
+        Log.d(LOG_TAG, "Stop Scan Service");
     }
 
     // Class for interacting with the main interface of the service.

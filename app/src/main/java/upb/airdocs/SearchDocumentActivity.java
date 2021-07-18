@@ -61,7 +61,6 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
         requestAllPermissions();
         restoreAllFields();
-        //Log.d(LOG_TAG, "IP=" + address + " scan_no=" + scan_no);
 
         bindScanService();
 
@@ -122,18 +121,6 @@ public class SearchDocumentActivity extends AppCompatActivity {
         restoreAllFields();
         //invalidateOptionsMenu();
         super.onRestart();
-    }
-
-    private void onStartScanSearchDoc() {
-        if (mBound) {
-            Message msg = Message.obtain(null, ScanService.MSG_SCAN_SEARCH_DOC, scan_no, 0);
-            try {
-                mMessenger.send(msg);
-                search = true;
-            } catch (RemoteException e) {
-                Log.e(LOG_TAG, e.getMessage());
-            }
-        }
     }
 
     private void requestAllPermissions() {
@@ -226,11 +213,22 @@ public class SearchDocumentActivity extends AppCompatActivity {
         }
     };
 
+    private void onStartScanSearchDoc() {
+        if (mBound) {
+            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_SEARCH_DOC, 0, 0);
+            try {
+                mMessenger.send(msg);
+                search = true;
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+    }
+
     private void searchDocumentOnServer() {
-        ServerAddress serverAddress = new ServerAddress(address, port, null);
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEARCH_DOC, 0, 0, serverAddress);
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEARCH_DOC, 0, 0);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {

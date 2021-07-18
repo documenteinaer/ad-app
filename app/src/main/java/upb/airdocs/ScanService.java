@@ -58,8 +58,8 @@ public class ScanService extends Service {
     public static final int MSG_SEND = 1;
     public static final int MSG_START_SCAN = 2;
     public static final int MSG_STOP_SCAN = 3;
-    public static final int MSG_SCAN_SEND_DOC = 4;
-    public static final int MSG_SCAN_SEARCH_DOC = 5;
+    public static final int MSG_SCAN_TO_POST_DOC = 4;
+    public static final int MSG_SCAN_TO_SEARCH_DOC = 5;
     public static final int MSG_SEND_DONE = 6;
     public static final int MSG_ACTUAL_SEND_DOC = 7;
     public static final int MSG_ACTUAL_SEARCH_DOC = 8;
@@ -83,6 +83,10 @@ public class ScanService extends Service {
     private static final int TYPE_TESTING = 0;
     private static final int TYPE_SEND_DOC = 1;
     private static final int TYPE_SEARCH_DOC = 2;
+
+    String address;
+    String port;
+    int scan_no;
 
 
     public ScanService() {
@@ -337,12 +341,10 @@ public class ScanService extends Service {
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            String address;
-            String port;
+            restoreAllFields();
             switch (msg.what) {
                 case MSG_SEND:
-                    address = ((ServerAddress)msg.obj).getAddress();
-                    port = ((ServerAddress)msg.obj).getPort();
+                    Log.d(LOG_TAG, "Send test fingerprints");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
                     sendFingerprintsToServer(address, port, TYPE_TESTING, null);
                     break;
@@ -355,36 +357,31 @@ public class ScanService extends Service {
                     currentFingerprintCollection.setX(auxObj.x);
                     currentFingerprintCollection.setY(auxObj.y);
                     currentFingerprintCollection.setZ(auxObj.z);
-                    scanLimit = auxObj.noScans;
+                    Log.d(LOG_TAG, "Scan for testing");
+                    Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
                     break;
                 case MSG_STOP_SCAN:
                     stopScan();
                     break;
-                case MSG_SCAN_SEND_DOC:
-                    Log.d(LOG_TAG, "Scan and send document");
-                    scanLimit = msg.arg1;
+                case MSG_SCAN_TO_POST_DOC:
+                    Log.d(LOG_TAG, "Scan to post document");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
                     break;
-                case MSG_SCAN_SEARCH_DOC:
-                    Log.d(LOG_TAG, "Scan and search document");
-                    scanLimit = msg.arg1;
+                case MSG_SCAN_TO_SEARCH_DOC:
+                    Log.d(LOG_TAG, "Scan to search document");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
                     break;
                 case MSG_ACTUAL_SEND_DOC:
-                    Log.d(LOG_TAG, "Actual send document");
-                    address = ((ServerAddress)msg.obj).getAddress();
-                    port = ((ServerAddress)msg.obj).getPort();
-                    String documentURL = ((ServerAddress)msg.obj).getDocumentURL();
+                    Log.d(LOG_TAG, "Post document");
+                    String documentURL = (String) msg.obj;
                     Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + documentURL);
                     sendFingerprintsToServer(address, port, TYPE_SEND_DOC, documentURL);
                     break;
                 case MSG_ACTUAL_SEARCH_DOC:
-                    Log.d(LOG_TAG, "Actual search document");
-                    address = ((ServerAddress)msg.obj).getAddress();
-                    port = ((ServerAddress)msg.obj).getPort();
+                    Log.d(LOG_TAG, "Search document");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
                     sendFingerprintsToServer(address, port, TYPE_SEARCH_DOC, null);
                     break;
@@ -457,6 +454,15 @@ public class ScanService extends Service {
         intent.putExtra("message", MSG_SEND_DONE);
         if (receivedURL != null) intent.putExtra("receivedURL", receivedURL);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void restoreAllFields(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        address = sharedPref.getString("ip", "192.168.142.105");
+        port = sharedPref.getString("port", "8001");
+        scanLimit = sharedPref.getInt("user_scan_no", 1);
+        devId = sharedPref.getString("devID", null);
     }
 
 }

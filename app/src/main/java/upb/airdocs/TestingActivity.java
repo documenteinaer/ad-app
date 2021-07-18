@@ -181,8 +181,7 @@ public class TestingActivity extends AppCompatActivity {
 
     public void onStartScan(String comment, String noSscans) {
         if (mBound) {
-            int nos =Integer.parseInt(noSscans);
-            AuxObj auxObj = new AuxObj(comment, selectedMap, x_p, y_p, x, y, z, nos);
+            AuxObj auxObj = new AuxObj(comment, selectedMap, x_p, y_p, x, y, z);
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, auxObj);
             try {
@@ -363,6 +362,7 @@ public class TestingActivity extends AppCompatActivity {
         }
 
     }
+
 
 
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {

@@ -67,7 +67,6 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         requestAllPermissions();
         restoreAllFields();
-        //Log.d(LOG_TAG, "IP=" + address + " scan_no=" + scan_no);
 
         bindScanService();
 
@@ -130,20 +129,6 @@ public class PostDocumentActivity extends AppCompatActivity {
         super.onRestart();
     }
 
-    private void onStartScanSendDoc() {
-        if (mBound) {
-            Message msg = Message.obtain(null, ScanService.MSG_SCAN_SEND_DOC, scan_no, 0);
-            try {
-                mMessenger.send(msg);
-                send = true;
-            } catch (RemoteException e) {
-                Log.e(LOG_TAG, e.getMessage());
-            }
-        }
-        else{
-            Log.d(LOG_TAG, "Not bound to the service");
-        }
-    }
 
     private void requestAllPermissions() {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -234,12 +219,26 @@ public class PostDocumentActivity extends AppCompatActivity {
         }
     };
 
+    private void onStartScanSendDoc() {
+        if (mBound) {
+            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0);
+            try {
+                mMessenger.send(msg);
+                send = true;
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+        else{
+            Log.d(LOG_TAG, "Not bound to the service");
+        }
+    }
+
     private void sendDocumentToServer() {
         String documentURL = sendDocumentURL.getText().toString();
-        ServerAddress serverAddress = new ServerAddress(address, port, documentURL);
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0, serverAddress);
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0, documentURL);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {

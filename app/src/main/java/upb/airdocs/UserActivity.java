@@ -26,23 +26,21 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
 
-
 public class UserActivity  extends AppCompatActivity {
     private static final String LOG_TAG = "UserActivity";
     Button postDocButton;
     Button searchDocButton;
-    int scan_no = 1;
     String devID;
     boolean mBound = false;
     boolean serviceStarted = false;
-    Messenger mMessenger = null;
+    //Messenger mMessenger = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
-        restoreAllFields();
+        restoreDevID();
         getDevIDAndStartService();
 
 
@@ -65,13 +63,11 @@ public class UserActivity  extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        restoreAllFields();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        saveAllFields();
         super.onStop();
     }
 
@@ -84,7 +80,6 @@ public class UserActivity  extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         stopService();
-        saveAllFields();
         super.onDestroy();
     }
 
@@ -151,21 +146,6 @@ public class UserActivity  extends AppCompatActivity {
         }
     }
 
-    private void saveAllFields(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("user_scan_no", scan_no);
-        Log.d(LOG_TAG, "Saved user scan no");
-        editor.apply();
-    }
-
-    private void restoreAllFields(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        scan_no = sharedPref.getInt("user_scan_no", 1);
-    }
-
     private void getDevIDAndStartService(){
         if (devID == null) {
             UserActivity.AsyncTaskRunner runner = new UserActivity.AsyncTaskRunner();
@@ -218,10 +198,24 @@ public class UserActivity  extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            saveDevID();
             startService();
         }
     }
 
+    private void saveDevID(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("devID", devID);
+        Log.d(LOG_TAG, "Saved devID="+devID);
+        editor.apply();
+    }
 
+    private void restoreDevID(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        devID = sharedPref.getString("devID", null);
+    }
 
 }

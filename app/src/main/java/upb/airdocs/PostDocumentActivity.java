@@ -1,7 +1,6 @@
 package upb.airdocs;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,13 +9,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,14 +28,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-
-import java.io.IOException;
-
 public class PostDocumentActivity extends AppCompatActivity {
     private static final String LOG_TAG = "SendDocumentActivity";
     final private static int MY_PERMISSIONS_REQUEST = 126;
@@ -52,7 +41,8 @@ public class PostDocumentActivity extends AppCompatActivity {
     Messenger mMessenger = null;
 
     Button scanSendDocButton;
-    EditText sendDocumentURL;
+    EditText postDocumentURL;
+    EditText postDocumentDescription;
     TextView scanSendStatus;
 
     String address;
@@ -72,7 +62,8 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
 
-        sendDocumentURL = (EditText) findViewById(R.id.send_document_url);
+        postDocumentURL = (EditText) findViewById(R.id.post_document_url);
+        postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
         scanSendDocButton.setOnClickListener(new View.OnClickListener() {
@@ -220,8 +211,9 @@ public class PostDocumentActivity extends AppCompatActivity {
     };
 
     private void onStartScanSendDoc() {
+        String documentDescription = postDocumentDescription.getText().toString();
         if (mBound) {
-            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0);
+            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0, documentDescription);
             try {
                 mMessenger.send(msg);
                 send = true;
@@ -235,7 +227,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     }
 
     private void sendDocumentToServer() {
-        String documentURL = sendDocumentURL.getText().toString();
+        String documentURL = postDocumentURL.getText().toString();
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
             Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0, documentURL);

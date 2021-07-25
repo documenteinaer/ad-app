@@ -367,6 +367,8 @@ public class ScanService extends Service {
                 case MSG_SCAN_TO_POST_DOC:
                     Log.d(LOG_TAG, "Scan to post document");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
+                    String documentDescription = (String) msg.obj;
+                    currentFingerprintCollection.setComment(documentDescription);
                     doScan();
                     break;
                 case MSG_SCAN_TO_SEARCH_DOC:

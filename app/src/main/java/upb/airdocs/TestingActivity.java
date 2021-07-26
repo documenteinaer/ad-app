@@ -15,11 +15,13 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -58,6 +60,7 @@ public class TestingActivity extends AppCompatActivity {
 
     String address;
     String port;
+    int scan_no;
 
     String devID;
     boolean serviceStarted = false;
@@ -93,7 +96,7 @@ public class TestingActivity extends AppCompatActivity {
 
         final EditText comment = (EditText) findViewById(R.id.comment);
 
-        final EditText numberOfScans = (EditText) findViewById(R.id.number_scans);
+        //final EditText numberOfScans = (EditText) findViewById(R.id.number_scans);
 
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
@@ -109,7 +112,7 @@ public class TestingActivity extends AppCompatActivity {
                 }
                 else if (scanActive == false) {
                     if (permissionGranted == true) {
-                        onStartScan(comment.getText().toString(), numberOfScans.getText().toString());
+                        onStartScan(comment.getText().toString(), String.valueOf(scan_no));
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -126,30 +129,11 @@ public class TestingActivity extends AppCompatActivity {
             }
         });
 
-        final Button sendButton = (Button) findViewById(R.id.send_fingerprints);
-        final EditText addressEditText = (EditText) findViewById(R.id.address);
-        final EditText portEditText = (EditText) findViewById(R.id.port);
+        final Button sendButton = (Button) findViewById(R.id.send_collections);
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                address = addressEditText.getText().toString();
-                port = portEditText.getText().toString();
                 Log.d(LOG_TAG, "address= " + address + " port=" + port);
                 onSendButton(address, port);
-            }
-        });
-
-        final Button saveAddressButton = (Button) findViewById(R.id.save_address);
-        saveAddressButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                saveFields();
-            }
-        });
-
-        final Button switchToUsermodeButton = (Button) findViewById(R.id.switch_to_usermode);
-        switchToUsermodeButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), UserActivity.class);
-                startActivity(intent);
             }
         });
     }
@@ -361,6 +345,8 @@ public class TestingActivity extends AppCompatActivity {
             }
         }
 
+        restoreFields();
+
     }
 
 
@@ -427,15 +413,16 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void saveFields(){
-        final EditText addressEditText = (EditText) findViewById(R.id.address);
-        final EditText portEditText = (EditText) findViewById(R.id.port);
+
+        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("ip", addressEditText.getText().toString());
-        editor.putString("port", portEditText.getText().toString());
+
+        editor.putInt("testing_scan_no", scan_no);
+        editor.putString("ip", address);
+        editor.putString("port", port);
         editor.putString("selectedMap", selectedMap);
         editor.putInt("selectedMapID", selectedMapID);
         editor.putFloat("x_p", x_p);
@@ -448,15 +435,16 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void restoreFields(){
-        final EditText addressEditText = (EditText) findViewById(R.id.address);
-        final EditText portEditText = (EditText) findViewById(R.id.port);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+
+        scan_no = sharedPref.getInt("testing_scan_no", 1);
         address = sharedPref.getString("ip", "192.168.142.123");
-        addressEditText.setText(address);
         port = sharedPref.getString("port", "8001");
-        portEditText.setText(port);
+
+        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
+
         selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
         selectedMapID = sharedPref.getInt("selectedMapID", R.drawable.precis_subsol);
         x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
@@ -577,6 +565,27 @@ public class TestingActivity extends AppCompatActivity {
         saveFields();
 
         //Log.d(LOG_TAG, "x = " + x + " y = " + y + " z = " + z);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.testing_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.testing_settings:
+                //Go to settings activity
+                intent = new Intent(getBaseContext(), TestingSettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

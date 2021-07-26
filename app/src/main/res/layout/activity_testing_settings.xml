@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/testing_settings_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="upb.airdocs.TestingSettingsActivity">
+
+    <TextView
+        android:id="@+id/title_testing_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings (for testing)"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.102"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.06" />
+
+    <TextView
+        android:id="@+id/title_no_scans"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Number of scans:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/title_testing_settings"
+        app:layout_constraintTop_toBottomOf="@+id/title_testing_settings" />
+
+    <TextView
+        android:id="@+id/title_address_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Server address and port:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/no_scans_testing"
+        app:layout_constraintTop_toBottomOf="@+id/no_scans_testing" />
+
+    <EditText
+        android:id="@+id/address_testing"
+        android:layout_width="153dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="192.168.142.234"
+        app:layout_constraintStart_toStartOf="@+id/title_address_port"
+        app:layout_constraintTop_toBottomOf="@+id/title_address_port" />
+
+    <EditText
+        android:id="@+id/port_testing"
+        android:layout_width="60dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="24dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="8000"
+        app:layout_constraintBottom_toBottomOf="@+id/address_testing"
+        app:layout_constraintStart_toEndOf="@+id/address_testing" />
+
+    <EditText
+        android:id="@+id/no_scans_testing"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="1"
+        app:layout_constraintStart_toStartOf="@+id/title_no_scans"
+        app:layout_constraintTop_toBottomOf="@+id/title_no_scans" />
+
+    <Button
+        android:id="@+id/save_testing_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/audio_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/audio_switch_testing" />
+
+    <TextView
+        android:id="@+id/title_signature_composition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Signature composition"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/address_testing"
+        app:layout_constraintTop_toBottomOf="@+id/address_testing" />
+
+    <Switch
+        android:id="@+id/wifi_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Wifi"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/title_signature_composition"
+        app:layout_constraintTop_toBottomOf="@+id/title_signature_composition" />
+
+    <Switch
+        android:id="@+id/ble_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="BLE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/wifi_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/wifi_switch_testing" />
+
+    <Switch
+        android:id="@+id/cellular_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Cellular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/ble_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/ble_switch_testing" />
+
+    <Switch
+        android:id="@+id/gps_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="GPS"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/cellular_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/cellular_switch_testing" />
+
+    <Switch
+        android:id="@+id/audio_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Audio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/gps_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/gps_switch_testing" />
+
+</android.support.constraint.ConstraintLayout>

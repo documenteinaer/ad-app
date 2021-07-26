@@ -250,7 +250,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
-            case R.id.settings:
+            case R.id.user_settings:
                 //Go to settings activity
                 intent = new Intent(getBaseContext(), SettingsActivity.class);
                 startActivity(intent);

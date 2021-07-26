@@ -219,7 +219,7 @@ public class ScanService extends Service {
         }
     }
 
-    private void sendFingerprintsToServer(final String address, final String port, final int type, String documentURL){
+    private void sendFingerprintsToServer(final int type){
         final JSONObject fingerprintCollectionsJSON = buildFinalJSON();
         final JSONObject jsonObjectFinal = new JSONObject();
         try {
@@ -229,7 +229,7 @@ public class ScanService extends Service {
             }
             else if (type == TYPE_SEND_DOC){
                 jsonObjectFinal.put("type", String.valueOf(TYPE_SEND_DOC));
-                jsonObjectFinal.put("document", documentURL);
+                jsonObjectFinal.put("document", URL);
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEARCH_DOC){
@@ -249,14 +249,14 @@ public class ScanService extends Service {
 
         new Thread(new Runnable() {
             public void run() {
-                sendJSONtoServer(address, port, jsonObjectFinal, type);
+                sendJSONtoServer(jsonObjectFinal, type);
             }
         }).start();
     }
 
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
-    public void sendJSONtoServer(String address, String port, JSONObject jsonObject, int type){
+    public void sendJSONtoServer(JSONObject jsonObject, int type){
 
         try {
             URL url = new URL("http://"+address+":"+port);
@@ -348,9 +348,10 @@ public class ScanService extends Service {
                 case MSG_SEND:
                     Log.d(LOG_TAG, "Send test fingerprints");
                     Log.d(LOG_TAG, "address=" + address + " port=" + port);
-                    sendFingerprintsToServer(address, port, TYPE_TESTING, null);
+                    sendFingerprintsToServer(TYPE_TESTING);
                     break;
                 case MSG_START_SCAN:
+                    restoreFieldsTesting();
                     Log.d(LOG_TAG, "Scan for testing");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
@@ -371,12 +372,12 @@ public class ScanService extends Service {
                 case MSG_ACTUAL_SEND_DOC:
                     Log.d(LOG_TAG, "Post document");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + URL);
-                    sendFingerprintsToServer(address, port, TYPE_SEND_DOC, URL);
+                    sendFingerprintsToServer(TYPE_SEND_DOC);
                     break;
                 case MSG_ACTUAL_SEARCH_DOC:
                     Log.d(LOG_TAG, "Search document");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
-                    sendFingerprintsToServer(address, port, TYPE_SEARCH_DOC, null);
+                    sendFingerprintsToServer(TYPE_SEARCH_DOC);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -449,15 +450,9 @@ public class ScanService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    private void restoreAllFields(){
+    private void restoreFieldsTesting(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        address = sharedPref.getString("ip", "192.168.142.105");
-        port = sharedPref.getString("port", "8001");
-        scanLimit = sharedPref.getInt("scan_no", 1);
-        devId = sharedPref.getString("devID", null);
-        comment = sharedPref.getString("comment", "-");
-        URL = sharedPref.getString("URL", "-");
 
         String selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
         float x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
@@ -472,6 +467,18 @@ public class ScanService extends Service {
         currentFingerprintCollection.setX(x);
         currentFingerprintCollection.setY(y);
         currentFingerprintCollection.setZ(z);
+    }
+
+    private void restoreAllFields(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+
+        address = sharedPref.getString("ip", "192.168.142.105");
+        port = sharedPref.getString("port", "8001");
+        scanLimit = sharedPref.getInt("scan_no", 1);
+        devId = sharedPref.getString("devID", null);
+        comment = sharedPref.getString("comment", "-");
+        URL = sharedPref.getString("URL", "-");
         currentFingerprintCollection.setComment(comment);
     }
 

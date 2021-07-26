@@ -264,18 +264,6 @@ public class SearchDocumentActivity extends AppCompatActivity {
         }
     }
 
-/*
-    private void saveAllFields(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("ip", address);
-        editor.putString("port", port);
-        editor.putInt("user_scan_no", scan_no);
-        Log.d(LOG_TAG, "Saved user scan no");
-        editor.apply();
-    }*/
-
     private void restoreAllFields(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -283,6 +271,6 @@ public class SearchDocumentActivity extends AppCompatActivity {
             address = sharedPref.getString("ip", "192.168.142.105");
             port = sharedPref.getString("port", "8001");
         }
-        scan_no = sharedPref.getInt("user_scan_no", 1);
+        scan_no = sharedPref.getInt("scan_no", 1);
     }
 }

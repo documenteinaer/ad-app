@@ -37,7 +37,7 @@ public class SettingsActivity extends Activity {
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("user_scan_no", Integer. parseInt(noscansEditText.getText().toString()));
+        editor.putInt("scan_no", Integer. parseInt(noscansEditText.getText().toString()));
         editor.putString("ip", addressEditText.getText().toString());
         editor.putString("port", portEditText.getText().toString());
         editor.apply();
@@ -50,7 +50,7 @@ public class SettingsActivity extends Activity {
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        int noscans = sharedPref.getInt("user_scan_no", 1);
+        int noscans = sharedPref.getInt("scan_no", 1);
         Log.d(LOG_TAG, "no scans = " + noscans);
         noscansEditText.setText(String.valueOf(noscans));
         String address = sharedPref.getString("ip", "192.168.142.123");

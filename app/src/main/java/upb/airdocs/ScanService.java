@@ -87,6 +87,8 @@ public class ScanService extends Service {
     String address;
     String port;
     int scan_no;
+    String comment;
+    String URL;
 
 
     public ScanService() {
@@ -345,18 +347,10 @@ public class ScanService extends Service {
             switch (msg.what) {
                 case MSG_SEND:
                     Log.d(LOG_TAG, "Send test fingerprints");
-                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
+                    Log.d(LOG_TAG, "address=" + address + " port=" + port);
                     sendFingerprintsToServer(address, port, TYPE_TESTING, null);
                     break;
                 case MSG_START_SCAN:
-                    AuxObj auxObj = (AuxObj)msg.obj;
-                    currentFingerprintCollection.setComment(auxObj.comment);
-                    currentFingerprintCollection.setMap(auxObj.map);
-                    currentFingerprintCollection.setX_P(auxObj.x_p);
-                    currentFingerprintCollection.setY_P(auxObj.y_p);
-                    currentFingerprintCollection.setX(auxObj.x);
-                    currentFingerprintCollection.setY(auxObj.y);
-                    currentFingerprintCollection.setZ(auxObj.z);
                     Log.d(LOG_TAG, "Scan for testing");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
                     doScan();
@@ -367,8 +361,6 @@ public class ScanService extends Service {
                 case MSG_SCAN_TO_POST_DOC:
                     Log.d(LOG_TAG, "Scan to post document");
                     Log.d(LOG_TAG, "scan_no=" + scanLimit);
-                    String documentDescription = (String) msg.obj;
-                    currentFingerprintCollection.setComment(documentDescription);
                     doScan();
                     break;
                 case MSG_SCAN_TO_SEARCH_DOC:
@@ -378,9 +370,8 @@ public class ScanService extends Service {
                     break;
                 case MSG_ACTUAL_SEND_DOC:
                     Log.d(LOG_TAG, "Post document");
-                    String documentURL = (String) msg.obj;
-                    Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + documentURL);
-                    sendFingerprintsToServer(address, port, TYPE_SEND_DOC, documentURL);
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + URL);
+                    sendFingerprintsToServer(address, port, TYPE_SEND_DOC, URL);
                     break;
                 case MSG_ACTUAL_SEARCH_DOC:
                     Log.d(LOG_TAG, "Search document");
@@ -463,8 +454,25 @@ public class ScanService extends Service {
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         address = sharedPref.getString("ip", "192.168.142.105");
         port = sharedPref.getString("port", "8001");
-        scanLimit = sharedPref.getInt("user_scan_no", 1);
+        scanLimit = sharedPref.getInt("scan_no", 1);
         devId = sharedPref.getString("devID", null);
+        comment = sharedPref.getString("comment", "-");
+        URL = sharedPref.getString("URL", "-");
+
+        String selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
+        float x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
+        float y_p = sharedPref.getFloat("y_p", Float.parseFloat("-1"));
+        float x = sharedPref.getFloat("x", Float.parseFloat("-1"));
+        float y = sharedPref.getFloat("y", Float.parseFloat("-1"));
+        float z = sharedPref.getFloat("z", Float.parseFloat("-1"));
+
+        currentFingerprintCollection.setMap(selectedMap);
+        currentFingerprintCollection.setX_P(x_p);
+        currentFingerprintCollection.setY_P(y_p);
+        currentFingerprintCollection.setX(x);
+        currentFingerprintCollection.setY(y);
+        currentFingerprintCollection.setZ(z);
+        currentFingerprintCollection.setComment(comment);
     }
 
 }

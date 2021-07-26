@@ -61,6 +61,7 @@ public class TestingActivity extends AppCompatActivity {
     String address;
     String port;
     int scan_no;
+    String comment;
 
     String devID;
     boolean serviceStarted = false;
@@ -94,11 +95,6 @@ public class TestingActivity extends AppCompatActivity {
         });
 
 
-        final EditText comment = (EditText) findViewById(R.id.comment);
-
-        //final EditText numberOfScans = (EditText) findViewById(R.id.number_scans);
-
-
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -112,7 +108,8 @@ public class TestingActivity extends AppCompatActivity {
                 }
                 else if (scanActive == false) {
                     if (permissionGranted == true) {
-                        onStartScan(comment.getText().toString(), String.valueOf(scan_no));
+                        saveComment();
+                        onStartScan();
                         scanActive = true;
                         startScanButton.setText("Stop Scan");
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -132,8 +129,7 @@ public class TestingActivity extends AppCompatActivity {
         final Button sendButton = (Button) findViewById(R.id.send_collections);
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d(LOG_TAG, "address= " + address + " port=" + port);
-                onSendButton(address, port);
+                onSendButton();
             }
         });
     }
@@ -150,11 +146,10 @@ public class TestingActivity extends AppCompatActivity {
         }
     }
 
-    public void onSendButton(String address, String port) {
-        ServerAddress serverAddress = new ServerAddress(address, port, null);
+    public void onSendButton() {
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_SEND, 0, 0, serverAddress);
+            Message msg = Message.obtain(null, ScanService.MSG_SEND, 0, 0);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {
@@ -163,11 +158,11 @@ public class TestingActivity extends AppCompatActivity {
         }
     }
 
-    public void onStartScan(String comment, String noSscans) {
+    public void onStartScan() {
+        saveFields();
         if (mBound) {
-            AuxObj auxObj = new AuxObj(comment, selectedMap, x_p, y_p, x, y, z);
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0, auxObj);
+            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {
@@ -360,7 +355,7 @@ public class TestingActivity extends AppCompatActivity {
                 scanActive = false;
                 Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
-                x = y = z = x_p = y_p = -1;
+                /*x = y = z = x_p = y_p = -1;
                 final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
                 coordinateX_P.setText(Float.toString(x_p));
                 final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
@@ -370,7 +365,7 @@ public class TestingActivity extends AppCompatActivity {
                 final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
                 coordinateY.setText(Float.toString(y));
                 final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
-                coordinateZ.setText(Float.toString(z));
+                coordinateZ.setText(Float.toString(z));*/
 
             }
             if (msg == ScanService.UPDATE_SCAN_NUMBERS) {
@@ -410,60 +405,6 @@ public class TestingActivity extends AppCompatActivity {
         stopService();
         saveFields();
         super.onDestroy();
-    }
-
-    private void saveFields(){
-
-        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
-
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putInt("testing_scan_no", scan_no);
-        editor.putString("ip", address);
-        editor.putString("port", port);
-        editor.putString("selectedMap", selectedMap);
-        editor.putInt("selectedMapID", selectedMapID);
-        editor.putFloat("x_p", x_p);
-        editor.putFloat("y_p", y_p);
-        editor.putFloat("x", x);
-        editor.putFloat("y", y);
-        editor.putFloat("z", z);
-        editor.putString("devID", devID);
-        editor.apply();
-    }
-
-    private void restoreFields(){
-
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-
-        scan_no = sharedPref.getInt("testing_scan_no", 1);
-        address = sharedPref.getString("ip", "192.168.142.123");
-        port = sharedPref.getString("port", "8001");
-
-        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
-
-        selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
-        selectedMapID = sharedPref.getInt("selectedMapID", R.drawable.precis_subsol);
-        x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
-        y_p = sharedPref.getFloat("y_p", Float.parseFloat("-1"));
-        x = sharedPref.getFloat("x", Float.parseFloat("-1"));
-        y = sharedPref.getFloat("y", Float.parseFloat("-1"));
-        z = sharedPref.getFloat("z", Float.parseFloat("-1"));
-        devID = sharedPref.getString("devID", null);
-
-        final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
-        coordinateX_P.setText(Float.toString(x_p));
-        final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
-        coordinateY_P.setText(Float.toString(y_p));
-        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
-        coordinateX.setText(Float.toString(x));
-        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
-        coordinateY.setText(Float.toString(y));
-        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
-        coordinateZ.setText(Float.toString(z));
     }
 
     private void setMapData(){
@@ -586,6 +527,96 @@ public class TestingActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void saveFields(){
+        final EditText commentEditText = (EditText) findViewById(R.id.comment);
+        comment = commentEditText.getText().toString();
+        final EditText mapEditText = (EditText) findViewById(R.id.map_name);
+        selectedMap = mapEditText.getText().toString();
+        final EditText x_pEditText = (EditText) findViewById(R.id.coordinate_x_p);
+        x_p = Float.parseFloat(x_pEditText.getText().toString());
+        final EditText y_pEditText = (EditText) findViewById(R.id.coordinate_y_p);
+        y_p = Float.parseFloat(y_pEditText.getText().toString());
+        final EditText xEditText = (EditText) findViewById(R.id.coordinate_x);
+        x = Float.parseFloat(xEditText.getText().toString());
+        final EditText yEditText = (EditText) findViewById(R.id.coordinate_y);
+        y = Float.parseFloat(yEditText.getText().toString());
+        final EditText zEditText = (EditText) findViewById(R.id.coordinate_z);
+        z = Float.parseFloat(zEditText.getText().toString());
+
+        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+
+        editor.putInt("scan_no", scan_no);
+        editor.putString("ip", address);
+        editor.putString("port", port);
+        editor.putString("comment", comment);
+        editor.putString("selectedMap", selectedMap);
+        editor.putInt("selectedMapID", selectedMapID);
+        editor.putFloat("x_p", x_p);
+        editor.putFloat("y_p", y_p);
+        editor.putFloat("x", x);
+        editor.putFloat("y", y);
+        editor.putFloat("z", z);
+        editor.putString("devID", devID);
+        editor.apply();
+    }
+
+    private void saveComment(){
+        final EditText commentEditText = (EditText) findViewById(R.id.comment);
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("comment", commentEditText.getText().toString());
+        editor.apply();
+    }
+
+    private void restoreFields(){
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+
+        scan_no = sharedPref.getInt("scan_no", 1);
+        address = sharedPref.getString("ip", "192.168.142.123");
+        port = sharedPref.getString("port", "8001");
+        comment = sharedPref.getString("comment", "-");
+
+
+        Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
+
+        selectedMap = sharedPref.getString("selectedMap", "precis_subsol.png");
+        selectedMapID = sharedPref.getInt("selectedMapID", R.drawable.precis_subsol);
+        x_p = sharedPref.getFloat("x_p", Float.parseFloat("-1"));
+        y_p = sharedPref.getFloat("y_p", Float.parseFloat("-1"));
+        x = sharedPref.getFloat("x", Float.parseFloat("-1"));
+        y = sharedPref.getFloat("y", Float.parseFloat("-1"));
+        z = sharedPref.getFloat("z", Float.parseFloat("-1"));
+        devID = sharedPref.getString("devID", null);
+
+        final EditText mapEditText = (EditText) findViewById(R.id.map_name);
+        mapEditText.setText(selectedMap);
+        final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
+        coordinateX_P.setText(Float.toString(x_p));
+        final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
+        coordinateY_P.setText(Float.toString(y_p));
+        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
+        coordinateX.setText(Float.toString(x));
+        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
+        coordinateY.setText(Float.toString(y));
+        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
+        coordinateZ.setText(Float.toString(z));
+
+        final EditText commentEditText = (EditText) findViewById(R.id.comment);
+        commentEditText.setText(comment);
+        final TextView devIdTextView = (TextView) findViewById(R.id.devID);
+        devIdTextView.setText(devID);
     }
 
 }

@@ -48,7 +48,8 @@ public class PostDocumentActivity extends AppCompatActivity {
     String address;
     String port;
     int scan_no;
-
+    String comment;
+    String URL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +86,13 @@ public class PostDocumentActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        restoreAllFields();
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("msg"));
     }
 
     @Override
     protected void onPause() {
+        saveCommentAndURL();
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
         super.onPause();
@@ -103,7 +106,6 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        //restoreAllFields();
         super.onStart();
     }
 
@@ -211,9 +213,10 @@ public class PostDocumentActivity extends AppCompatActivity {
     };
 
     private void onStartScanSendDoc() {
-        String documentDescription = postDocumentDescription.getText().toString();
+        //String documentDescription = postDocumentDescription.getText().toString();
+        saveCommentAndURL();
         if (mBound) {
-            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0, documentDescription);
+            Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0);
             try {
                 mMessenger.send(msg);
                 send = true;
@@ -227,10 +230,9 @@ public class PostDocumentActivity extends AppCompatActivity {
     }
 
     private void sendDocumentToServer() {
-        String documentURL = postDocumentURL.getText().toString();
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0, documentURL);
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {
@@ -265,17 +267,6 @@ public class PostDocumentActivity extends AppCompatActivity {
         }
     }
 
-    /*private void saveAllFields(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("ip", address);
-        editor.putString("port", port);
-        editor.putInt("user_scan_no", scan_no);
-        Log.d(LOG_TAG, "Saved user scan no");
-        editor.apply();
-    }*/
-
     private void restoreAllFields(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -283,7 +274,27 @@ public class PostDocumentActivity extends AppCompatActivity {
             address = sharedPref.getString("ip", "192.168.142.105");
             port = sharedPref.getString("port", "8001");
         }
-        scan_no = sharedPref.getInt("user_scan_no", 1);
+        scan_no = sharedPref.getInt("scan_no", 1);
+        comment = sharedPref.getString("comment", "-");
+        URL = sharedPref.getString("URL", "-");
+
+        final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        commentEditText.setText(comment);
+        final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+        urlEditText.setText(URL);
+    }
+
+    private void saveCommentAndURL(){
+        final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("comment", commentEditText.getText().toString());
+        editor.putString("URL", urlEditText.getText().toString());
+        editor.apply();
     }
 
 }

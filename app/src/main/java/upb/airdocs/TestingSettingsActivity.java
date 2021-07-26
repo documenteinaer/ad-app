@@ -42,7 +42,7 @@ private void saveFields(){
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("testing_scan_no", scan_no);
+        editor.putInt("scan_no", scan_no);
         editor.putString("ip", address);
         editor.putString("port", port);
         editor.commit();
@@ -55,7 +55,7 @@ private void saveFields(){
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        int scan_no = sharedPref.getInt("testing_scan_no", 1);
+        int scan_no = sharedPref.getInt("scan_no", 1);
         noscansEditText.setText(String.valueOf(scan_no));
         String address = sharedPref.getString("ip", "192.168.142.123");
         addressEditText.setText(address);

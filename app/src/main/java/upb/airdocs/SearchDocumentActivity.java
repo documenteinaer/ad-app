@@ -28,8 +28,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class SearchDocumentActivity extends AppCompatActivity {
@@ -66,8 +69,6 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
         scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
 
-        receivedDocumentURL = (EditText) findViewById(R.id.received_document_url);
-
         scanSearchDocButton = (Button) findViewById(R.id.scan_search_doc);
         scanSearchDocButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -83,6 +84,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     @Override
@@ -206,8 +208,11 @@ public class SearchDocumentActivity extends AppCompatActivity {
                     scanSearchDocButton.setEnabled(true);
                     scanSearchStatus.setText("Sent successfuly");
                     String receivedURL = intent.getStringExtra("receivedURL");
-                    receivedDocumentURL.setText(receivedURL);
+                    //receivedDocumentURL.setText(receivedURL);
+                    Log.d(LOG_TAG, "Msg=" + receivedURL);
                     search = false;
+
+                    generateAdapterList();
                 }
             }
         }
@@ -272,5 +277,31 @@ public class SearchDocumentActivity extends AppCompatActivity {
             port = sharedPref.getString("port", "8001");
         }
         scan_no = sharedPref.getInt("scan_no", 1);
+    }
+
+    /**
+     * Util function to generate list of items
+     *
+     * @return ArrayList
+     */
+    private ArrayList<Document> generateItemsList() {
+        String itemNames[] = getResources().getStringArray(R.array.items_name);
+        String itemDescriptions[] = getResources().getStringArray(R.array.item_description);
+
+        ArrayList<Document> list = new ArrayList<>();
+
+        for (int i = 0; i < itemNames.length; i++) {
+            list.add(new Document(itemNames[i], itemDescriptions[i]));
+        }
+
+        return list;
+    }
+
+    private void generateAdapterList(){
+        ListView itemsListView  = (ListView)findViewById(R.id.list_view_items);
+        //create adapter object
+        DocumentsListAdapter adapter = new DocumentsListAdapter(this, generateItemsList());
+        //set custom adapter as adapter to our list view
+        itemsListView.setAdapter(adapter);
     }
 }

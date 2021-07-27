@@ -32,7 +32,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class SearchDocumentActivity extends AppCompatActivity {
@@ -207,19 +211,21 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 if (search == true){
                     scanSearchDocButton.setEnabled(true);
                     scanSearchStatus.setText("Sent successfuly");
-                    String receivedURL = intent.getStringExtra("receivedURL");
-                    //receivedDocumentURL.setText(receivedURL);
-                    Log.d(LOG_TAG, "Msg=" + receivedURL);
+                    String jsonString = intent.getStringExtra("json");
+                    Log.d(LOG_TAG, "Msg=" + jsonString);
                     search = false;
 
-                    generateAdapterList();
+                    generateAdapterList(jsonString);
                 }
             }
         }
     };
 
+
+
     private void onStartScanSearchDoc() {
         if (mBound) {
+            clearAdapterList();
             Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_SEARCH_DOC, 0, 0);
             try {
                 mMessenger.send(msg);
@@ -284,23 +290,45 @@ public class SearchDocumentActivity extends AppCompatActivity {
      *
      * @return ArrayList
      */
-    private ArrayList<Document> generateItemsList() {
-        String itemNames[] = getResources().getStringArray(R.array.items_name);
-        String itemDescriptions[] = getResources().getStringArray(R.array.item_description);
-
+    private ArrayList<Document> generateItemsList(String jsonString) {
         ArrayList<Document> list = new ArrayList<>();
 
-        for (int i = 0; i < itemNames.length; i++) {
-            list.add(new Document(itemNames[i], itemDescriptions[i]));
+        try {
+
+            JSONObject jsonObject = new JSONObject(jsonString);
+
+            for(Iterator<String> iter = jsonObject.keys(); iter.hasNext();) {
+                String key = iter.next();
+                try {
+                    JSONObject docInfo = (JSONObject)jsonObject.get(key);
+                    String docName = (String)docInfo.get("document");
+                    String docDescription = (String)docInfo.get("description");
+                    list.add(new Document(docName, docDescription));
+
+                } catch (JSONException e) {
+                    // Something went wrong!
+                }
+            }
+
+        } catch (Throwable t) {
+            Log.e(LOG_TAG, "Could not parse malformed JSON: \"" + jsonString + "\"");
         }
 
         return list;
     }
 
-    private void generateAdapterList(){
+    private void generateAdapterList(String jsonString){
         ListView itemsListView  = (ListView)findViewById(R.id.list_view_items);
         //create adapter object
-        DocumentsListAdapter adapter = new DocumentsListAdapter(this, generateItemsList());
+        DocumentsListAdapter adapter = new DocumentsListAdapter(this, generateItemsList(jsonString));
+        //set custom adapter as adapter to our list view
+        itemsListView.setAdapter(adapter);
+    }
+
+    private void clearAdapterList(){
+        ListView itemsListView  = (ListView)findViewById(R.id.list_view_items);
+        //create adapter object
+        DocumentsListAdapter adapter = new DocumentsListAdapter(this, new ArrayList<Document>());
         //set custom adapter as adapter to our list view
         itemsListView.setAdapter(adapter);
     }

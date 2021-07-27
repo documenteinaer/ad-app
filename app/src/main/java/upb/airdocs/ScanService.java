@@ -314,11 +314,12 @@ public class ScanService extends Service {
                         numberOfTotalScans = 0;
                         sent = 1;
                         Log.d(LOG_TAG, "Success (search doc)");
-                        String delims = "[<>]+";
+                        /*String delims = "[<>]+";
                         String[] tokens = response.toString().split(delims);
                         String receivedURL = tokens[4];
-                        Log.d(LOG_TAG, receivedURL);
-                        announceSendDone(receivedURL);
+                        announceSendDone(receivedURL);*/
+                        announceSendDone(response.toString());
+                        //Log.d(LOG_TAG, response.toString());
                 }
                 else{
                     Log.d(LOG_TAG, "Failed");
@@ -442,11 +443,11 @@ public class ScanService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public void announceSendDone(String receivedURL){
+    public void announceSendDone(String jsonString){
         Log.d(LOG_TAG, "Announce Send Done to Activity");
         Intent intent = new Intent("msg");
         intent.putExtra("message", MSG_SEND_DONE);
-        if (receivedURL != null) intent.putExtra("receivedURL", receivedURL);
+        if (jsonString!= null) intent.putExtra("json", jsonString);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

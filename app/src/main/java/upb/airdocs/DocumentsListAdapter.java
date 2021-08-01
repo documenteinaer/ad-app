@@ -1,6 +1,8 @@
 package upb.airdocs;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +51,7 @@ public class DocumentsListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Document currentItem = (Document) getItem(position);
+        final Document currentItem = (Document) getItem(position);
         viewHolder.itemName.setText(currentItem.getItemName());
         viewHolder.itemDescription.setText(currentItem.getItemDescription());
 
@@ -59,9 +61,31 @@ public class DocumentsListAdapter extends BaseAdapter {
                     .resize(240, 240)
                     .centerCrop()
                     .into(viewHolder.imgThumbnail);
+
+            viewHolder.imgThumbnail.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    openURL(currentItem.getItemName());
+                }
+            });
+            viewHolder.itemName.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    openURL(currentItem.getItemName());
+                }
+            });
         }
 
         return convertView;
+    }
+    private void openURL(String url){
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        context.startActivity(i);
     }
 
     //ViewHolder inner class

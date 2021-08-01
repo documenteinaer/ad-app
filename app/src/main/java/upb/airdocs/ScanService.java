@@ -89,6 +89,7 @@ public class ScanService extends Service {
     int scan_no;
     String comment;
     String URL;
+    float threshold;
 
 
     public ScanService() {
@@ -224,16 +225,17 @@ public class ScanService extends Service {
         final JSONObject jsonObjectFinal = new JSONObject();
         try {
             if (type == TYPE_TESTING) {
-                jsonObjectFinal.put("type", String.valueOf(TYPE_TESTING));
+                jsonObjectFinal.put("type", "TEST");
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEND_DOC){
-                jsonObjectFinal.put("type", String.valueOf(TYPE_SEND_DOC));
+                jsonObjectFinal.put("type", "POST");
                 jsonObjectFinal.put("document", URL);
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEARCH_DOC){
-                jsonObjectFinal.put("type", String.valueOf(TYPE_SEARCH_DOC));
+                jsonObjectFinal.put("type", "SEARCH");
+                jsonObjectFinal.put("threshold", String.valueOf(threshold));
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
         } catch (JSONException e) {
@@ -480,6 +482,8 @@ public class ScanService extends Service {
         devId = sharedPref.getString("devID", null);
         comment = sharedPref.getString("comment", "-");
         URL = sharedPref.getString("URL", "-");
+        threshold = sharedPref.getFloat("threshold", 0.25f);
+
         currentFingerprintCollection.setComment(comment);
     }
 

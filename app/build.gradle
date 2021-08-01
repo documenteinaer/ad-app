@@ -31,4 +31,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:12.0.1'
     //implementation "androidx.multidex:multidex:2.0.1"
     implementation 'com.mapbox.mapboxsdk:mapbox-android-gestures:0.5.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

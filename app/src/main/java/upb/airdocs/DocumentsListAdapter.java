@@ -4,8 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -49,6 +53,14 @@ public class DocumentsListAdapter extends BaseAdapter {
         viewHolder.itemName.setText(currentItem.getItemName());
         viewHolder.itemDescription.setText(currentItem.getItemDescription());
 
+        if (URLUtil.isValidUrl(currentItem.getItemName())) {
+            Picasso.get()
+                    .load(currentItem.getItemName())
+                    .resize(240, 240)
+                    .centerCrop()
+                    .into(viewHolder.imgThumbnail);
+        }
+
         return convertView;
     }
 
@@ -56,10 +68,14 @@ public class DocumentsListAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView itemName;
         TextView itemDescription;
+        ImageView imgThumbnail;
 
         public ViewHolder(View view) {
             itemName = (TextView)view.findViewById(R.id.doc_name);
             itemDescription = (TextView) view.findViewById(R.id.doc_description);
+            imgThumbnail = (ImageView) view.findViewById(R.id.img_thumbnail);
         }
     }
+
+
 }

@@ -277,6 +277,12 @@ public class ScanService extends Service {
                 sent = 0;
                 e.printStackTrace();
                 Log.d(LOG_TAG, "Failed - connect exception");
+                if (type == TYPE_SEND_DOC || type == TYPE_SEARCH_DOC){
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                }
                 displaySendStatus();
                 return;
             }

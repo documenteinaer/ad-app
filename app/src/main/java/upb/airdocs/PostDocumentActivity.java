@@ -62,6 +62,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         bindScanService();
 
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
+        scanSendStatus.setText("");
 
         postDocumentURL = (EditText) findViewById(R.id.post_document_url);
         postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
@@ -71,6 +72,7 @@ public class PostDocumentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (scanActive == false) {
                     if (permissionGranted == true) {
+                        scanSendStatus.setText("");
                         onStartScanSendDoc();
                         scanActive = true;
                         scanSendDocButton.setEnabled(false);
@@ -206,6 +208,13 @@ public class PostDocumentActivity extends AppCompatActivity {
                 if (send == true){
                     scanSendDocButton.setEnabled(true);
                     scanSendStatus.setText("Sent successfuly");
+                    send = false;
+                }
+            }
+            else if (msg == ScanService.UPDATE_SEND_STATUS){
+                if (send == true) {
+                    scanSendDocButton.setEnabled(true);
+                    scanSendStatus.setText("Something went wrong");
                     send = false;
                 }
             }

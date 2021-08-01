@@ -72,12 +72,14 @@ public class SearchDocumentActivity extends AppCompatActivity {
         bindScanService();
 
         scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
+        scanSearchStatus.setText("");
 
         scanSearchDocButton = (Button) findViewById(R.id.scan_search_doc);
         scanSearchDocButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (scanActive == false) {
                     if (permissionGranted == true) {
+                        scanSearchStatus.setText("");
                         onStartScanSearchDoc();
                         scanActive = true;
                         scanSearchDocButton.setEnabled(false);
@@ -210,12 +212,19 @@ public class SearchDocumentActivity extends AppCompatActivity {
             else if (msg == ScanService.MSG_SEND_DONE){
                 if (search == true){
                     scanSearchDocButton.setEnabled(true);
-                    scanSearchStatus.setText("Sent successfuly");
+                    scanSearchStatus.setText("Answer received");
                     String jsonString = intent.getStringExtra("json");
                     Log.d(LOG_TAG, "Msg=" + jsonString);
                     search = false;
 
                     generateAdapterList(jsonString);
+                }
+            }
+            else if (msg == ScanService.UPDATE_SEND_STATUS){
+                if (search == true) {
+                    scanSearchDocButton.setEnabled(true);
+                    scanSearchStatus.setText("Something went wrong");
+                    search = false;
                 }
             }
         }

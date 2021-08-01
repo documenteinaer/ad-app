@@ -79,7 +79,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/threshold"
+        app:layout_constraintTop_toBottomOf="@+id/threshold" />
+
+    <TextView
+        android:id="@+id/threshold_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Threshold"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/address_user"
         app:layout_constraintTop_toBottomOf="@+id/address_user" />
+
+    <EditText
+        android:id="@+id/threshold"
+        android:layout_width="73dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="0.25"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/threshold_title"
+        app:layout_constraintTop_toBottomOf="@+id/threshold_title" />
 
 </android.support.constraint.ConstraintLayout>

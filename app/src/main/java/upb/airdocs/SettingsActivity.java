@@ -2,7 +2,6 @@ package upb.airdocs;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,7 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_user_settings);
         restoreFields();
 
         final Button saveButton = (Button) findViewById(R.id.save_settings);
@@ -33,6 +32,7 @@ public class SettingsActivity extends Activity {
         final EditText noscansEditText = (EditText) findViewById(R.id.no_scans_user);
         final EditText addressEditText = (EditText) findViewById(R.id.address_user);
         final EditText portEditText = (EditText) findViewById(R.id.port_user);
+        final EditText thresholdEditText = (EditText) findViewById(R.id.threshold);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -40,6 +40,7 @@ public class SettingsActivity extends Activity {
         editor.putInt("scan_no", Integer. parseInt(noscansEditText.getText().toString()));
         editor.putString("ip", addressEditText.getText().toString());
         editor.putString("port", portEditText.getText().toString());
+        editor.putFloat("threshold", Float.valueOf(thresholdEditText.getText().toString()));
         editor.apply();
     }
 
@@ -47,6 +48,7 @@ public class SettingsActivity extends Activity {
         final EditText noscansEditText = (EditText) findViewById(R.id.no_scans_user);
         final EditText addressEditText = (EditText) findViewById(R.id.address_user);
         final EditText portEditText = (EditText) findViewById(R.id.port_user);
+        final EditText thresholdEditText = (EditText) findViewById(R.id.threshold);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -57,6 +59,8 @@ public class SettingsActivity extends Activity {
         addressEditText.setText(address);
         String port = sharedPref.getString("port", "8001");
         portEditText.setText(port);
+        float threshold  = sharedPref.getFloat("threshold", 0.25f);
+        thresholdEditText.setText(String.valueOf(threshold));
 
     }
 

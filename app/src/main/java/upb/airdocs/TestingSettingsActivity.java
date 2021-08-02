@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 
 public class TestingSettingsActivity extends Activity {
 
     private static final String LOG_TAG = "TestingSettingsActivity";
+    boolean ble = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +35,18 @@ private void saveFields(){
         final EditText noscansEditText = (EditText) findViewById(R.id.no_scans_testing);
         final EditText addressEditText = (EditText) findViewById(R.id.address_testing);
         final EditText portEditText = (EditText) findViewById(R.id.port_testing);
+        final Switch bleSwitch = (Switch) findViewById(R.id.ble_switch_testing);
+        final Switch cellularSwitch = (Switch) findViewById(R.id.cellular_switch_testing);
+        final Switch gpsSwitch = (Switch) findViewById(R.id.gps_switch_testing);
+        final Switch audioSwitch = (Switch) findViewById(R.id.audio_switch_testing);
 
         String address = addressEditText.getText().toString();
         String port = portEditText.getText().toString();
         int scan_no = Integer.parseInt(noscansEditText.getText().toString());
+        boolean ble = bleSwitch.isChecked();
+        boolean cellular = cellularSwitch.isChecked();
+        boolean gps = gpsSwitch.isChecked();
+        boolean audio = audioSwitch.isChecked();
 
         Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
 
@@ -45,6 +56,10 @@ private void saveFields(){
         editor.putInt("scan_no", scan_no);
         editor.putString("ip", address);
         editor.putString("port", port);
+        editor.putBoolean("ble", ble);
+        editor.putBoolean("cellular", cellular);
+        editor.putBoolean("gps", gps);
+        editor.putBoolean("audio", audio);
         editor.commit();
     }
 
@@ -52,6 +67,10 @@ private void saveFields(){
         final EditText noscansEditText = (EditText) findViewById(R.id.no_scans_testing);
         final EditText addressEditText = (EditText) findViewById(R.id.address_testing);
         final EditText portEditText = (EditText) findViewById(R.id.port_testing);
+        final Switch bleSwitch = (Switch) findViewById(R.id.ble_switch_testing);
+        final Switch cellularSwitch = (Switch) findViewById(R.id.cellular_switch_testing);
+        final Switch gpsSwitch = (Switch) findViewById(R.id.gps_switch_testing);
+        final Switch audioSwitch = (Switch) findViewById(R.id.audio_switch_testing);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -61,6 +80,15 @@ private void saveFields(){
         addressEditText.setText(address);
         String port = sharedPref.getString("port", "8001");
         portEditText.setText(port);
+        boolean ble = sharedPref.getBoolean("ble", true);
+        bleSwitch.setChecked(ble);
+        boolean cellular = sharedPref.getBoolean("cellular", true);
+        cellularSwitch.setChecked(cellular);
+        boolean gps = sharedPref.getBoolean("gps", true);
+        gpsSwitch.setChecked(gps);
+        boolean audio = sharedPref.getBoolean("audio", true);
+        audioSwitch.setChecked(audio);
+
 
         Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
     }

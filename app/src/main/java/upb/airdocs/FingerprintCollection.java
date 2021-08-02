@@ -65,7 +65,7 @@ public class FingerprintCollection{
         itemList.add(fingerprint);
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps){
         JSONObject collectionJSON = new JSONObject();
 
         try {
@@ -85,7 +85,7 @@ public class FingerprintCollection{
 
             for (int i = 0; i < itemList.size(); i++) {
                 Fingerprint fingerprint = itemList.get(i);
-                collectionFingerprintJSON.put(fingerprint.toJSON());
+                collectionFingerprintJSON.put(fingerprint.toJSON(ble, cellular, gps));
             }
 
             collectionJSON.put("fingerprints", collectionFingerprintJSON);

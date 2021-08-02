@@ -90,6 +90,7 @@ public class ScanService extends Service {
     String comment;
     String URL;
     float threshold;
+    boolean ble, cellular, gps, audio;
 
 
     public ScanService() {
@@ -169,10 +170,18 @@ public class ScanService extends Service {
         scanning = wiFiScan.startScan();
 
         if (scanning) {
-            audioScan.startScan();
-            bleScan.startScan();
-            gpsScan.startScan();
-            telephonyScan.startScan();
+            if (audio) {
+                audioScan.startScan();
+            }
+            if (ble) {
+                bleScan.startScan();
+            }
+            if (gps) {
+                gpsScan.startScan();
+            }
+            if (cellular) {
+                telephonyScan.startScan();
+            }
         }
         else{
             stopScanInActivity();
@@ -201,18 +210,18 @@ public class ScanService extends Service {
                 wiFiScan.unregisterReceiver();
             }
 
-            if (audioScan != null){
+            if (audio && audioScan != null){
                 audioScan.stopScan();
             }
 
-            if (telephonyScan != null) {
+            if (cellular && telephonyScan != null) {
                 telephonyScan.unregisterPhoneStateManager();
             }
 
-            if (bleScan != null) {
+            if (ble && bleScan != null) {
                 bleScan.stopScan();
             }
-            if (gpsScan != null) {
+            if (gps && gpsScan != null) {
                 gpsScan.stopScan();
             }
             numberOfScansInCollection = 0;
@@ -221,7 +230,7 @@ public class ScanService extends Service {
     }
 
     private void sendFingerprintsToServer(final int type){
-        final JSONObject fingerprintCollectionsJSON = buildFinalJSON();
+        final JSONObject fingerprintCollectionsJSON = buildFinalJSON(ble, cellular, gps);
         final JSONObject jsonObjectFinal = new JSONObject();
         try {
             if (type == TYPE_TESTING) {
@@ -407,13 +416,13 @@ public class ScanService extends Service {
         //printCollectionsList();
     }
 
-    private JSONObject buildFinalJSON(){
+    private JSONObject buildFinalJSON(boolean ble, boolean cellular, boolean gps){
         JSONObject jsonObject = new JSONObject();
 
         try{
             for (int i = 0; i < collectionsList.size(); i++) {
                 FingerprintCollection fingerprintCollection = collectionsList.get(i);
-                jsonObject.put("collection"+i, fingerprintCollection.toJSON());
+                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps));
             }
         }
         catch(JSONException e){
@@ -489,6 +498,11 @@ public class ScanService extends Service {
         comment = sharedPref.getString("comment", "-");
         URL = sharedPref.getString("URL", "-");
         threshold = sharedPref.getFloat("threshold", 0.25f);
+
+        ble = sharedPref.getBoolean("ble", true);
+        cellular = sharedPref.getBoolean("cellular", true);
+        gps = sharedPref.getBoolean("gps", true);
+        audio = sharedPref.getBoolean("audio", true);
 
         currentFingerprintCollection.setComment(comment);
     }

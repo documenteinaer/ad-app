@@ -116,7 +116,7 @@ public class Fingerprint{
         return telephonyFingerprintJSON;
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps){
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject wifiFingerprintJSON = wifiFingerprintHashtableToJSON();
@@ -126,9 +126,15 @@ public class Fingerprint{
 
             jsonObject.put("timestamp", timestamp);
             jsonObject.put("wifi", wifiFingerprintJSON);
-            jsonObject.put("ble", bleFingerprintJSON);
-            jsonObject.put("gps", gpsFingerprintJSON);
-            jsonObject.put("telephony",telephonyFingerprintJSON);
+            if (ble) {
+                jsonObject.put("ble", bleFingerprintJSON);
+            }
+            if (gps) {
+                jsonObject.put("gps", gpsFingerprintJSON);
+            }
+            if (cellular) {
+                jsonObject.put("telephony", telephonyFingerprintJSON);
+            }
 
             //Log.d(LOG_TAG, "Fingerprint JSON: "+ jsonObject.toString(4));
 

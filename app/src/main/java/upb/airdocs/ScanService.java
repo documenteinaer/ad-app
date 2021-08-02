@@ -273,7 +273,7 @@ public class ScanService extends Service {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
-            catch(ConnectException e) {
+            catch(Exception e) {
                 sent = 0;
                 e.printStackTrace();
                 Log.d(LOG_TAG, "Failed - connect exception");

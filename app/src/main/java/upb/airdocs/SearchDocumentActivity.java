@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -304,7 +305,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
         try {
 
-            JSONObject jsonObject = new JSONObject(jsonString);
+            /*JSONObject jsonObject = new JSONObject(jsonString);
 
             for(Iterator<String> iter = jsonObject.keys(); iter.hasNext();) {
                 String key = iter.next();
@@ -317,7 +318,17 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     // Something went wrong!
                 }
+            }*/
+
+            JSONArray jsonArray = new JSONArray(jsonString);
+            for(int i=0; i < jsonArray.length(); i++) {
+                JSONObject docInfo = (JSONObject)jsonArray.get(i);
+                String docName = (String)docInfo.get("document");
+                String docDescription = (String)docInfo.get("description");
+                list.add(new Document(docName, docDescription));
+
             }
+
 
         } catch (Throwable t) {
             Log.e(LOG_TAG, "Could not parse malformed JSON: \"" + jsonString + "\"");

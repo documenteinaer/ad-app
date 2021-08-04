@@ -94,6 +94,8 @@ public class TestingActivity extends AppCompatActivity {
             }
         });
 
+        final TextView sendStatus = (TextView) findViewById(R.id.send_status);
+
 
         final Button startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +110,7 @@ public class TestingActivity extends AppCompatActivity {
                 }
                 else if (scanActive == false) {
                     if (permissionGranted == true) {
+                        sendStatus.setText("");
                         saveComment();
                         onStartScan();
                         scanActive = true;

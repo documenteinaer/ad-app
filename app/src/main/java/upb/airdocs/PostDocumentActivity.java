@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -25,8 +26,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 public class PostDocumentActivity extends AppCompatActivity {
     private static final String LOG_TAG = "SendDocumentActivity";
@@ -44,6 +48,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     EditText postDocumentURL;
     EditText postDocumentDescription;
     TextView scanSendStatus;
+    ImageView imageThumbnail;
 
     String address;
     String port;
@@ -57,15 +62,22 @@ public class PostDocumentActivity extends AppCompatActivity {
         setContentView(R.layout.post_doc);
 
         requestAllPermissions();
-        restoreAllFields();
 
         bindScanService();
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
 
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
         scanSendStatus.setText("");
 
         postDocumentURL = (EditText) findViewById(R.id.post_document_url);
         postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
+
+        imageThumbnail = (ImageView) findViewById(R.id.shared_img_thumbnail);
+
+        restoreAllFields();
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
         scanSendDocButton.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +95,16 @@ public class PostDocumentActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                handleSendText(intent); // Handle text being sent
+            } else if (type.startsWith("image/")) {
+                handleSendImage(intent); // Handle single image being sent
+            }
+        } else {
+            // Handle other intents, such as being started from the home screen
+        }
     }
 
     @Override
@@ -287,23 +309,51 @@ public class PostDocumentActivity extends AppCompatActivity {
         comment = sharedPref.getString("comment", "-");
         URL = sharedPref.getString("URL", "-");
 
-        final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
-        commentEditText.setText(comment);
-        final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
-        urlEditText.setText(URL);
+        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        postDocumentDescription.setText(comment);
+        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+        postDocumentURL.setText(URL);
     }
 
     private void saveCommentAndURL(){
-        final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
-        final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
-        editor.putString("comment", commentEditText.getText().toString());
-        editor.putString("URL", urlEditText.getText().toString());
+        editor.putString("comment", postDocumentDescription.getText().toString());
+        editor.putString("URL", postDocumentURL.getText().toString());
         editor.apply();
+    }
+
+    void handleSendText(Intent intent) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            // Update UI to reflect text being shared
+            Log.d(LOG_TAG, "received text: " + sharedText);
+            postDocumentURL.setText("Announcement");
+            postDocumentDescription.setText(sharedText);
+            saveCommentAndURL();
+        }
+    }
+
+    void handleSendImage(Intent intent) {
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            // Update UI to reflect image being shared
+            String imgName = imageUri.getLastPathSegment();
+            Log.d(LOG_TAG, "received image: " + imgName);
+            postDocumentURL.setText(imgName);
+            postDocumentDescription.setText("");
+            saveCommentAndURL();
+            Picasso.get()
+                    .load(imageUri)
+                    .resize(240, 240)
+                    .centerCrop()
+                    .into(imageThumbnail);
+        }
     }
 
 }

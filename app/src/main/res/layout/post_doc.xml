@@ -32,25 +32,26 @@
         android:id="@+id/post_document_url"
         android:layout_width="239dp"
         android:layout_height="43dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="18dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Document URL to be sent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintStart_toStartOf="@+id/doc_url_title"
+        app:layout_constraintTop_toBottomOf="@+id/doc_url_title" />
 
     <Button
         android:id="@+id/scan_send_doc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="324dp"
         android:text="Post Document"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/post_document_description"
-        app:layout_constraintTop_toBottomOf="@+id/post_document_description" />
+        app:layout_constraintStart_toStartOf="@+id/shared_img_thumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/shared_img_thumbnail" />
 
     <TextView
         android:id="@+id/textView2"
@@ -69,13 +70,46 @@
         android:id="@+id/post_document_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="18dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         android:text="Document description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/doc_description_title"
+        app:layout_constraintTop_toBottomOf="@+id/doc_description_title" />
+
+    <TextView
+        android:id="@+id/doc_url_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Document name / URL:"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/doc_description_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Document description / announcement:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/post_document_url"
         app:layout_constraintTop_toBottomOf="@+id/post_document_url" />
+
+    <ImageView
+        android:id="@+id/shared_img_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/post_document_description"
+        app:layout_constraintTop_toBottomOf="@+id/post_document_description"
+        tools:srcCompat="@tools:sample/avatars" />
 
 </android.support.constraint.ConstraintLayout>

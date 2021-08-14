@@ -2,7 +2,11 @@ package upb.airdocs;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,9 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class DocumentsListAdapter extends BaseAdapter {
@@ -54,7 +61,29 @@ public class DocumentsListAdapter extends BaseAdapter {
         final Document currentItem = (Document) getItem(position);
         viewHolder.itemName.setText(currentItem.getItemName());
         viewHolder.itemDescription.setText(currentItem.getItemDescription());
+        String imageString = currentItem.getImageString();
+        if (imageString != null){
+            Bitmap imageBitmap = convertStringToBitmap(imageString);
+            final Uri imageUri = getImageUri(context, imageBitmap);
+            Picasso.get()
+                    .load(imageUri)
+                    .resize(240, 240)
+                    .centerCrop()
+                    .into(viewHolder.imgThumbnail);
 
+            viewHolder.imgThumbnail.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(imageUri, "image/*");
+                    context.startActivity(intent);
+                }
+            });
+        }
+        else
         if (URLUtil.isValidUrl(currentItem.getItemName())) {
             Picasso.get()
                     .load(currentItem.getItemName())
@@ -99,6 +128,27 @@ public class DocumentsListAdapter extends BaseAdapter {
             itemDescription = (TextView) view.findViewById(R.id.doc_description);
             imgThumbnail = (ImageView) view.findViewById(R.id.img_thumbnail);
         }
+    }
+
+    private Bitmap convertStringToBitmap(String imageString){
+        Bitmap bitmap = null;
+
+        try{
+            byte [] encodeByte= Base64.decode(imageString,Base64.DEFAULT);
+            InputStream inputStream  = new ByteArrayInputStream(encodeByte);
+            bitmap  = BitmapFactory.decodeStream(inputStream);
+            return bitmap;
+        }catch(Exception e){
+            e.getMessage();
+            return null;
+        }
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
 

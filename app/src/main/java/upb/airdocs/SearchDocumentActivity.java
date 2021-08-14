@@ -10,16 +10,21 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +41,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -325,7 +334,13 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 JSONObject docInfo = (JSONObject)jsonArray.get(i);
                 String docName = (String)docInfo.get("document");
                 String docDescription = (String)docInfo.get("description");
-                list.add(new Document(docName, docDescription));
+                if (docInfo.has("image")){
+                    String imageString = (String)docInfo.get("image");
+                    list.add(new Document(docName, docDescription, imageString));
+                }
+                else {
+                    list.add(new Document(docName, docDescription));
+                }
 
             }
 
@@ -352,4 +367,5 @@ public class SearchDocumentActivity extends AppCompatActivity {
         //set custom adapter as adapter to our list view
         itemsListView.setAdapter(adapter);
     }
+
 }

@@ -9,15 +9,19 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class PostDocumentActivity extends AppCompatActivity {
     private static final String LOG_TAG = "SendDocumentActivity";
@@ -55,6 +62,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     int scan_no;
     String comment;
     String URL;
+    String postImageString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +124,7 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        saveCommentAndURL();
+        saveFields();
         // Unregister since the activity is not visible
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
         super.onPause();
@@ -231,6 +239,7 @@ public class PostDocumentActivity extends AppCompatActivity {
                     scanSendDocButton.setEnabled(true);
                     scanSendStatus.setText("Sent successfuly");
                     send = false;
+                    clearFields();
                 }
             }
             else if (msg == ScanService.UPDATE_SEND_STATUS){
@@ -245,7 +254,7 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     private void onStartScanSendDoc() {
         //String documentDescription = postDocumentDescription.getText().toString();
-        saveCommentAndURL();
+        saveFields();
         if (mBound) {
             Message msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0);
             try {
@@ -315,7 +324,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         postDocumentURL.setText(URL);
     }
 
-    private void saveCommentAndURL(){
+    private void saveFields(){
         //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
         //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
 
@@ -325,21 +334,22 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         editor.putString("comment", postDocumentDescription.getText().toString());
         editor.putString("URL", postDocumentURL.getText().toString());
+        editor.putString("image", postImageString);
         editor.apply();
     }
 
-    void handleSendText(Intent intent) {
+    private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             // Update UI to reflect text being shared
             Log.d(LOG_TAG, "received text: " + sharedText);
             postDocumentURL.setText("Announcement");
             postDocumentDescription.setText(sharedText);
-            saveCommentAndURL();
+            saveFields();
         }
     }
 
-    void handleSendImage(Intent intent) {
+    private void handleSendImage(Intent intent) {
         Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             // Update UI to reflect image being shared
@@ -347,13 +357,57 @@ public class PostDocumentActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "received image: " + imgName);
             postDocumentURL.setText(imgName);
             postDocumentDescription.setText("");
-            saveCommentAndURL();
             Picasso.get()
                     .load(imageUri)
                     .resize(240, 240)
                     .centerCrop()
                     .into(imageThumbnail);
+            String imageString = convertImageToString(imageUri);
+            if (imageString != null){
+                postImageString = imageString;
+            }
+            saveFields();
+
         }
     }
 
+    private String convertImageToString(Uri imageUri){
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
+            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            return imageString;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void clearFields(){
+        postDocumentURL = (EditText) findViewById(R.id.post_document_url);
+        postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
+        imageThumbnail = (ImageView) findViewById(R.id.shared_img_thumbnail);
+
+        postDocumentURL.setText("");
+        postDocumentDescription.setText("");
+        imageThumbnail.setImageDrawable(null);
+
+        comment = null;
+        URL = null;
+        postImageString = null;
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("comment", null);
+        editor.putString("URL", null);
+        editor.putString("image", null);
+        editor.apply();
+
+    }
 }

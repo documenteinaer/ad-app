@@ -91,7 +91,7 @@ public class ScanService extends Service {
     String URL;
     float threshold;
     boolean ble, cellular, gps, audio;
-
+    String image;
 
     public ScanService() {
     }
@@ -240,6 +240,9 @@ public class ScanService extends Service {
             else if (type == TYPE_SEND_DOC){
                 jsonObjectFinal.put("type", "POST");
                 jsonObjectFinal.put("document", URL);
+                if (image != null) {
+                    jsonObjectFinal.put("image", image);
+                }
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEARCH_DOC){
@@ -503,6 +506,8 @@ public class ScanService extends Service {
         cellular = sharedPref.getBoolean("cellular", true);
         gps = sharedPref.getBoolean("gps", true);
         audio = sharedPref.getBoolean("audio", true);
+
+        image = sharedPref.getString("image", null);
 
         currentFingerprintCollection.setComment(comment);
     }

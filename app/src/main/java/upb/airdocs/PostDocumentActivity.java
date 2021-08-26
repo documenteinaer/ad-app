@@ -350,7 +350,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     }
 
     private void handleSendImage(Intent intent) {
-        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        final Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             // Update UI to reflect image being shared
             String imgName = imageUri.getLastPathSegment();
@@ -362,6 +362,25 @@ public class PostDocumentActivity extends AppCompatActivity {
                     .resize(240, 240)
                     .centerCrop()
                     .into(imageThumbnail);
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                final Uri imgUri = getImageUri(this, bitmap);
+                imageThumbnail.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(imgUri, "image/*");
+                        startActivity(intent);
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             String imageString = convertImageToString(imageUri);
             if (imageString != null){
                 postImageString = imageString;
@@ -409,5 +428,11 @@ public class PostDocumentActivity extends AppCompatActivity {
         editor.putString("image", null);
         editor.apply();
 
+    }
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 }

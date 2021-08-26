@@ -28,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -343,8 +344,16 @@ public class PostDocumentActivity extends AppCompatActivity {
         if (sharedText != null) {
             // Update UI to reflect text being shared
             Log.d(LOG_TAG, "received text: " + sharedText);
-            postDocumentURL.setText("Announcement");
-            postDocumentDescription.setText(sharedText);
+
+            if ( URLUtil.isValidUrl(sharedText)){
+                postDocumentURL.setText(sharedText);
+                postDocumentDescription.setText("");
+            }
+            else{
+                postDocumentURL.setText("Announcement");
+                postDocumentDescription.setText(sharedText);
+            }
+
             saveFields();
         }
     }

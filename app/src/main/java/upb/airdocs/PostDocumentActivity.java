@@ -360,9 +360,10 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     private void handleSendImage(Intent intent) {
         final Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        String imgName = "1232";
         if (imageUri != null) {
             // Update UI to reflect image being shared
-            String imgName = imageUri.getLastPathSegment();
+            imgName = imageUri.getLastPathSegment();
             Log.d(LOG_TAG, "received image: " + imgName);
             postDocumentURL.setText(imgName);
             postDocumentDescription.setText("");
@@ -374,23 +375,23 @@ public class PostDocumentActivity extends AppCompatActivity {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                final Uri imgUri = getImageUri(this, bitmap);
-                imageThumbnail.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(imgUri, "image/*");
-                        startActivity(intent);
-                    }
-                });
+                final Uri imgUri = getImageUri(this, bitmap, imgName);
+                if (imageUri != null) {
+                    imageThumbnail.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_VIEW);
+                            intent.setDataAndType(imgUri, "image/*");
+                            startActivity(intent);
+                        }
+                    });
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            String imageString = convertImageToString(imageUri);
+            String imageString = resizeAndConvertToString(imageUri);
             if (imageString != null){
                 postImageString = imageString;
             }
@@ -415,6 +416,37 @@ public class PostDocumentActivity extends AppCompatActivity {
         return null;
     }
 
+    private String resizeAndConvertToString(Uri imageUri){
+        Bitmap bitmap = null;
+        float scale = 1;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+
+            if (width > 1000){
+                scale = 1000f/width;
+                width = 1000;
+                height = Math.round(height*scale);
+                Log.d(LOG_TAG, "scale="+scale+" width="+width+" height="+height);
+            }
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
+            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            return imageString;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     private void clearFields(){
         postDocumentURL = (EditText) findViewById(R.id.post_document_url);
         postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
@@ -438,10 +470,13 @@ public class PostDocumentActivity extends AppCompatActivity {
         editor.apply();
 
     }
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
+    public Uri getImageUri(Context inContext, Bitmap inImage, String name) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, name, null);
+        if (path != null) {
+            return Uri.parse(path);
+        }
+        return null;
     }
 }

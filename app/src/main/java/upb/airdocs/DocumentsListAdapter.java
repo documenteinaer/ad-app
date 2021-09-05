@@ -59,12 +59,13 @@ public class DocumentsListAdapter extends BaseAdapter {
         }
 
         final Document currentItem = (Document) getItem(position);
-        viewHolder.itemName.setText(currentItem.getItemName());
+        String imgName = currentItem.getItemName();
+        viewHolder.itemName.setText(imgName);
         viewHolder.itemDescription.setText(currentItem.getItemDescription());
         String imageString = currentItem.getImageString();
         if (imageString != null){
             Bitmap imageBitmap = convertStringToBitmap(imageString);
-            final Uri imageUri = getImageUri(context, imageBitmap);
+            final Uri imageUri = getImageUri(context, imageBitmap, imgName);
             Picasso.get()
                     .load(imageUri)
                     .resize(240, 240)
@@ -144,11 +145,14 @@ public class DocumentsListAdapter extends BaseAdapter {
         }
     }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
+    public Uri getImageUri(Context inContext, Bitmap inImage, String name) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, name, null);
+        if (path != null) {
+            return Uri.parse(path);
+        }
+        return null;
     }
 
 

@@ -59,13 +59,17 @@ public class DocumentsListAdapter extends BaseAdapter {
         }
 
         final Document currentItem = (Document) getItem(position);
-        String imgName = currentItem.getItemName();
-        viewHolder.itemName.setText(imgName);
+        String docName = currentItem.getItemName();
+        if (!docName.equals("-")) {
+            viewHolder.itemName.setText(docName);
+        }else{
+            viewHolder.itemName.setVisibility(View.GONE);
+        }
         viewHolder.itemDescription.setText(currentItem.getItemDescription());
-        String imageString = currentItem.getImageString();
-        if (imageString != null){
-            Bitmap imageBitmap = convertStringToBitmap(imageString);
-            final Uri imageUri = getImageUri(context, imageBitmap, imgName);
+        String docString = currentItem.getImageString();
+        if (docString != null){
+            Bitmap imageBitmap = convertStringToBitmap(docString);
+            final Uri imageUri = getImageUri(context, imageBitmap, docName);
             Picasso.get()
                     .load(imageUri)
                     .resize(240, 240)

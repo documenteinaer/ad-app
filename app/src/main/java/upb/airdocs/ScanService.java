@@ -88,10 +88,10 @@ public class ScanService extends Service {
     String port;
     int scan_no;
     String comment;
-    String URL;
     float threshold;
     boolean ble, cellular, gps, audio;
     String image;
+    String docName;
 
     public ScanService() {
     }
@@ -239,7 +239,7 @@ public class ScanService extends Service {
             }
             else if (type == TYPE_SEND_DOC){
                 jsonObjectFinal.put("type", "POST");
-                jsonObjectFinal.put("document", URL);
+                jsonObjectFinal.put("document", docName);
                 if (image != null) {
                     jsonObjectFinal.put("image", image);
                 }
@@ -392,7 +392,7 @@ public class ScanService extends Service {
                     break;
                 case MSG_ACTUAL_SEND_DOC:
                     Log.d(LOG_TAG, "Post document");
-                    Log.d(LOG_TAG, "address= " + address + " port=" + port + " documentURL=" + URL);
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
                     sendFingerprintsToServer(TYPE_SEND_DOC);
                     break;
                 case MSG_ACTUAL_SEARCH_DOC:
@@ -499,8 +499,8 @@ public class ScanService extends Service {
         scanLimit = sharedPref.getInt("scan_no", 1);
         devId = sharedPref.getString("devID", null);
         comment = sharedPref.getString("comment", "-");
-        URL = sharedPref.getString("URL", "-");
         threshold = sharedPref.getFloat("threshold", 0.25f);
+        docName = sharedPref.getString("docName", "-");
 
         ble = sharedPref.getBoolean("ble", true);
         cellular = sharedPref.getBoolean("cellular", true);

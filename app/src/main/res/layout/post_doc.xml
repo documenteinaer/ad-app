@@ -28,19 +28,6 @@
         app:layout_constraintHorizontal_bias="0.477"
         app:layout_constraintStart_toEndOf="@+id/scan_send_doc" />
 
-    <EditText
-        android:id="@+id/post_document_url"
-        android:layout_width="239dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="18dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Document URL to be sent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/doc_url_title"
-        app:layout_constraintTop_toBottomOf="@+id/doc_url_title" />
-
     <Button
         android:id="@+id/scan_send_doc"
         android:layout_width="wrap_content"
@@ -80,11 +67,11 @@
         app:layout_constraintTop_toBottomOf="@+id/doc_description_title" />
 
     <TextView
-        android:id="@+id/doc_url_title"
+        android:id="@+id/doc_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="Document name / URL:"
+        android:text="Document name: -"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/textView5"
@@ -94,12 +81,13 @@
         android:id="@+id/doc_description_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="Document description / announcement:"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="116dp"
+        android:text="Document description:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/post_document_url"
-        app:layout_constraintTop_toBottomOf="@+id/post_document_url" />
+        app:layout_constraintStart_toStartOf="@+id/doc_title"
+        app:layout_constraintTop_toBottomOf="@+id/doc_title" />
 
     <ImageView
         android:id="@+id/shared_img_thumbnail"

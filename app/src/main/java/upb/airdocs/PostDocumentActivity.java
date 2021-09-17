@@ -10,7 +10,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.Message;
@@ -53,7 +52,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     Messenger mMessenger = null;
 
     Button scanSendDocButton;
-    EditText postDocumentURL;
+    TextView postDocTitle;
     EditText postDocumentDescription;
     TextView scanSendStatus;
     ImageView imageThumbnail;
@@ -62,8 +61,8 @@ public class PostDocumentActivity extends AppCompatActivity {
     String port;
     int scan_no;
     String comment;
-    String URL;
     String postImageString;
+    String docName = "-";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +80,8 @@ public class PostDocumentActivity extends AppCompatActivity {
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
         scanSendStatus.setText("");
 
-        postDocumentURL = (EditText) findViewById(R.id.post_document_url);
+
+        postDocTitle = (TextView) findViewById(R.id.doc_title);
         postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
 
         imageThumbnail = (ImageView) findViewById(R.id.shared_img_thumbnail);
@@ -317,12 +317,12 @@ public class PostDocumentActivity extends AppCompatActivity {
         }
         scan_no = sharedPref.getInt("scan_no", 1);
         comment = sharedPref.getString("comment", "-");
-        URL = sharedPref.getString("URL", "-");
+        docName = sharedPref.getString("docName", "-");
 
         //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
         postDocumentDescription.setText(comment);
+        postDocTitle.setText("Document name: "+docName);
         //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
-        postDocumentURL.setText(URL);
     }
 
     private void saveFields(){
@@ -334,23 +334,22 @@ public class PostDocumentActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
 
         editor.putString("comment", postDocumentDescription.getText().toString());
-        editor.putString("URL", postDocumentURL.getText().toString());
         editor.putString("image", postImageString);
+        editor.putString("docName", docName);
         editor.apply();
     }
 
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        docName = "-";
         if (sharedText != null) {
             // Update UI to reflect text being shared
             Log.d(LOG_TAG, "received text: " + sharedText);
 
             if ( URLUtil.isValidUrl(sharedText)){
-                postDocumentURL.setText(sharedText);
-                postDocumentDescription.setText("");
+                postDocumentDescription.setText(sharedText);
             }
             else{
-                postDocumentURL.setText("Announcement");
                 postDocumentDescription.setText(sharedText);
             }
 
@@ -365,7 +364,8 @@ public class PostDocumentActivity extends AppCompatActivity {
             // Update UI to reflect image being shared
             imgName = imageUri.getLastPathSegment();
             Log.d(LOG_TAG, "received image: " + imgName);
-            postDocumentURL.setText(imgName);
+            postDocTitle.setText("Document name: "+imgName);
+            docName = imgName;
             postDocumentDescription.setText("");
             Picasso.get()
                     .load(imageUri)
@@ -448,17 +448,18 @@ public class PostDocumentActivity extends AppCompatActivity {
 
 
     private void clearFields(){
-        postDocumentURL = (EditText) findViewById(R.id.post_document_url);
+        //postDocumentURL = (EditText) findViewById(R.id.post_document_url);
         postDocumentDescription = (EditText) findViewById(R.id.post_document_description);
         imageThumbnail = (ImageView) findViewById(R.id.shared_img_thumbnail);
 
-        postDocumentURL.setText("");
+        //postDocumentURL.setText("");
+        postDocTitle.setText("Document name: -");
         postDocumentDescription.setText("");
         imageThumbnail.setImageDrawable(null);
 
         comment = null;
-        URL = null;
         postImageString = null;
+        docName = "-";
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -467,6 +468,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         editor.putString("comment", null);
         editor.putString("URL", null);
         editor.putString("image", null);
+        editor.putString("docName", null);
         editor.apply();
 
     }

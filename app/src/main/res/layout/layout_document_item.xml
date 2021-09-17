@@ -14,7 +14,6 @@
             android:id="@+id/doc_name"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:clickable="true"
             android:padding="8dp"
             android:textSize="16sp"
             android:textStyle="italic" />
@@ -23,6 +22,7 @@
             android:id="@+id/doc_description"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:padding="8dp"
             android:textSize="16sp" />
     </LinearLayout>

@@ -60,12 +60,13 @@ public class DocumentsListAdapter extends BaseAdapter {
 
         final Document currentItem = (Document) getItem(position);
         String docName = currentItem.getItemName();
+        final String docDescription = currentItem.getItemDescription();
         if (!docName.equals("-")) {
             viewHolder.itemName.setText(docName);
         }else{
             viewHolder.itemName.setVisibility(View.GONE);
         }
-        viewHolder.itemDescription.setText(currentItem.getItemDescription());
+        viewHolder.itemDescription.setText(docDescription);
         String docString = currentItem.getImageString();
         if (docString != null){
             Bitmap imageBitmap = convertStringToBitmap(docString);
@@ -88,28 +89,28 @@ public class DocumentsListAdapter extends BaseAdapter {
                 }
             });
         }
-        else
-        if (URLUtil.isValidUrl(currentItem.getItemName())) {
-            Picasso.get()
-                    .load(currentItem.getItemName())
+
+        if (URLUtil.isValidUrl(docDescription)) {
+            /*Picasso.get()
+                    .load(currentItem.getItemDescription())
                     .resize(240, 240)
                     .centerCrop()
-                    .into(viewHolder.imgThumbnail);
+                    .into(viewHolder.imgThumbnail);*/
 
-            viewHolder.imgThumbnail.setOnClickListener(new View.OnClickListener()
+            /*viewHolder.imgThumbnail.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    openURL(currentItem.getItemName());
+                    openURL(docDescription);
                 }
-            });
-            viewHolder.itemName.setOnClickListener(new View.OnClickListener()
+            });*/
+            viewHolder.itemDescription.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    openURL(currentItem.getItemName());
+                    openURL(docDescription);
                 }
             });
         }

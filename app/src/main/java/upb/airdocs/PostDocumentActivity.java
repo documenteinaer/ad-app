@@ -348,9 +348,13 @@ public class PostDocumentActivity extends AppCompatActivity {
 
             if ( URLUtil.isValidUrl(sharedText)){
                 postDocumentDescription.setText(sharedText);
+                postDocTitle.setVisibility(View.GONE);
+                imageThumbnail.setVisibility(View.GONE);
             }
             else{
                 postDocumentDescription.setText(sharedText);
+                postDocTitle.setVisibility(View.GONE);
+                imageThumbnail.setVisibility(View.GONE);
             }
 
             saveFields();
@@ -466,7 +470,6 @@ public class PostDocumentActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
 
         editor.putString("comment", null);
-        editor.putString("URL", null);
         editor.putString("image", null);
         editor.putString("docName", null);
         editor.apply();

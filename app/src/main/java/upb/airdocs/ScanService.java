@@ -238,6 +238,12 @@ public class ScanService extends Service {
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEND_DOC){
+                if (image != null && docName == null){
+                    Log.d(LOG_TAG, "Failed due to null filename");
+                    sent = 0;
+                    displaySendStatus();
+                    return;
+                }
                 jsonObjectFinal.put("type", "POST");
                 jsonObjectFinal.put("document", docName);
                 if (image != null) {

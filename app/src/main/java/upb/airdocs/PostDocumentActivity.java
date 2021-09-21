@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.IBinder;
@@ -16,6 +17,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -363,13 +365,10 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     private void handleSendImage(Intent intent) {
         final Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        String imgName = "1232";
         if (imageUri != null) {
-            // Update UI to reflect image being shared
-            imgName = imageUri.getLastPathSegment();
-            Log.d(LOG_TAG, "received image: " + imgName);
-            postDocTitle.setText("Document name: "+imgName);
-            docName = imgName;
+            String fileName = getFileName(imageUri);
+            postDocTitle.setText("Document name: "+fileName);
+            docName = fileName;
             postDocumentDescription.setText("");
             Picasso.get()
                     .load(imageUri)
@@ -379,7 +378,7 @@ public class PostDocumentActivity extends AppCompatActivity {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                final Uri imgUri = getImageUri(this, bitmap, imgName);
+                final Uri imgUri = getImageUri(this, bitmap, fileName);
                 if (imageUri != null) {
                     imageThumbnail.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -400,8 +399,19 @@ public class PostDocumentActivity extends AppCompatActivity {
                 postImageString = imageString;
             }
             saveFields();
-
         }
+        else{
+            docName = null;
+        }
+    }
+
+    private String getFileName(Uri uri){
+        Cursor returnCursor =
+                getContentResolver().query(uri, null, null, null, null);
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String fileName = returnCursor.getString(nameIndex);
+        return fileName;
     }
 
     private String convertImageToString(Uri imageUri){

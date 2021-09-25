@@ -88,6 +88,8 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         imageThumbnail = (ImageView) findViewById(R.id.shared_img_thumbnail);
 
+        clearFields();
+
         restoreAllFields();
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);

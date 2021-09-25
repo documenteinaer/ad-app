@@ -20,14 +20,14 @@
 
     <TextView
         android:id="@+id/scan_search_status"
-        android:layout_width="121dp"
-        android:layout_height="33dp"
-        android:layout_marginBottom="8dp"
-        android:text="Status "
-        app:layout_constraintBottom_toBottomOf="@+id/scan_search_doc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Unsent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.464"
-        app:layout_constraintStart_toEndOf="@+id/scan_search_doc" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/scan_search_doc"
+        app:layout_constraintTop_toBottomOf="@+id/scan_search_doc" />
 
     <Button
         android:id="@+id/scan_search_doc"
@@ -56,15 +56,14 @@
     <ListView
         android:id="@+id/list_view_items"
         android:layout_width="0dp"
-        android:layout_height="480dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="450dp"
+        android:layout_marginTop="20dp"
+        android:fadeScrollbars="false"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
-        android:fadeScrollbars="false"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.758"
-        app:layout_constraintStart_toStartOf="@+id/scan_search_doc"
-        app:layout_constraintTop_toBottomOf="@+id/scan_search_doc" />
+        app:layout_constraintStart_toStartOf="@+id/scan_search_status"
+        app:layout_constraintTop_toBottomOf="@+id/scan_search_status" />
 
 </android.support.constraint.ConstraintLayout>

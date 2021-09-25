@@ -34,23 +34,40 @@ public class WiFiScan {
         mContext = context;
     }
 
-    public boolean startScan(){
-
-        stop = false;
-
+    public boolean isLocationEnabled(){
         LocationManager locationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             Toast.makeText(mContext,
                     "Network Provider disabled. Cannot start scan. Please enable Location Services.",
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
             return false;
         }
+        return true;
+    }
 
-
-        //Log.d(LOG_TAG, "Obtaining the WiFi Manager");
+    public boolean isWiFiEnabled(){
         mWifiManager = (WifiManager)
                 mContext.getSystemService(Context.WIFI_SERVICE);
         if (mWifiManager.isWifiEnabled()) {
+            return true;
+        }
+        else{
+            Toast.makeText(mContext,
+                    "WiFi is not enabled. Scan will not start.",
+                    Toast.LENGTH_LONG).show();
+            return false;
+        }
+    }
+
+    public boolean startScan(){
+
+        stop = false;
+
+        if (!isLocationEnabled()){
+            return false;
+        }
+
+        if (isWiFiEnabled()){
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
             mContext.registerReceiver(wifiScanReceiver, intentFilter);
@@ -58,15 +75,16 @@ public class WiFiScan {
             if (mWifiManager != null) {
                 Log.d(LOG_TAG, "WiFi Manager is not null, start scan");
                 mWifiManager.startScan();
+                return true;
             }
-            return true;
+            else {
+                return false;
+            }
         }
         else{
-            Toast.makeText(mContext,
-                    "WiFi is not enabled. Scan will not start.",
-                    Toast.LENGTH_SHORT).show();
             return false;
         }
+
     }
 
 

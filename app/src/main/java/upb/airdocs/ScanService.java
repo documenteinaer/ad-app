@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,6 +68,7 @@ public class ScanService extends Service {
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
     public static final int UPDATE_SEND_STATUS = 3;
+    public static final int ACT_STOP_SCAN_FAILED = 4;
 
     public static String devId = null;
 
@@ -184,7 +186,7 @@ public class ScanService extends Service {
             }
         }
         else{
-            stopScanInActivity();
+            stopScanFailedInActivity();
         }
 
     }
@@ -330,7 +332,7 @@ public class ScanService extends Service {
                         numberOfScansInCollection = 0;
                         numberOfTotalScans = 0;
                         sent = 1;
-                    Log.d(LOG_TAG, "Success (send doc)");
+                        Log.d(LOG_TAG, "Success (send doc)");
                         announceSendDone(null);
                 }
                 else if (type == TYPE_SEARCH_DOC){
@@ -454,6 +456,13 @@ public class ScanService extends Service {
         Log.d(LOG_TAG, "Stop Scan in Activity");
         Intent intent = new Intent("msg");
         intent.putExtra("message", ACT_STOP_SCAN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public void stopScanFailedInActivity(){
+        Log.d(LOG_TAG, "Stop Scan Failed in Activity");
+        Intent intent = new Intent("msg");
+        intent.putExtra("message", ACT_STOP_SCAN_FAILED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

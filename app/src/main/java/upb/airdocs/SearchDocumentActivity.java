@@ -82,7 +82,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
         bindScanService();
 
         scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
-        scanSearchStatus.setText("");
+        //scanSearchStatus.setText("");
 
         scanSearchDocButton = (Button) findViewById(R.id.scan_search_doc);
         scanSearchDocButton.setOnClickListener(new View.OnClickListener() {
@@ -213,7 +213,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
             if (msg == ScanService.ACT_STOP_SCAN) {
                 scanActive = false;
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                Log.d(LOG_TAG, "In broadcast receiver");
+                Log.d(LOG_TAG, "In receiver - scan successful");
                 if (search == true){
                     scanSearchStatus.setText("Scan complete");
                     searchDocumentOnServer();
@@ -233,7 +233,17 @@ public class SearchDocumentActivity extends AppCompatActivity {
             else if (msg == ScanService.UPDATE_SEND_STATUS){
                 if (search == true) {
                     scanSearchDocButton.setEnabled(true);
-                    scanSearchStatus.setText("Something went wrong");
+                    scanSearchStatus.setText("Send failed - network or server unreachable");
+                    search = false;
+                }
+            }
+            else if (msg == ScanService.ACT_STOP_SCAN_FAILED){
+                scanActive = false;
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                Log.d(LOG_TAG, "In broadcast receiver - scan failed");
+                if (search == true) {
+                    scanSearchDocButton.setEnabled(true);
+                    scanSearchStatus.setText("Scan failed - location or wifi disabled");
                     search = false;
                 }
             }

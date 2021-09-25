@@ -80,7 +80,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         String type = intent.getType();
 
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
-        scanSendStatus.setText("");
+        //scanSendStatus.setText("");
 
 
         postDocTitle = (TextView) findViewById(R.id.doc_title);
@@ -91,6 +91,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         restoreAllFields();
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
+
         scanSendDocButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (scanActive == false) {
@@ -231,7 +232,7 @@ public class PostDocumentActivity extends AppCompatActivity {
             if (msg == ScanService.ACT_STOP_SCAN) {
                 scanActive = false;
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                Log.d(LOG_TAG, "In broadcast receiver");
+                Log.d(LOG_TAG, "In receiver - scan successful");
                 if (send == true){
                     scanSendStatus.setText("Scan complete");
                     sendDocumentToServer();
@@ -246,9 +247,20 @@ public class PostDocumentActivity extends AppCompatActivity {
                 }
             }
             else if (msg == ScanService.UPDATE_SEND_STATUS){
+                Log.d(LOG_TAG, "In broadcast receiver - send failed");
                 if (send == true) {
                     scanSendDocButton.setEnabled(true);
-                    scanSendStatus.setText("Something went wrong");
+                    scanSendStatus.setText("Send failed - network or server unreachable");
+                    send = false;
+                }
+            }
+            else if (msg == ScanService.ACT_STOP_SCAN_FAILED){
+                scanActive = false;
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                Log.d(LOG_TAG, "In broadcast receiver - scan failed");
+                if (send == true) {
+                    scanSendDocButton.setEnabled(true);
+                    scanSendStatus.setText("Scan failed - location or wifi disabled");
                     send = false;
                 }
             }

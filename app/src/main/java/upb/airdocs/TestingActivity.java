@@ -358,6 +358,8 @@ public class TestingActivity extends AppCompatActivity {
                 scanActive = false;
                 Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
+                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
+                sendStatus.setText("Scan sucessful");
                 /*x = y = z = x_p = y_p = -1;
                 final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
                 coordinateX_P.setText(Float.toString(x_p));
@@ -387,10 +389,19 @@ public class TestingActivity extends AppCompatActivity {
                 if (sent == 1) {
                     sendStatus.setText("Sent successfully");
                 } else if (sent == 0) {
-                    sendStatus.setText("Send failed");
+                    sendStatus.setText("Send failed - network or server unreachable");
                 } else {
                     sendStatus.setText("Unsent");
                 }
+            }
+            else if (msg == ScanService.ACT_STOP_SCAN_FAILED){
+                Log.d(LOG_TAG, "In broadcast receiver - scan failed");
+                scanActive = false;
+                Button startScanButton = (Button) findViewById(R.id.start_scan);
+                startScanButton.setText("Start Scan");
+                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
+                sendStatus.setText("Scan failed - location or wifi disabled");
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
     };

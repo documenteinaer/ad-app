@@ -58,6 +58,8 @@ public class DocumentsListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        viewHolder.imgThumbnail.setImageBitmap(null);
+
         final Document currentItem = (Document) getItem(position);
         String docName = currentItem.getItemName();
         final String docDescription = currentItem.getItemDescription();

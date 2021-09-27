@@ -38,8 +38,14 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class PostDocumentActivity extends AppCompatActivity {
     private static final String LOG_TAG = "SendDocumentActivity";
@@ -63,8 +69,9 @@ public class PostDocumentActivity extends AppCompatActivity {
     String port;
     int scan_no;
     String comment;
-    String postImageString;
     String docName = "-";
+    String postFileString = null;
+    String fileType = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +119,14 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
+                fileType = "plaintext";
                 handleSendText(intent); // Handle text being sent
             } else if (type.startsWith("image/")) {
+                fileType = "img";
                 handleSendImage(intent); // Handle single image being sent
+            } else if (type.equals("application/pdf")){
+                fileType = "pdf";
+                handleSendGenericFile(intent);
             }
         } else {
             // Handle other intents, such as being started from the home screen
@@ -324,36 +336,7 @@ public class PostDocumentActivity extends AppCompatActivity {
         }
     }
 
-    private void restoreAllFields(){
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        if (address == null) {
-            address = sharedPref.getString("ip", "192.168.142.105");
-            port = sharedPref.getString("port", "8001");
-        }
-        scan_no = sharedPref.getInt("scan_no", 1);
-        comment = sharedPref.getString("comment", "-");
-        docName = sharedPref.getString("docName", "-");
 
-        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
-        postDocumentDescription.setText(comment);
-        postDocTitle.setText("Document name: "+docName);
-        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
-    }
-
-    private void saveFields(){
-        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
-        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
-
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        editor.putString("comment", postDocumentDescription.getText().toString());
-        editor.putString("image", postImageString);
-        editor.putString("docName", docName);
-        editor.apply();
-    }
 
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -410,8 +393,29 @@ public class PostDocumentActivity extends AppCompatActivity {
 
             String imageString = resizeAndConvertToString(imageUri);
             if (imageString != null){
-                postImageString = imageString;
+                postFileString = imageString;
             }
+            saveFields();
+        }
+        else{
+            docName = null;
+        }
+    }
+
+    private void handleSendGenericFile(Intent intent){
+        final Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (fileUri != null) {
+            String fileName = getFileName(fileUri);
+            postDocTitle.setText("Document name: "+fileName);
+            docName = fileName;
+            postDocumentDescription.setText("");
+
+            String fileString = convertFileToString(fileUri);
+            //Log.d(LOG_TAG, "File string: "+fileString);
+            if (fileString != null){
+                postFileString = fileString;
+            }
+
             saveFields();
         }
         else{
@@ -474,6 +478,72 @@ public class PostDocumentActivity extends AppCompatActivity {
         return null;
     }
 
+    private String convertFileToString(Uri fileUri){
+        String fileString = null;
+        //File file = new File(fileUri.toString());
+        //String filePath = file.getAbsolutePath();
+        //Log.d(LOG_TAG, "file path: " + filePath);
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(this.getContentResolver()
+                    .openFileDescriptor(fileUri, "r").getFileDescriptor());
+
+            byte[] byteArray = IOUtils.toByteArray(inputStream);
+            fileString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            return fileString;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage, String name) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, name, null);
+        if (path != null) {
+            return Uri.parse(path);
+        }
+        return null;
+    }
+
+    private void restoreAllFields(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        if (address == null) {
+            address = sharedPref.getString("ip", "192.168.142.105");
+            port = sharedPref.getString("port", "8001");
+        }
+        scan_no = sharedPref.getInt("scan_no", 1);
+        //comment = sharedPref.getString("comment", "-");
+        //docName = sharedPref.getString("docName", "-");
+
+        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        //postDocumentDescription.setText(comment);
+        //postDocTitle.setText("Document name: "+docName);
+        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+    }
+
+    private void saveFields(){
+        //final EditText commentEditText = (EditText) findViewById(R.id.post_document_description);
+        //final EditText urlEditText = (EditText) findViewById(R.id.post_document_url);
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("docName", docName);
+        editor.putString("comment", postDocumentDescription.getText().toString());
+
+        if (postFileString != null){
+            editor.putString("file", postFileString);
+        }
+        editor.putString("filetype", fileType);
+
+        editor.apply();
+    }
 
     private void clearFields(){
         //postDocumentURL = (EditText) findViewById(R.id.post_document_url);
@@ -486,26 +556,19 @@ public class PostDocumentActivity extends AppCompatActivity {
         imageThumbnail.setImageDrawable(null);
 
         comment = null;
-        postImageString = null;
+        postFileString = null;
         docName = "-";
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
-        editor.putString("comment", null);
-        editor.putString("image", null);
         editor.putString("docName", null);
+        editor.putString("comment", null);
+        editor.putString("file", null);
+        editor.putString("filetype", null);
+
         editor.apply();
 
-    }
-    public Uri getImageUri(Context inContext, Bitmap inImage, String name) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, name, null);
-        if (path != null) {
-            return Uri.parse(path);
-        }
-        return null;
     }
 }

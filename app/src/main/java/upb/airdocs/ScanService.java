@@ -92,8 +92,9 @@ public class ScanService extends Service {
     String comment;
     float threshold;
     boolean ble, cellular, gps, audio;
-    String image;
     String docName;
+    String file;
+    String fileType;
 
     public ScanService() {
     }
@@ -240,7 +241,7 @@ public class ScanService extends Service {
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_SEND_DOC){
-                if (image != null && docName == null){
+                if (file != null && docName == null){
                     Log.d(LOG_TAG, "Failed due to null filename");
                     sent = 0;
                     displaySendStatus();
@@ -248,8 +249,11 @@ public class ScanService extends Service {
                 }
                 jsonObjectFinal.put("type", "POST");
                 jsonObjectFinal.put("document", docName);
-                if (image != null) {
-                    jsonObjectFinal.put("image", image);
+                if (file != null){
+                    jsonObjectFinal.put("file", file);
+                }
+                if (fileType != null){
+                    jsonObjectFinal.put("filetype", fileType);
                 }
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
@@ -522,7 +526,8 @@ public class ScanService extends Service {
         gps = sharedPref.getBoolean("gps", true);
         audio = sharedPref.getBoolean("audio", true);
 
-        image = sharedPref.getString("image", null);
+        file = sharedPref.getString("file", null);
+        fileType = sharedPref.getString("filetype", null);
 
         currentFingerprintCollection.setComment(comment);
     }

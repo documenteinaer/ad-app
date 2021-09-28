@@ -2,6 +2,8 @@ package upb.airdocs;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -20,6 +22,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
+
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DocumentsListAdapter extends BaseAdapter {
     private static final String LOG_TAG = "DocumentsListAdapter";
@@ -102,17 +107,18 @@ public class DocumentsListAdapter extends BaseAdapter {
                 });
             }
             if (fileType.equals("pdf")){
-                final Uri fileUri = convertStringToFile(fileString, docName);
-                if (fileUri != null) {
+                final File file = convertStringToFile(fileString, docName);
+                if (file != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Log.d(LOG_TAG, "trying to open file: " + fileUri.getPath());
-                            /*Intent intent = new Intent();
+                            //Log.d(LOG_TAG, "trying to open file: " + fileUri.getPath());
+                            Uri fileUri = openPdfFile(file);
+                            Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
                             intent.setDataAndType(fileUri, "application/pdf");
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            context.startActivity(intent);*/
+                            context.startActivity(intent);
                         }
                     });
                 }
@@ -145,6 +151,25 @@ public class DocumentsListAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    private Uri openPdfFile(File file){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = FileProvider.getUriForFile(context,  context.getPackageName()+ ".fileprovider", file);
+
+            List<ResolveInfo> resInfoList = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            Log.d(LOG_TAG, "found file: "+ uri.getPath());
+        }else {
+            uri = Uri.fromFile(file);
+        }
+
+        return uri;
     }
 
     private void openURL(String url){
@@ -190,7 +215,7 @@ public class DocumentsListAdapter extends BaseAdapter {
         return null;
     }
 
-    private Uri convertStringToFile(String fileString, String filename){
+    private File convertStringToFile(String fileString, String filename){
         try{
             byte [] encodeByte= Base64.decode(fileString,Base64.DEFAULT);
             InputStream inputStream  = new ByteArrayInputStream(encodeByte);
@@ -199,17 +224,10 @@ public class DocumentsListAdapter extends BaseAdapter {
             Log.d(LOG_TAG, "path:" + path);
             File file = new File(path);
             file.createNewFile();
-            /*File dir = context.getExternalFilesDir(null);
-            String path = dir.getAbsolutePath() + "/" + filename;
-            Log.d(LOG_TAG, "path:" + path);
-            File file = new File(path);
-            file.createNewFile();*/
             if(file.exists()) {
                 Log.d(LOG_TAG, "created file: "+file.getAbsolutePath());
                 copyInputStreamToFile(inputStream, file);
-                Uri fileUri = Uri.fromFile(file);
-                Log.d(LOG_TAG, "written file: " + fileUri.getPath());
-                return fileUri;
+                return file;
             }
             else{
                 return null;

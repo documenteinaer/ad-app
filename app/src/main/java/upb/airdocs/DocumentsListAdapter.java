@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -101,19 +103,19 @@ public class DocumentsListAdapter extends BaseAdapter {
             }
             if (fileType.equals("pdf")){
                 final Uri fileUri = convertStringToFile(fileString, docName);
-                /*if (fileUri != null) {
+                if (fileUri != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Log.d(LOG_TAG, "trying to open file: " + fileUri.getPath());
-                            Intent intent = new Intent();
+                            /*Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
                             intent.setDataAndType(fileUri, "application/pdf");
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            context.startActivity(intent);
+                            context.startActivity(intent);*/
                         }
                     });
-                }*/
+                }
             }
         }
 
@@ -144,6 +146,7 @@ public class DocumentsListAdapter extends BaseAdapter {
 
         return convertView;
     }
+
     private void openURL(String url){
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
@@ -191,16 +194,16 @@ public class DocumentsListAdapter extends BaseAdapter {
         try{
             byte [] encodeByte= Base64.decode(fileString,Base64.DEFAULT);
             InputStream inputStream  = new ByteArrayInputStream(encodeByte);
-            /*File sdCard = Environment.getExternalStorageDirectory();
-            String path = sdCard.getAbsolutePath()  + "/Download/" + filename;
-            Log.d(LOG_TAG, "path:" + path);
-            File file = new File(path);
-            file.createNewFile();*/
-            File dir = context.getExternalFilesDir(null);
-            String path = dir.getAbsolutePath() + "/" + filename;
+            File sdCard = Environment.getExternalStorageDirectory();
+            String path = sdCard.getAbsolutePath()  + "/Documents/" + filename;
             Log.d(LOG_TAG, "path:" + path);
             File file = new File(path);
             file.createNewFile();
+            /*File dir = context.getExternalFilesDir(null);
+            String path = dir.getAbsolutePath() + "/" + filename;
+            Log.d(LOG_TAG, "path:" + path);
+            File file = new File(path);
+            file.createNewFile();*/
             if(file.exists()) {
                 Log.d(LOG_TAG, "created file: "+file.getAbsolutePath());
                 copyInputStreamToFile(inputStream, file);
@@ -216,20 +219,6 @@ public class DocumentsListAdapter extends BaseAdapter {
             return null;
         }
     }
-
-    /*public static File createFile(String filename)
-    {
-        File file = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-        {
-            file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + filename);
-        }
-        else
-        {
-            file = new File(Environment.getExternalStorageDirectory() + "/" + filename);
-        }
-        return file;
-    }*/
 
     private void copyInputStreamToFile(InputStream in, File file) {
         OutputStream out = null;

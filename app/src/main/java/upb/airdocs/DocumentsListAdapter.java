@@ -87,7 +87,7 @@ public class DocumentsListAdapter extends BaseAdapter {
         String fileString = currentItem.getFileString();
         String fileType = currentItem.getFileType();
         if (fileString != null){
-            if (fileType.equals("img")) {
+            if (fileType.equals("image/*")) {
                 Bitmap imageBitmap = convertStringToBitmap(fileString);
                 final Uri imageUri = getImageUri(context, imageBitmap, docName);
                 Picasso.get()
@@ -101,13 +101,11 @@ public class DocumentsListAdapter extends BaseAdapter {
                     public void onClick(View v) {
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(imageUri, "image/*");
+                        intent.setDataAndType(imageUri, fileType);
                         context.startActivity(intent);
                     }
                 });
-            } else if (fileType.equals("pdf")|| fileType.equals("video") ||
-                    fileType.equals("audio") || fileType.equals("doc") ||
-                    fileType.equals("docx")){
+            } else if (FileTypes.isAcceptedType(fileType)){
                 final File file = convertStringToFile(fileString, docName);
                 if (file != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
@@ -117,17 +115,7 @@ public class DocumentsListAdapter extends BaseAdapter {
                             Uri fileUri = openPdfFile(file);
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
-                            if (fileType.equals("pdf")) {
-                                intent.setDataAndType(fileUri, "application/pdf");
-                            } else if (fileType.equals("video")){
-                                intent.setDataAndType(fileUri, "video/*");
-                            } else if (fileType.equals("audio")){
-                                intent.setDataAndType(fileUri, "audio/*");
-                            } else if (fileType.equals("doc")){
-                                intent.setDataAndType(fileUri, "application/msword");
-                            } else if (fileType.equals("docx")){
-                                intent.setDataAndType(fileUri, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-                            }
+                            intent.setDataAndType(fileUri, fileType);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(intent);
                         }

@@ -123,22 +123,16 @@ public class PostDocumentActivity extends AppCompatActivity {
                 fileType = "plaintext";
                 handleSendText(intent); // Handle text being sent
             } else if (type.startsWith("image/")){
-                fileType = "img";
+                fileType = "image/*";
                 handleSendImage(intent); // Handle single image being sent
-            } else if (type.equals("application/pdf")){
-                fileType = "pdf";
-                handleSendGenericFile(intent);
-            } else if (type.startsWith("video/")){
-                fileType = "video";
+            }  else if (type.startsWith("video/")){
+                fileType = "video/*";
                 handleSendGenericFile(intent);
             } else if (type.startsWith("audio/")){
-                fileType = "audio";
+                fileType = "audio/*";
                 handleSendGenericFile(intent);
-            } else if (type.equals("application/msword")){
-                fileType = "doc";
-                handleSendGenericFile(intent);
-            } else if (type.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
-                fileType = "docx";
+            }  else if (FileTypes.isAcceptedType(type)){
+                fileType = type;
                 handleSendGenericFile(intent);
             }
 

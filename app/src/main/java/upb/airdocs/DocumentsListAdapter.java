@@ -105,8 +105,7 @@ public class DocumentsListAdapter extends BaseAdapter {
                         context.startActivity(intent);
                     }
                 });
-            }
-            if (fileType.equals("pdf")){
+            } else if (fileType.equals("pdf")|| fileType.equals("video") || fileType.equals("audio")){
                 final File file = convertStringToFile(fileString, docName);
                 if (file != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +115,13 @@ public class DocumentsListAdapter extends BaseAdapter {
                             Uri fileUri = openPdfFile(file);
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
-                            intent.setDataAndType(fileUri, "application/pdf");
+                            if (fileType.equals("pdf")) {
+                                intent.setDataAndType(fileUri, "application/pdf");
+                            } else if (fileType.equals("video")){
+                                intent.setDataAndType(fileUri, "video/*");
+                            } else if (fileType.equals("audio")){
+                                intent.setDataAndType(fileUri, "audio/*");
+                            }
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(intent);
                         }

@@ -87,7 +87,7 @@ public class DocumentsListAdapter extends BaseAdapter {
         String fileString = currentItem.getFileString();
         String fileType = currentItem.getFileType();
         if (fileString != null){
-            if (fileType.equals("image/*")) {
+            if (fileType.equals("image/*") && fileString != null) {
                 Bitmap imageBitmap = convertStringToBitmap(fileString);
                 final Uri imageUri = getImageUri(context, imageBitmap, docName);
                 Picasso.get()
@@ -105,7 +105,7 @@ public class DocumentsListAdapter extends BaseAdapter {
                         context.startActivity(intent);
                     }
                 });
-            } else if (FileTypes.isAcceptedType(fileType)){
+            } else if (FileTypes.isAcceptedType(fileType) && fileString != null){
                 final File file = convertStringToFile(fileString, docName);
                 if (file != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
@@ -150,6 +150,10 @@ public class DocumentsListAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    private void openGenericFile(){
+
     }
 
     private Uri openPdfFile(File file){

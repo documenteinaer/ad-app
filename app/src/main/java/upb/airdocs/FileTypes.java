@@ -13,7 +13,8 @@ public class FileTypes {
                     "application/vnd.ms-powerpoint",
                     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                     "audio/*",
-                    "video/*"));
+                    "video/*",
+                    "text/plain"));
 
     public static boolean isAcceptedType(String fileType){
         return types.contains(fileType);

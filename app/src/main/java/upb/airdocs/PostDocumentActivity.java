@@ -120,7 +120,7 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
-                fileType = "plaintext";
+                fileType = "text/plain";
                 handleSendText(intent); // Handle text being sent
             } else if (type.startsWith("image/")){
                 fileType = "image/*";
@@ -348,8 +348,11 @@ public class PostDocumentActivity extends AppCompatActivity {
 
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        docName = "-";
-        if (sharedText != null) {
+        if (sharedText == null){
+            handleSendGenericFile(intent);
+        }
+        else {
+            docName = "-";
             // Update UI to reflect text being shared
             Log.d(LOG_TAG, "received text: " + sharedText);
 

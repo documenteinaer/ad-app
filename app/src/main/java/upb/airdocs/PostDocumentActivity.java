@@ -134,7 +134,14 @@ public class PostDocumentActivity extends AppCompatActivity {
             } else if (type.startsWith("audio/")){
                 fileType = "audio";
                 handleSendGenericFile(intent);
+            } else if (type.equals("application/msword")){
+                fileType = "doc";
+                handleSendGenericFile(intent);
+            } else if (type.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
+                fileType = "docx";
+                handleSendGenericFile(intent);
             }
+
         } else {
             // Handle other intents, such as being started from the home screen
         }

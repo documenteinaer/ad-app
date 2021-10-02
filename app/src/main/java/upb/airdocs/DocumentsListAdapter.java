@@ -105,7 +105,9 @@ public class DocumentsListAdapter extends BaseAdapter {
                         context.startActivity(intent);
                     }
                 });
-            } else if (fileType.equals("pdf")|| fileType.equals("video") || fileType.equals("audio")){
+            } else if (fileType.equals("pdf")|| fileType.equals("video") ||
+                    fileType.equals("audio") || fileType.equals("doc") ||
+                    fileType.equals("docx")){
                 final File file = convertStringToFile(fileString, docName);
                 if (file != null) {
                     viewHolder.itemName.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +123,10 @@ public class DocumentsListAdapter extends BaseAdapter {
                                 intent.setDataAndType(fileUri, "video/*");
                             } else if (fileType.equals("audio")){
                                 intent.setDataAndType(fileUri, "audio/*");
+                            } else if (fileType.equals("doc")){
+                                intent.setDataAndType(fileUri, "application/msword");
+                            } else if (fileType.equals("docx")){
+                                intent.setDataAndType(fileUri, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
                             }
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(intent);

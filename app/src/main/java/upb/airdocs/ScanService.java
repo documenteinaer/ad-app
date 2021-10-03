@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -286,23 +287,29 @@ public class ScanService extends Service {
     public void sendJSONtoServer(JSONObject jsonObject, int type){
 
         try {
-            URL url = new URL("http://"+address+":"+port);
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            URL url = new URL("http://" + address + ":" + port);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
+            con.setConnectTimeout(20000);
             //String jsonInputString = "{\"this\": \"is a test\", \"received\": \"ok\"}";
             String jsonInputString = jsonObject.toString();
-            try(OutputStream os = con.getOutputStream()) {
+            try (OutputStream os = con.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
+                if (e instanceof SocketTimeoutException){
+                    Log.d(LOG_TAG, "Failed - socket timeout");
+                } else if (e instanceof ConnectException){
+                    Log.d(LOG_TAG, "Failed - connect exception");
+                } else{
+                    Log.d(LOG_TAG, "Failed - other exception");
+                }
                 sent = 0;
                 e.printStackTrace();
-                Log.d(LOG_TAG, "Failed - connect exception");
-                if (type == TYPE_SEND_DOC || type == TYPE_SEARCH_DOC){
+                if (type == TYPE_SEND_DOC || type == TYPE_SEARCH_DOC) {
                     collectionsList = new ArrayList<FingerprintCollection>();
                     numberOfCollections = 0;
                     numberOfScansInCollection = 0;
@@ -312,7 +319,7 @@ public class ScanService extends Service {
                 return;
             }
 
-            try(BufferedReader br = new BufferedReader(
+            try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(con.getInputStream(), "utf-8"))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine = null;
@@ -321,40 +328,37 @@ public class ScanService extends Service {
                 }
                 Log.d(LOG_TAG, response.toString() + " " + type);
 
-                if (response.toString().equals("<html><body><h1>Successful Testing</h1></body></html>") && (type == TYPE_TESTING)){
-                        collectionsList = new ArrayList<FingerprintCollection>();
-                        numberOfCollections = 0;
-                        numberOfScansInCollection = 0;
-                        numberOfTotalScans = 0;
-                        displayNumberOfScans();
-                        sent = 1;
-                        Log.d(LOG_TAG, "Success (testing)");
-                        displaySendStatus();
-                }
-                else if (response.toString().equals("<html><body><h1>Successful Sending</h1></body></html>") && type == TYPE_SEND_DOC ){
-                        collectionsList = new ArrayList<FingerprintCollection>();
-                        numberOfCollections = 0;
-                        numberOfScansInCollection = 0;
-                        numberOfTotalScans = 0;
-                        sent = 1;
-                        Log.d(LOG_TAG, "Success (send doc)");
-                        announceSendDone(null);
-                }
-                else if (type == TYPE_SEARCH_DOC){
-                        collectionsList = new ArrayList<FingerprintCollection>();
-                        numberOfCollections = 0;
-                        numberOfScansInCollection = 0;
-                        numberOfTotalScans = 0;
-                        sent = 1;
-                        Log.d(LOG_TAG, "Success (search doc)");
+                if (response.toString().equals("<html><body><h1>Successful Testing</h1></body></html>") && (type == TYPE_TESTING)) {
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                    displayNumberOfScans();
+                    sent = 1;
+                    Log.d(LOG_TAG, "Success (testing)");
+                    displaySendStatus();
+                } else if (response.toString().equals("<html><body><h1>Successful Sending</h1></body></html>") && type == TYPE_SEND_DOC) {
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                    sent = 1;
+                    Log.d(LOG_TAG, "Success (send doc)");
+                    announceSendDone(null);
+                } else if (type == TYPE_SEARCH_DOC) {
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                    sent = 1;
+                    Log.d(LOG_TAG, "Success (search doc)");
                         /*String delims = "[<>]+";
                         String[] tokens = response.toString().split(delims);
                         String receivedURL = tokens[4];
                         announceSendDone(receivedURL);*/
-                        announceSendDone(response.toString());
-                        //Log.d(LOG_TAG, response.toString());
-                }
-                else{
+                    announceSendDone(response.toString());
+                    //Log.d(LOG_TAG, response.toString());
+                } else {
                     Log.d(LOG_TAG, "Failed");
                     sent = 0;
                     displaySendStatus();
@@ -362,7 +366,6 @@ public class ScanService extends Service {
 
 
             }
-
         } catch (MalformedURLException e) {
             sent = 0;
             e.printStackTrace();

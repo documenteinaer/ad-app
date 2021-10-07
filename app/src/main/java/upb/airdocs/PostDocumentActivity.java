@@ -417,16 +417,24 @@ public class PostDocumentActivity extends AppCompatActivity {
         final Uri fileUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (fileUri != null) {
             String fileName = getFileName(fileUri);
-            postDocTitle.setText("Document name: "+fileName);
-            docName = fileName;
-            postDocumentDescription.setText("");
-
-            String fileString = convertFileToString(fileUri);
-            //Log.d(LOG_TAG, "File string: "+fileString);
-            if (fileString != null){
-                postFileString = fileString;
+            if (fileName == null){
+                Toast.makeText(getApplicationContext(), "Cannot obtain file name. Try again.", Toast.LENGTH_LONG).show();
+                docName = null;
+                fileType = null;
+                postFileString = null;
+                return;
             }
+            else {
+                postDocTitle.setText("Document name: " + fileName);
+                docName = fileName;
+                postDocumentDescription.setText("");
 
+                String fileString = convertFileToString(fileUri);
+                //Log.d(LOG_TAG, "File string: "+fileString);
+                if (fileString != null) {
+                    postFileString = fileString;
+                }
+            }
             saveFields();
         }
         else{
@@ -437,10 +445,12 @@ public class PostDocumentActivity extends AppCompatActivity {
     private String getFileName(Uri uri){
         Cursor returnCursor =
                 getContentResolver().query(uri, null, null, null, null);
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        returnCursor.moveToFirst();
-        String fileName = returnCursor.getString(nameIndex);
-        return fileName;
+        if (returnCursor.moveToFirst()) {
+            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            String fileName = returnCursor.getString(nameIndex);
+            return fileName;
+        }
+        return null;
     }
 
     private String convertImageToString(Uri imageUri){

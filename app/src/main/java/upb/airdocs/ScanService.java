@@ -66,6 +66,7 @@ public class ScanService extends Service {
     public static final int MSG_SEND_DONE = 6;
     public static final int MSG_ACTUAL_SEND_DOC = 7;
     public static final int MSG_ACTUAL_SEARCH_DOC = 8;
+    public static final int MSG_DEL_DOC = 9;
 
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
@@ -87,6 +88,7 @@ public class ScanService extends Service {
     private static final int TYPE_TESTING = 0;
     private static final int TYPE_SEND_DOC = 1;
     private static final int TYPE_SEARCH_DOC = 2;
+    private static final int TYPE_DELETE = 3;
 
     String address;
     String port;
@@ -97,6 +99,7 @@ public class ScanService extends Service {
     String docName;
     String file;
     String fileType;
+    String delId;
 
     public ScanService() {
     }
@@ -264,6 +267,10 @@ public class ScanService extends Service {
                 jsonObjectFinal.put("threshold", String.valueOf(threshold));
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
+            else if (type == TYPE_DELETE){
+                jsonObjectFinal.put("type", "DEL");
+                jsonObjectFinal.put("id", delId);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -358,7 +365,15 @@ public class ScanService extends Service {
                         announceSendDone(receivedURL);*/
                     announceSendDone(response.toString());
                     //Log.d(LOG_TAG, response.toString());
-                } else {
+                } else if (response.toString().equals("<html><body><h1>Successful Deleting</h1></body></html>") && (type == TYPE_DELETE)) {
+                    collectionsList = new ArrayList<FingerprintCollection>();
+                    numberOfCollections = 0;
+                    numberOfScansInCollection = 0;
+                    numberOfTotalScans = 0;
+                    sent = 1;
+                    Log.d(LOG_TAG, "Success (delete doc)");
+                }
+                else {
                     Log.d(LOG_TAG, "Failed");
                     sent = 0;
                     displaySendStatus();
@@ -415,6 +430,11 @@ public class ScanService extends Service {
                     Log.d(LOG_TAG, "Search document");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
                     sendFingerprintsToServer(TYPE_SEARCH_DOC);
+                    break;
+                case MSG_DEL_DOC:
+                    Log.d(LOG_TAG, "Delete document");
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
+                    sendFingerprintsToServer(TYPE_DELETE);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -532,6 +552,7 @@ public class ScanService extends Service {
 
         file = sharedPref.getString("file", null);
         fileType = sharedPref.getString("filetype", null);
+        delId = sharedPref.getString("delId", null);
 
         currentFingerprintCollection.setComment(comment);
     }

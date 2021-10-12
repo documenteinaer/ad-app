@@ -442,17 +442,6 @@ public class PostDocumentActivity extends AppCompatActivity {
         }
     }
 
-    /*private String getFileName(Uri uri){
-        Cursor returnCursor =
-                getContentResolver().query(uri, null, null, null, null);
-        if (returnCursor.moveToFirst()) {
-            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            String fileName = returnCursor.getString(nameIndex);
-            return fileName;
-        }
-        return null;
-    }*/
-
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {

@@ -5,17 +5,19 @@ public class Document {
     private String itemDescription = null;
     private String fileString = null;
     private String fileType = null;
+    private String id = null;
 
     public Document(String name, String description) {
         this.itemName = name;
         this.itemDescription = description;
     }
 
-    public Document(String name, String description, String fileString, String fileType) {
+    public Document(String name, String description, String fileString, String fileType, String id) {
         this.itemName = name;
         this.itemDescription = description;
         this.fileString = fileString;
         this.fileType = fileType;
+        this.id = id;
     }
 
     public String getItemName() {
@@ -33,4 +35,6 @@ public class Document {
     public String getFileType() {
         return fileType;
     }
+
+    public String getId(){ return id;}
 }

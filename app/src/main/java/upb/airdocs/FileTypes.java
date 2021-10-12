@@ -14,7 +14,8 @@ public class FileTypes {
                     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                     "audio/*",
                     "video/*",
-                    "text/plain"));
+                    "text/plain",
+                    "application/zip"));
 
     public static boolean isAcceptedType(String fileType){
         return types.contains(fileType);

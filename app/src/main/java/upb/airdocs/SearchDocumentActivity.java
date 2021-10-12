@@ -278,6 +278,18 @@ public class SearchDocumentActivity extends AppCompatActivity {
         }
     }
 
+    public void deleteDocumentFromServer() {
+        if (mBound) {
+            // Create and send a message to the service, using a supported 'what' value
+            Message msg = Message.obtain(null, ScanService.MSG_DEL_DOC, 0, 0);
+            try {
+                mMessenger.send(msg);
+            } catch (RemoteException e) {
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -348,7 +360,8 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 if (docInfo.has("file")){
                     String fileString = (String)docInfo.get("file");
                     String fileType = (String)docInfo.get("filetype");
-                    list.add(new Document(docName, docDescription, fileString, fileType));
+                    String id = (String)docInfo.get("id");
+                    list.add(new Document(docName, docDescription, fileString, fileType, id));
                 }
                 else {
                     list.add(new Document(docName, docDescription));

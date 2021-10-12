@@ -2,6 +2,7 @@ package upb.airdocs;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -21,6 +22,7 @@ import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
@@ -112,11 +114,12 @@ public class DocumentsListAdapter extends BaseAdapter {
                         @Override
                         public void onClick(View v) {
                             //Log.d(LOG_TAG, "trying to open file: " + fileUri.getPath());
-                            Uri fileUri = openPdfFile(file);
+                            Uri fileUri = openFile(file);
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
                             intent.setDataAndType(fileUri, fileType);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                             context.startActivity(intent);
                         }
                     });
@@ -149,14 +152,25 @@ public class DocumentsListAdapter extends BaseAdapter {
             });
         }
 
+        String id = currentItem.getId();
+        viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                saveDelId(id);
+                if (context instanceof SearchDocumentActivity) {
+                    ((SearchDocumentActivity)context).deleteDocumentFromServer();
+                }
+
+                items.remove(position);
+                notifyDataSetChanged();
+                Toast.makeText(context, "Deleting file from server", Toast.LENGTH_LONG).show();
+            }
+        });
+
         return convertView;
     }
 
-    private void openGenericFile(){
 
-    }
-
-    private Uri openPdfFile(File file){
+    private Uri openFile(File file){
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -186,11 +200,13 @@ public class DocumentsListAdapter extends BaseAdapter {
         TextView itemName;
         TextView itemDescription;
         ImageView imgThumbnail;
+        ImageView deleteButton;
 
         public ViewHolder(View view) {
             itemName = (TextView)view.findViewById(R.id.doc_name);
             itemDescription = (TextView) view.findViewById(R.id.doc_description);
             imgThumbnail = (ImageView) view.findViewById(R.id.img_thumbnail);
+            deleteButton = (ImageView) view.findViewById(R.id.delete_button);
         }
     }
 
@@ -270,6 +286,14 @@ public class DocumentsListAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void saveDelId(String id){
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("delId", id);
+        editor.apply();
     }
 
 

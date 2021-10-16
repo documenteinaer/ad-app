@@ -268,8 +268,9 @@ public class ScanService extends Service {
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
             }
             else if (type == TYPE_DELETE){
-                jsonObjectFinal.put("type", "DEL");
+                jsonObjectFinal.put("type", "DELFILE");
                 jsonObjectFinal.put("id", delId);
+                jsonObjectFinal.put("devid", devId);
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -109,4 +109,26 @@
         app:layout_constraintStart_toStartOf="@+id/threshold_title"
         app:layout_constraintTop_toBottomOf="@+id/threshold_title" />
 
+    <Button
+        android:id="@+id/delete_all_documents"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="Delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Delete all documents posted from this device:"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/save_settings"
+        app:layout_constraintTop_toBottomOf="@+id/save_settings" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

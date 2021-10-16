@@ -67,6 +67,7 @@ public class ScanService extends Service {
     public static final int MSG_ACTUAL_SEND_DOC = 7;
     public static final int MSG_ACTUAL_SEARCH_DOC = 8;
     public static final int MSG_DEL_DOC = 9;
+    public static final int MSG_DEL_ALL = 10;
 
     public static final int ACT_STOP_SCAN = 1;
     public static final int UPDATE_SCAN_NUMBERS = 2;
@@ -89,6 +90,7 @@ public class ScanService extends Service {
     private static final int TYPE_SEND_DOC = 1;
     private static final int TYPE_SEARCH_DOC = 2;
     private static final int TYPE_DELETE = 3;
+    private static final int TYPE_DELETE_ALL = 4;
 
     String address;
     String port;
@@ -272,6 +274,10 @@ public class ScanService extends Service {
                 jsonObjectFinal.put("id", delId);
                 jsonObjectFinal.put("devid", devId);
             }
+            else if (type == TYPE_DELETE_ALL){
+                jsonObjectFinal.put("type", "DELALL");
+                jsonObjectFinal.put("devid", devId);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -436,6 +442,11 @@ public class ScanService extends Service {
                     Log.d(LOG_TAG, "Delete document");
                     Log.d(LOG_TAG, "address= " + address + " port=" + port);
                     sendFingerprintsToServer(TYPE_DELETE);
+                    break;
+                case MSG_DEL_ALL:
+                    Log.d(LOG_TAG, "Delete all documents");
+                    Log.d(LOG_TAG, "address= " + address + " port=" + port);
+                    sendFingerprintsToServer(TYPE_DELETE_ALL);
                     break;
                 default:
                     super.handleMessage(msg);

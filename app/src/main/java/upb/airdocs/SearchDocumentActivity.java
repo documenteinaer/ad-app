@@ -357,14 +357,14 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 JSONObject docInfo = (JSONObject)jsonArray.get(i);
                 String docName = (String)docInfo.get("document");
                 String docDescription = (String)docInfo.get("description");
+                String fileType = (String)docInfo.get("filetype");
+                String id = (String)docInfo.get("id");
                 if (docInfo.has("file")){
                     String fileString = (String)docInfo.get("file");
-                    String fileType = (String)docInfo.get("filetype");
-                    String id = (String)docInfo.get("id");
                     list.add(new Document(docName, docDescription, fileString, fileType, id));
                 }
                 else {
-                    list.add(new Document(docName, docDescription));
+                    list.add(new Document(docName, docDescription, fileType, id));
                 }
 
             }

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 
 public class TestingSettingsActivity extends Activity {
 
@@ -29,6 +30,10 @@ public class TestingSettingsActivity extends Activity {
                 finish();
             }
         });
+
+        final TextView versionText = (TextView) findViewById(R.id.testing_version_name);
+        String versionTextString = "Application version: "+ BuildConfig.VERSION_NAME;
+        versionText.setText(versionTextString);
 
     }
 private void saveFields(){

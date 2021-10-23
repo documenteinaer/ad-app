@@ -157,4 +157,15 @@
         app:layout_constraintStart_toStartOf="@+id/gps_switch_testing"
         app:layout_constraintTop_toBottomOf="@+id/gps_switch_testing" />
 
+    <TextView
+        android:id="@+id/testing_version_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Application Version:"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/save_testing_settings"
+        app:layout_constraintTop_toBottomOf="@+id/save_testing_settings" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

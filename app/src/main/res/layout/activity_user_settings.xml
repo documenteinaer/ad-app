@@ -131,4 +131,15 @@
         app:layout_constraintStart_toStartOf="@+id/save_settings"
         app:layout_constraintTop_toBottomOf="@+id/save_settings" />
 
+    <TextView
+        android:id="@+id/user_version_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Application version:"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/delete_all_documents"
+        app:layout_constraintTop_toBottomOf="@+id/delete_all_documents" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

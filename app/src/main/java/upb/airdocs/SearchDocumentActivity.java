@@ -188,6 +188,16 @@ public class SearchDocumentActivity extends AppCompatActivity {
         //stopService(serviceIntent);
     }
 
+    public void stopService(){
+        if (mBound) {
+            unbindService(mConnection);
+            Log.d(LOG_TAG, "Unbind Scan Service");
+        }
+        Intent serviceIntent = new Intent(this, ScanService.class);
+        stopService(serviceIntent);
+        Log.d(LOG_TAG, "Stop Scan Service");
+    }
+
     // Class for interacting with the main interface of the service.
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder iBinder) {
@@ -312,6 +322,10 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 intent = new Intent(getBaseContext(), TestingActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.user_exit:
+                stopService();
+                finishAffinity();
+                System.exit(0);
             default:
                 return super.onOptionsItemSelected(item);
         }

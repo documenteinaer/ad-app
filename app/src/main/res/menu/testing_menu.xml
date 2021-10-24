@@ -3,4 +3,7 @@
     <item android:id="@+id/testing_settings"
         android:title="Settings">
     </item>
+    <item android:id="@+id/testing_exit"
+        android:title="Exit Application">
+    </item>
 </menu>

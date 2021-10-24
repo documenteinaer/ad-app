@@ -6,4 +6,7 @@
     <item android:id="@+id/testing_activity"
         android:title="Testing Activity">
     </item>
+    <item android:id="@+id/user_exit"
+        android:title="Exit Application">
+    </item>
 </menu>

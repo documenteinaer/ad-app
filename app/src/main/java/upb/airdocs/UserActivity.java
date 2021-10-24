@@ -147,6 +147,10 @@ public class UserActivity  extends AppCompatActivity {
                 intent = new Intent(getBaseContext(), TestingActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.user_exit:
+                stopService();
+                finishAffinity();
+                System.exit(0);
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -147,6 +147,11 @@ public class UserActivity  extends AppCompatActivity {
                 intent = new Intent(getBaseContext(), TestingActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.user_help:
+                //Go to helper activity
+                intent = new Intent(getBaseContext(), HelperActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.user_exit:
                 stopService();
                 finishAffinity();

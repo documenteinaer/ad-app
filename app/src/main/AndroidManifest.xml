@@ -35,6 +35,9 @@
             android:name=".TestingActivity"
             android:label="AirDocs" />
         <activity
+            android:name=".HelperActivity"
+            android:label="AirDocs" />
+        <activity
             android:name=".UserActivity"
             android:label="AirDocs">
         <intent-filter>

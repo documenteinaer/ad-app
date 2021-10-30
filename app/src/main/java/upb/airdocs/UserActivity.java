@@ -35,6 +35,7 @@ public class UserActivity  extends AppCompatActivity {
     boolean mBound = false;
     boolean serviceStarted = false;
     //Messenger mMessenger = null;
+    boolean firstRun;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,15 @@ public class UserActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_user);
 
         restoreDevID();
+        restoreFirstRun();
         getDevIDAndStartService();
+
+        if (firstRun == true){
+            firstRun = false;
+            saveFirstRun();
+            Intent intent = new Intent(getBaseContext(), HelperActivity.class);
+            startActivity(intent);
+        }
 
 
         postDocButton = (Button) findViewById(R.id.post_doc_button);
@@ -231,6 +240,20 @@ public class UserActivity  extends AppCompatActivity {
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
         devID = sharedPref.getString("devID", null);
+    }
+
+    private void restoreFirstRun(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        firstRun = sharedPref.getBoolean("firstRun", true);
+    }
+
+    private void saveFirstRun(){
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("firstRun", firstRun);
+        editor.apply();
     }
 
 }

@@ -1,12 +1,15 @@
 package upb.airdocs;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +17,9 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
 public class HelperActivity extends AppCompatActivity {
+
+    Button goBackButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +36,12 @@ public class HelperActivity extends AppCompatActivity {
 
         webView.loadUrl("file:///android_asset/helper.html");
 
-
+        goBackButton = (Button) findViewById(R.id.go_back_button);
+        goBackButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private static class LocalContentWebViewClient extends WebViewClientCompat {

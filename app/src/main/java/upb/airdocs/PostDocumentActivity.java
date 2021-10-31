@@ -106,6 +106,10 @@ public class PostDocumentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (scanActive == false) {
                     if (permissionGranted == true) {
+                        if (docName.equals("-") && postDocumentDescription.getText().toString().equals("")){
+                            Toast.makeText(getApplicationContext(), "Please attach document or text before sending!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         scanSendStatus.setText("");
                         onStartScanSendDoc();
                         scanActive = true;

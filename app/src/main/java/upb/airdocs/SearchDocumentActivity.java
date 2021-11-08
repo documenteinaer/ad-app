@@ -35,6 +35,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
     Button scanSearchDocButton;
     EditText receivedDocumentURL;
     TextView scanSearchStatus;
+    ProgressBar progressBar;
 
     String address;
     String port;
@@ -82,6 +84,8 @@ public class SearchDocumentActivity extends AppCompatActivity {
 
         bindScanService();
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBarSearchDoc);
+
         scanSearchStatus = (TextView) findViewById(R.id.scan_search_status);
         //scanSearchStatus.setText("");
 
@@ -94,6 +98,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
                         onStartScanSearchDoc();
                         scanActive = true;
                         scanSearchDocButton.setEnabled(false);
+                        progressBar.setVisibility(View.VISIBLE);
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     } else {
                         Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
@@ -233,6 +238,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
             else if (msg == ScanService.MSG_SEND_DONE){
                 if (search == true){
                     scanSearchDocButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
                     scanSearchStatus.setText("Answer received");
                     String jsonString = intent.getStringExtra("json");
                     Log.d(LOG_TAG, "Msg=" + jsonString);
@@ -244,6 +250,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
             else if (msg == ScanService.UPDATE_SEND_STATUS){
                 if (search == true) {
                     scanSearchDocButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
                     scanSearchStatus.setText("Send failed - network or server unreachable");
                     search = false;
                 }
@@ -254,6 +261,7 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "In broadcast receiver - scan failed");
                 if (search == true) {
                     scanSearchDocButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
                     scanSearchStatus.setText("Scan failed - location or wifi disabled");
                     search = false;
                 }

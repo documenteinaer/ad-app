@@ -34,6 +34,7 @@ import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +66,7 @@ public class PostDocumentActivity extends AppCompatActivity {
     EditText postDocumentDescription;
     TextView scanSendStatus;
     ImageView imageThumbnail;
+    ProgressBar progressBar;
 
     String address;
     String port;
@@ -84,7 +86,6 @@ public class PostDocumentActivity extends AppCompatActivity {
         bindScanService();
 
         Intent intent = getIntent();
-        String action = intent.getAction();
         String type = intent.getType();
 
         scanSendStatus = (TextView) findViewById(R.id.scan_send_status);
@@ -100,6 +101,10 @@ public class PostDocumentActivity extends AppCompatActivity {
 
         restoreAllFields();
 
+        handleIntent(intent);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBarPostDoc);
+
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
 
         scanSendDocButton.setOnClickListener(new View.OnClickListener() {
@@ -110,10 +115,12 @@ public class PostDocumentActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Please attach document or text before sending!", Toast.LENGTH_LONG).show();
                             return;
                         }
+                        saveFields();
                         scanSendStatus.setText("");
                         onStartScanSendDoc();
                         scanActive = true;
                         scanSendDocButton.setEnabled(false);
+                        progressBar.setVisibility(View.VISIBLE);
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     } else {
                         Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
@@ -121,6 +128,11 @@ public class PostDocumentActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void handleIntent(Intent intent){
+        String action = intent.getAction();
+        String type = intent.getType();
 
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
@@ -139,9 +151,8 @@ public class PostDocumentActivity extends AppCompatActivity {
                 fileType = type;
                 handleSendGenericFile(intent);
             }
-
-        } else {
-            // Handle other intents, such as being started from the home screen
+        } else if (type == null){
+            fileType = "text/plain";
         }
     }
 
@@ -277,6 +288,7 @@ public class PostDocumentActivity extends AppCompatActivity {
             else if (msg == ScanService.MSG_SEND_DONE){
                 if (send == true){
                     scanSendDocButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
                     scanSendStatus.setText("Sent successfuly");
                     send = false;
                     clearFields();
@@ -286,6 +298,7 @@ public class PostDocumentActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "In broadcast receiver - send failed");
                 if (send == true) {
                     scanSendDocButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
                     scanSendStatus.setText("Send failed - network or server unreachable");
                     send = false;
                 }

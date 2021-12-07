@@ -135,6 +135,9 @@ public class WiFiScan {
         displayNumberOfScans();
         ScanService.currentFingerprint = new Fingerprint();
         beep();
+        if (ScanService.scanLimit == -1){
+            return;
+        }
         if (ScanService.numberOfScansInCollection >= ScanService.scanLimit){
             stop = true;
             Log.d(LOG_TAG, "The number of fingerprints reached the configured limit. Stopping now.");

@@ -3,6 +3,7 @@ package upb.airdocs;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.View;
@@ -86,8 +87,13 @@ public class MapGalleryActivity extends Activity
                         "Map " + names[position] + " selected",
                         Toast.LENGTH_SHORT).show();
 
-                TestingActivity.selectedMap = names[position];
-                TestingActivity.selectedMapID = imageIDs[position];
+                Context context = getApplicationContext();
+                SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                editor.putString("selectedMap", names[position]);
+                editor.putInt("selectedMapID", imageIDs[position]);
+                editor.apply();
             }
         });
 

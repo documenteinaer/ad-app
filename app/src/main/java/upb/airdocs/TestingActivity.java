@@ -67,75 +67,104 @@ public class TestingActivity extends AppCompatActivity {
     String devID;
     boolean serviceStarted = false;
 
+    TextView sendStatus;
+    Button selectMapButton;
+    Button selectPointButton;
+    Button startScanButton;
+    Button sendButton;
+    TextView devIDTextView;
+    EditText mapName;
+    EditText coordinateX_P;
+    EditText coordinateY_P;
+    TextView scans;
+    EditText coordinateX;
+    EditText coordinateY;
+    EditText coordinateZ;
+    EditText commentEditText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_testing);
 
-        setMapData();
-
         requestAllPermissions();
+
+        devIDTextView = (TextView) findViewById(R.id.devID);
+        mapName = (EditText) findViewById(R.id.map_name);
+        coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
+        coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
+        scans = (TextView) findViewById(R.id.number_of_scans);
+        sendStatus = (TextView) findViewById(R.id.send_status);
+        coordinateX = (EditText) findViewById(R.id.coordinate_x);
+        coordinateY = (EditText) findViewById(R.id.coordinate_y);
+        coordinateZ = (EditText) findViewById(R.id.coordinate_z);
+        commentEditText = (EditText) findViewById(R.id.comment);
+
+        setMapData();
 
         restoreFields();
 
         getDevIDAndStartService();
 
-        final Button selectMapButton = (Button) findViewById(R.id.select_map);
+        selectMapButton = (Button) findViewById(R.id.select_map);
         selectMapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), MapGalleryActivity.class));
             }
         });
 
-        final Button selectPointButton = (Button) findViewById(R.id.select_point);
+        selectPointButton = (Button) findViewById(R.id.select_point);
         selectPointButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), SelectPointActivity.class));
             }
         });
 
-        final TextView sendStatus = (TextView) findViewById(R.id.send_status);
-
-
-        final Button startScanButton = (Button) findViewById(R.id.start_scan);
+        startScanButton = (Button) findViewById(R.id.start_scan);
         startScanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (devID == null && serviceStarted == false){
-                    getDevIDAndStartService();
-                    Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
-                }
-                else if (devID != null && serviceStarted == false){
-                    startService();
-                    Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
-                }
-                else if (scanActive == false) {
-                    if (permissionGranted == true) {
-                        sendStatus.setText("");
-                        saveComment();
-                        onStartScan();
-                        scanActive = true;
-                        startScanButton.setText("Stop Scan");
-                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    onStopScan();
-                    scanActive = false;
-                    startScanButton.setText("Start Scan");
-
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                }
+                treatStartStopScan();
             }
         });
 
-        final Button sendButton = (Button) findViewById(R.id.send_collections);
+        sendButton = (Button) findViewById(R.id.send_collections);
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 onSendButton();
             }
         });
+    }
+
+    private void treatStartStopScan(){
+        if (devID == null && serviceStarted == false){
+            getDevIDAndStartService();
+            Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
+        }
+        else if (devID != null && serviceStarted == false){
+            startService();
+            Toast.makeText(getApplicationContext(), "Wait a few seconds and press again", Toast.LENGTH_LONG).show();
+        }
+        else if (scanActive == false) {
+            if (permissionGranted == true) {
+                sendStatus.setText("");
+                saveComment();
+                onStartScan();
+                scanActive = true;
+                startScanButton.setText("Stop Scan");
+
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            } else {
+                Toast.makeText(getApplicationContext(), "Permissions have not been granted", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            onStopScan();
+            scanActive = false;
+            startScanButton.setText("Start Scan");
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+
     }
 
     private void getDevIDAndStartService(){
@@ -144,7 +173,6 @@ public class TestingActivity extends AppCompatActivity {
             runner.execute();
         }
         else{
-            final TextView devIDTextView = (TextView) findViewById(R.id.devID);
             devIDTextView.setText("Device "+devID);
             startService();
         }
@@ -165,8 +193,10 @@ public class TestingActivity extends AppCompatActivity {
     public void onStartScan() {
         saveFields();
         if (mBound) {
+            Message msg;
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0);
+            msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0);
+
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {
@@ -301,7 +331,6 @@ public class TestingActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            final TextView devIDTextView = (TextView) findViewById(R.id.devID);
             devIDTextView.setText("Device "+devID);
             startService();
         }
@@ -311,16 +340,16 @@ public class TestingActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        restoreFields();
+
         LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, new IntentFilter("msg"));
 
         if (selectedMap != null) {
-            final EditText mapName = (EditText) findViewById(R.id.map_name);
+
             mapName.setText(selectedMap);
         }
         if (x_p >= 0 && y_p >= 0) {
-            final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
             coordinateX_P.setText(Float.toString(x_p));
-            final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
             coordinateY_P.setText(Float.toString(y_p));
             compute_coordinates();
         }
@@ -328,13 +357,11 @@ public class TestingActivity extends AppCompatActivity {
             int numberOfScansInCollection = ScanService.numberOfScansInCollection;
             int numberOfTotalScans = ScanService.numberOfTotalScans;
             int collections = ScanService.numberOfCollections;
-            final TextView scans = (TextView) findViewById(R.id.number_of_scans);
             scans.setText(numberOfScansInCollection + " fingerprints in the current collection\n" +
                     numberOfTotalScans + " fingerprints in total\n" +
                     collections + " collections");
 
             int sent = ScanService.sent;
-            final TextView sendStatus = (TextView) findViewById(R.id.send_status);
             if (sent == 1) {
                 sendStatus.setText("Sent successfully");
             } else if (sent == 0) {
@@ -344,7 +371,7 @@ public class TestingActivity extends AppCompatActivity {
             }
         }
 
-        restoreFields();
+        //restoreFields();
 
     }
 
@@ -357,20 +384,13 @@ public class TestingActivity extends AppCompatActivity {
             int msg = intent.getIntExtra("message", -1/*default value*/);
             if (msg == ScanService.ACT_STOP_SCAN) {
                 scanActive = false;
-                Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
-                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
                 sendStatus.setText("Scan sucessful");
                 /*x = y = z = x_p = y_p = -1;
-                final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
                 coordinateX_P.setText(Float.toString(x_p));
-                final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
                 coordinateY_P.setText(Float.toString(y_p));
-                final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
                 coordinateX.setText(Float.toString(x));
-                final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
                 coordinateY.setText(Float.toString(y));
-                final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
                 coordinateZ.setText(Float.toString(z));*/
 
             }
@@ -378,7 +398,6 @@ public class TestingActivity extends AppCompatActivity {
                 int numberOfScansInCollection = ScanService.numberOfScansInCollection;
                 int numberOfTotalScans = ScanService.numberOfTotalScans;
                 int collections = ScanService.numberOfCollections;
-                final TextView scans = (TextView) findViewById(R.id.number_of_scans);
                 scans.setText(numberOfScansInCollection + " fingerprints in the current collection\n" +
                         numberOfTotalScans + " fingerprints in total\n" +
                         collections + " collections");
@@ -386,7 +405,6 @@ public class TestingActivity extends AppCompatActivity {
             if (msg == ScanService.UPDATE_SEND_STATUS) {
                 Log.d(LOG_TAG, "Intent received");
                 int sent = ScanService.sent;
-                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
                 if (sent == 1) {
                     sendStatus.setText("Sent successfully");
                 } else if (sent == 0) {
@@ -398,9 +416,7 @@ public class TestingActivity extends AppCompatActivity {
             else if (msg == ScanService.ACT_STOP_SCAN_FAILED){
                 Log.d(LOG_TAG, "In broadcast receiver - scan failed");
                 scanActive = false;
-                Button startScanButton = (Button) findViewById(R.id.start_scan);
                 startScanButton.setText("Start Scan");
-                final TextView sendStatus = (TextView) findViewById(R.id.send_status);
                 sendStatus.setText("Scan failed - location or wifi disabled");
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
@@ -512,11 +528,8 @@ public class TestingActivity extends AppCompatActivity {
         y = x_p * mapData.r + y_p * mapData.s + mapData.ty;
         z = mapData.z;
 
-        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
         coordinateX.setText(Float.toString(x));
-        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
         coordinateY.setText(Float.toString(y));
-        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
         coordinateZ.setText(Float.toString(z));
         saveFields();
 
@@ -549,20 +562,13 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void saveFields(){
-        final EditText commentEditText = (EditText) findViewById(R.id.comment);
         comment = commentEditText.getText().toString();
-        final EditText mapEditText = (EditText) findViewById(R.id.map_name);
-        selectedMap = mapEditText.getText().toString();
-        final EditText x_pEditText = (EditText) findViewById(R.id.coordinate_x_p);
-        x_p = Float.parseFloat(x_pEditText.getText().toString());
-        final EditText y_pEditText = (EditText) findViewById(R.id.coordinate_y_p);
-        y_p = Float.parseFloat(y_pEditText.getText().toString());
-        final EditText xEditText = (EditText) findViewById(R.id.coordinate_x);
-        x = Float.parseFloat(xEditText.getText().toString());
-        final EditText yEditText = (EditText) findViewById(R.id.coordinate_y);
-        y = Float.parseFloat(yEditText.getText().toString());
-        final EditText zEditText = (EditText) findViewById(R.id.coordinate_z);
-        z = Float.parseFloat(zEditText.getText().toString());
+        selectedMap = mapName.getText().toString();
+        x_p = Float.parseFloat(coordinateX_P.getText().toString());
+        y_p = Float.parseFloat(coordinateY_P.getText().toString());
+        x = Float.parseFloat(coordinateX.getText().toString());
+        y = Float.parseFloat(coordinateY.getText().toString());
+        z = Float.parseFloat(coordinateZ.getText().toString());
 
         Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
 
@@ -587,7 +593,6 @@ public class TestingActivity extends AppCompatActivity {
     }
 
     private void saveComment(){
-        final EditText commentEditText = (EditText) findViewById(R.id.comment);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -619,23 +624,15 @@ public class TestingActivity extends AppCompatActivity {
         z = sharedPref.getFloat("z", Float.parseFloat("-1"));
         devID = sharedPref.getString("devID", null);
 
-        final EditText mapEditText = (EditText) findViewById(R.id.map_name);
-        mapEditText.setText(selectedMap);
-        final EditText coordinateX_P = (EditText) findViewById(R.id.coordinate_x_p);
+        mapName.setText(selectedMap);
         coordinateX_P.setText(Float.toString(x_p));
-        final EditText coordinateY_P = (EditText) findViewById(R.id.coordinate_y_p);
         coordinateY_P.setText(Float.toString(y_p));
-        final EditText coordinateX = (EditText) findViewById(R.id.coordinate_x);
         coordinateX.setText(Float.toString(x));
-        final EditText coordinateY = (EditText) findViewById(R.id.coordinate_y);
         coordinateY.setText(Float.toString(y));
-        final EditText coordinateZ = (EditText) findViewById(R.id.coordinate_z);
         coordinateZ.setText(Float.toString(z));
 
-        final EditText commentEditText = (EditText) findViewById(R.id.comment);
         commentEditText.setText(comment);
-        final TextView devIdTextView = (TextView) findViewById(R.id.devID);
-        devIdTextView.setText(devID);
+        devIDTextView.setText(devID);
     }
 
 }

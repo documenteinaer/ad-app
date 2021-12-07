@@ -53,14 +53,22 @@ public class Fingerprint{
     public void printToLogFingerprint(){
         Log.d(LOG_TAG, "Fingerprint: ");
         Log.d(LOG_TAG, "Timestamp: "+ timestamp);
-        Log.d(LOG_TAG, "Wifi Fingerprint: ");
-        Log.d(LOG_TAG, wifiFingerprintHashtable.toString());
-        Log.d(LOG_TAG, "BLE Fingerprint: ");
-        Log.d(LOG_TAG, bleFingerprintHashtable.toString());
-        Log.d(LOG_TAG, "GPS Fingerprint: ");
-        Log.d(LOG_TAG, gpsFingerprintArrayList.toString());
-        Log.d(LOG_TAG, "Telephony Fingerprint: ");
-        Log.d(LOG_TAG, telephonyFingerprintArrayList.toString());
+        if (!wifiFingerprintHashtable.isEmpty()) {
+            Log.d(LOG_TAG, "Wifi Fingerprint: ");
+            Log.d(LOG_TAG, wifiFingerprintHashtable.toString());
+        }
+        if (!bleFingerprintHashtable.isEmpty()) {
+            Log.d(LOG_TAG, "BLE Fingerprint: ");
+            Log.d(LOG_TAG, bleFingerprintHashtable.toString());
+        }
+        if (!gpsFingerprintArrayList.isEmpty()) {
+            Log.d(LOG_TAG, "GPS Fingerprint: ");
+            Log.d(LOG_TAG, gpsFingerprintArrayList.toString());
+        }
+        if (!telephonyFingerprintArrayList.isEmpty()) {
+            Log.d(LOG_TAG, "Telephony Fingerprint: ");
+            Log.d(LOG_TAG, telephonyFingerprintArrayList.toString());
+        }
     }
 
     public JSONObject wifiFingerprintHashtableToJSON(){

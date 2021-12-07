@@ -3,6 +3,7 @@ package upb.airdocs;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -146,8 +147,14 @@ public class SelectPointActivity extends Activity {
                 Toast.makeText(getBaseContext(),
                         "X: " + adj_x + " Y: " + adj_y,
                         Toast.LENGTH_SHORT).show();
-                TestingActivity.x_p = adj_x;
-                TestingActivity.y_p = adj_y;
+
+                Context context = getApplicationContext();
+                SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                editor.putFloat("x_p", adj_x);
+                editor.putFloat("y_p", adj_y);
+                editor.apply();
             }
 
             return super.onSingleTapConfirmed(e);

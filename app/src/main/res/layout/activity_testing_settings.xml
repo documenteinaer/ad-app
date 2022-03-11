@@ -77,12 +77,12 @@
         android:id="@+id/save_testing_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="10dp"
         android:text="Save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/audio_switch_testing"
-        app:layout_constraintTop_toBottomOf="@+id/audio_switch_testing" />
+        app:layout_constraintStart_toStartOf="@+id/magnetic_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/magnetic_switch_testing" />
 
     <TextView
         android:id="@+id/title_signature_composition"
@@ -113,8 +113,8 @@
         android:id="@+id/ble_switch_testing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:checked="true"
+        android:layout_marginTop="10dp"
+        android:checked="false"
         android:text="BLE"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -125,8 +125,8 @@
         android:id="@+id/cellular_switch_testing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:checked="true"
+        android:layout_marginTop="10dp"
+        android:checked="false"
         android:text="Cellular"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -137,8 +137,8 @@
         android:id="@+id/gps_switch_testing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:checked="true"
+        android:layout_marginTop="10dp"
+        android:checked="false"
         android:text="GPS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -149,8 +149,8 @@
         android:id="@+id/audio_switch_testing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:checked="true"
+        android:layout_marginTop="10dp"
+        android:checked="false"
         android:text="Audio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -167,5 +167,17 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/save_testing_settings"
         app:layout_constraintTop_toBottomOf="@+id/save_testing_settings" />
+
+    <Switch
+        android:id="@+id/magnetic_switch_testing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:checked="false"
+        android:text="Magnetic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/audio_switch_testing"
+        app:layout_constraintTop_toBottomOf="@+id/audio_switch_testing" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

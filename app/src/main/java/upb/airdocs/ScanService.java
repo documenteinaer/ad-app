@@ -8,6 +8,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -55,6 +57,7 @@ public class ScanService extends Service {
     TelephonyScan telephonyScan = new TelephonyScan(this);
     AudioScan audioScan = new AudioScan(this);
     //WiFiScanNew wiFiScanNew = new WiFiScanNew(this);
+    MagneticScan magneticScan = new MagneticScan(this);
 
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
@@ -97,7 +100,7 @@ public class ScanService extends Service {
     int scan_no;
     String comment;
     float threshold;
-    boolean ble, cellular, gps, audio;
+    boolean ble, cellular, gps, audio, magnetic;
     String docName;
     String file;
     String fileType;
@@ -180,6 +183,10 @@ public class ScanService extends Service {
         scanning = wiFiScan.startScan();
 
         if (scanning) {
+            if (magnetic) {
+                magneticScan.startScan();
+            }
+
             if (audio) {
                 audioScan.startScan();
             }
@@ -220,6 +227,10 @@ public class ScanService extends Service {
                 wiFiScan.unregisterReceiver();
             }
 
+            if (magnetic && magneticScan != null) {
+                magneticScan.stopScan();
+            }
+
             if (audio && audioScan != null){
                 audioScan.stopScan();
             }
@@ -240,7 +251,7 @@ public class ScanService extends Service {
     }
 
     private void sendFingerprintsToServer(final int type){
-        final JSONObject fingerprintCollectionsJSON = buildFinalJSON(ble, cellular, gps);
+        final JSONObject fingerprintCollectionsJSON = buildFinalJSON(ble, cellular, gps, magnetic);
         final JSONObject jsonObjectFinal = new JSONObject();
         try {
             if (type == TYPE_TESTING) {
@@ -467,13 +478,13 @@ public class ScanService extends Service {
         //printCollectionsList();
     }
 
-    private JSONObject buildFinalJSON(boolean ble, boolean cellular, boolean gps){
+    private JSONObject buildFinalJSON(boolean ble, boolean cellular, boolean gps, boolean magnetic){
         JSONObject jsonObject = new JSONObject();
 
         try{
             for (int i = 0; i < collectionsList.size(); i++) {
                 FingerprintCollection fingerprintCollection = collectionsList.get(i);
-                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps));
+                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic));
             }
         }
         catch(JSONException e){
@@ -561,6 +572,7 @@ public class ScanService extends Service {
         cellular = sharedPref.getBoolean("cellular", true);
         gps = sharedPref.getBoolean("gps", true);
         audio = sharedPref.getBoolean("audio", true);
+        magnetic = sharedPref.getBoolean("magnetic", true);
 
         file = sharedPref.getString("file", null);
         fileType = sharedPref.getString("filetype", null);

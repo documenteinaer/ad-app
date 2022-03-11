@@ -44,6 +44,7 @@ private void saveFields(){
         final Switch cellularSwitch = (Switch) findViewById(R.id.cellular_switch_testing);
         final Switch gpsSwitch = (Switch) findViewById(R.id.gps_switch_testing);
         final Switch audioSwitch = (Switch) findViewById(R.id.audio_switch_testing);
+        final Switch magneticSwitch = (Switch) findViewById(R.id.magnetic_switch_testing);
 
         String address = addressEditText.getText().toString();
         String port = portEditText.getText().toString();
@@ -52,6 +53,7 @@ private void saveFields(){
         boolean cellular = cellularSwitch.isChecked();
         boolean gps = gpsSwitch.isChecked();
         boolean audio = audioSwitch.isChecked();
+        boolean magnetic = magneticSwitch.isChecked();
 
         Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);
 
@@ -65,6 +67,7 @@ private void saveFields(){
         editor.putBoolean("cellular", cellular);
         editor.putBoolean("gps", gps);
         editor.putBoolean("audio", audio);
+        editor.putBoolean("magnetic", magnetic);
         editor.commit();
     }
 
@@ -76,6 +79,7 @@ private void saveFields(){
         final Switch cellularSwitch = (Switch) findViewById(R.id.cellular_switch_testing);
         final Switch gpsSwitch = (Switch) findViewById(R.id.gps_switch_testing);
         final Switch audioSwitch = (Switch) findViewById(R.id.audio_switch_testing);
+        final Switch magneticSwitch = (Switch) findViewById(R.id.magnetic_switch_testing);
 
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
@@ -93,6 +97,8 @@ private void saveFields(){
         gpsSwitch.setChecked(gps);
         boolean audio = sharedPref.getBoolean("audio", true);
         audioSwitch.setChecked(audio);
+        boolean magnetic = sharedPref.getBoolean("magnetic", true);
+        magneticSwitch.setChecked(magnetic);
 
 
         Log.d(LOG_TAG, "address=" + address + " port=" + port + " scan_no=" + scan_no);

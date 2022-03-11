@@ -19,6 +19,7 @@ public class Fingerprint{
     private Hashtable<String,BLEFingerprint> bleFingerprintHashtable = new Hashtable<String,BLEFingerprint>();
     private ArrayList<GPSFingerprint> gpsFingerprintArrayList = new ArrayList<GPSFingerprint>();
     private ArrayList<TelephonyFingerprint> telephonyFingerprintArrayList = new ArrayList<TelephonyFingerprint>();
+    private ArrayList<MagneticFingerprint> magneticFingerprintArrayList = new ArrayList<MagneticFingerprint>();
 
     public void addTimestamp(String timestamp){
         this.timestamp = timestamp;
@@ -47,8 +48,9 @@ public class Fingerprint{
         telephonyFingerprintArrayList.add(telephonyFingerprint);
     }
 
-
-
+    public void addMagneticFingerprint(MagneticFingerprint magneticFingerprint){
+        magneticFingerprintArrayList.add(magneticFingerprint);
+    }
 
     public void printToLogFingerprint(){
         Log.d(LOG_TAG, "Fingerprint: ");
@@ -68,6 +70,10 @@ public class Fingerprint{
         if (!telephonyFingerprintArrayList.isEmpty()) {
             Log.d(LOG_TAG, "Telephony Fingerprint: ");
             Log.d(LOG_TAG, telephonyFingerprintArrayList.toString());
+        }
+        if (!magneticFingerprintArrayList.isEmpty()) {
+            Log.d(LOG_TAG, "Magnetic Fingerprint: ");
+            Log.d(LOG_TAG, magneticFingerprintArrayList.toString());
         }
     }
 
@@ -124,13 +130,25 @@ public class Fingerprint{
         return telephonyFingerprintJSON;
     }
 
-    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps){
+    public JSONArray magneticFingerprintArrayListToJSON(){
+        JSONArray magneticFingerprintJSON = new JSONArray();
+
+        for (int i = 0; i < magneticFingerprintArrayList.size(); i++) {
+            MagneticFingerprint magneticFingerprint = magneticFingerprintArrayList.get(i);
+            magneticFingerprintJSON.put(magneticFingerprint.toJSON());
+        }
+
+        return magneticFingerprintJSON;
+    }
+
+    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps, boolean magnetic){
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject wifiFingerprintJSON = wifiFingerprintHashtableToJSON();
             JSONObject bleFingerprintJSON = bleFingerprintHashtableToJSON();
             JSONArray gpsFingerprintJSON = gpsFingerprintArrayListToJSON();
             JSONArray telephonyFingerprintJSON = telephonyFingerprintArrayListToJSON();
+            JSONArray magneticFingerprintJSON = magneticFingerprintArrayListToJSON();
 
             jsonObject.put("timestamp", timestamp);
             jsonObject.put("wifi", wifiFingerprintJSON);
@@ -142,6 +160,9 @@ public class Fingerprint{
             }
             if (cellular) {
                 jsonObject.put("telephony", telephonyFingerprintJSON);
+            }
+            if (magnetic) {
+                jsonObject.put("magnetic", magneticFingerprintJSON);
             }
 
             //Log.d(LOG_TAG, "Fingerprint JSON: "+ jsonObject.toString(4));

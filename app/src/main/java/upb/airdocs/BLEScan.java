@@ -7,9 +7,12 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.os.Handler;
+import android.os.ParcelUuid;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class BLEScan {
     Context mContext;
@@ -69,6 +72,16 @@ public class BLEScan {
                 public void onScanResult(int callbackType, ScanResult result) {
                     super.onScanResult(callbackType, result);
                     BluetoothDevice device = result.getDevice();
+                    if (device.getName()!= null && device.getName().equals("Kontakt")) {
+                        //Log.d(LOG_TAG, "BLE info: " + result.getScanRecord().getServiceData());
+                        Map<ParcelUuid, byte[]> serviceData = result.getScanRecord().getServiceData();
+                        Map.Entry<ParcelUuid, byte[]> entry = serviceData.entrySet().iterator().next();
+                        byte[] value = entry.getValue();
+                        byte[] ID = {value[0], value[1], value[2], value[3]};
+                        String sID = new String(ID);
+                        Log.d(LOG_TAG, sID + " " + device.getAddress());
+                    }
+
                     //Log.d(LOG_TAG, "Timestamp: "+result.getTimestampNanos()+" Name: "+device.getName()+
                     //        " MAC: "+device.getAddress()+ " RSSI: "+result.getRssi());
 

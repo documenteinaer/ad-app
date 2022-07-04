@@ -386,12 +386,13 @@ public class SearchDocumentActivity extends AppCompatActivity {
                 String docDescription = (String)docInfo.get("description");
                 String fileType = (String)docInfo.get("filetype");
                 String id = (String)docInfo.get("id");
+                String similarity = docInfo.get("similarity").toString();
                 if (docInfo.has("file")){
                     String fileString = (String)docInfo.get("file");
-                    list.add(new Document(docName, docDescription, fileString, fileType, id));
+                    list.add(new Document(docName, docDescription, fileString, fileType, id, similarity));
                 }
                 else {
-                    list.add(new Document(docName, docDescription, fileType, id));
+                    list.add(new Document(docName, docDescription, fileType, id, similarity));
                 }
 
             }

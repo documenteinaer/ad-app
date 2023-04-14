@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -22,6 +23,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.indooratlas.android.sdk.IALocation;
+import com.indooratlas.android.sdk.IALocationListener;
+import com.indooratlas.android.sdk.IALocationManager;
+import com.indooratlas.android.sdk.IALocationRequest;
+import com.indooratlas.android.sdk.IARegion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScanService extends Service {
+public class ScanService extends Service  implements IALocationListener, IARegion.Listener  {
     private static final String LOG_TAG = "ScanService";
     private static final Integer ID_FOREGROUND = 1890;
     public static final String CHANNEL_ID = "ScanServiceChannel";
@@ -106,6 +113,20 @@ public class ScanService extends Service {
     String fileType;
     String delId;
 
+
+    IALocationManager mManager;
+    IARegion mCurrentVenue = null;
+    IARegion mCurrentFloorPlan = null;
+    Integer mCurrentFloorLevel = null;
+    Float mCurrentCertainty = null;
+    IALocation loc = null;
+
+
+    double latitude;
+    double longitude;
+
+
+
     public ScanService() {
     }
 
@@ -117,6 +138,11 @@ public class ScanService extends Service {
 
     @Override
     public void onCreate() {
+
+
+        mManager = IALocationManager.create(this);
+        mManager.registerRegionListener(this);
+        mManager.requestLocationUpdates(IALocationRequest.create(), this);
         Log.d(LOG_TAG, "Starting Scan Service.");
     }
 
@@ -254,6 +280,7 @@ public class ScanService extends Service {
         final JSONObject fingerprintCollectionsJSON = buildFinalJSON(ble, cellular, gps, magnetic);
         final JSONObject jsonObjectFinal = new JSONObject();
         try {
+
             if (type == TYPE_TESTING) {
                 jsonObjectFinal.put("type", "TEST");
                 jsonObjectFinal.put("fingerprints", fingerprintCollectionsJSON);
@@ -484,7 +511,7 @@ public class ScanService extends Service {
         try{
             for (int i = 0; i < collectionsList.size(); i++) {
                 FingerprintCollection fingerprintCollection = collectionsList.get(i);
-                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic));
+                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic, latitude, longitude, mCurrentFloorLevel));
             }
         }
         catch(JSONException e){
@@ -581,4 +608,41 @@ public class ScanService extends Service {
         currentFingerprintCollection.setComment(comment);
     }
 
+
+
+    @Override
+    public void onLocationChanged(IALocation iaLocation) {
+        if (iaLocation == null) {
+            return;
+        }
+        mCurrentFloorLevel = iaLocation.hasFloorLevel() ? iaLocation.getFloorLevel() : null;
+        mCurrentCertainty = iaLocation.hasFloorCertainty() ? iaLocation.getFloorCertainty() : null;
+        latitude = iaLocation.getLatitude();
+        longitude = iaLocation.getLongitude();
+        loc = iaLocation;
+        System.out.println(latitude + " " + longitude);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onEnterRegion(IARegion iaRegion) {
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
+    }
+
+    @Override
+    public void onExitRegion(IARegion iaRegion) {
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
+    }
 }

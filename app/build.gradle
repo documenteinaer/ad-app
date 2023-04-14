@@ -4,8 +4,8 @@ android {
     compileSdkVersion 30
     defaultConfig {
         applicationId "upb.airdocs"
-        minSdkVersion 23
-        targetSdkVersion 30
+        minSdkVersion 24
+        targetSdkVersion 29 // target sdk version 30 doesnt work
         versionCode 1
         versionName "0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -18,8 +18,10 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+//        sourceCompatibility 1.8
+//        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -27,12 +29,15 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //implementation 'com.android.support:appcompat-v7:26.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+//    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+//    implementation 'com.google.android.gms:play-services-base:18.2.0'
     //implementation 'com.android.support:appcompat-v7:28.0.0'
     //implementation 'com.google.android.gms:play-services-ads:19.6.0'
     testImplementation 'junit:junit:4.12'
     //androidTestImplementation 'com.android.support.test:runner:1.0.2'
     //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api 'com.google.android.gms:play-services:12.0.1'
+//    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     //implementation "androidx.multidex:multidex:2.0.1"
     implementation 'com.mapbox.mapboxsdk:mapbox-android-gestures:0.5.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
@@ -43,4 +48,14 @@ dependencies {
     // Java language implementation
     implementation "androidx.core:core:$core_version"
     implementation "androidx.webkit:webkit:1.4.0"
+    compile 'com.indooratlas.android:indooratlas-android-sdk:3.4.12@aar'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.15.0'
+    implementation 'com.google.ar.sceneform:assets:1.15.0'
+    implementation 'com.google.ar:core:'
+}
+
+repositories{
+    maven {
+        url "https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/"
+    }
 }

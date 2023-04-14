@@ -14,8 +14,8 @@
         android:rotation="0"
         android:scaleType="fitStart"
         android:scaleX="1"
-        android:scaleY="1"
-        app:srcCompat="@drawable/cast_album_art_placeholder" />
+        android:scaleY="1" />
+<!--        app:srcCompat="@drawable/cast_album_art_placeholder" />-->
 
     <LinearLayout
         android:layout_width="match_parent"

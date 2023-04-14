@@ -38,6 +38,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.indooratlas.android.sdk.IALocation;
+import com.indooratlas.android.sdk.IALocationListener;
+import com.indooratlas.android.sdk.IALocationManager;
+import com.indooratlas.android.sdk.IALocationRequest;
+import com.indooratlas.android.sdk.IARegion;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.IOUtils;
@@ -49,7 +54,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class PostDocumentActivity extends AppCompatActivity {
+public class PostDocumentActivity extends AppCompatActivity{
     private static final String LOG_TAG = "SendDocumentActivity";
     final private static int MY_PERMISSIONS_REQUEST = 126;
     // Flag indicating whether we have called bind on the service.

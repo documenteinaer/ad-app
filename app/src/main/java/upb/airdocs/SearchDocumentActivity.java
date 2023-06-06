@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,6 +40,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.indooratlas.android.sdk.IALocation;
+import com.indooratlas.android.sdk.IALocationListener;
+import com.indooratlas.android.sdk.IALocationManager;
+import com.indooratlas.android.sdk.IALocationRequest;
+import com.indooratlas.android.sdk.IAPOI;
+import com.indooratlas.android.sdk.IARegion;
+import com.indooratlas.android.sdk.resources.IALatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,7 +60,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class SearchDocumentActivity extends AppCompatActivity {
+public class SearchDocumentActivity extends AppCompatActivity implements IALocationListener, IARegion.Listener {
     private static final String LOG_TAG = "SearchDocumentActivity";
     final private static int MY_PERMISSIONS_REQUEST = 126;
     // Flag indicating whether we have called bind on the service.
@@ -74,10 +83,29 @@ public class SearchDocumentActivity extends AppCompatActivity {
     int scan_no;
 
 
+    IALocationManager mManager;
+    IARegion mCurrentVenue = null;
+    IARegion mCurrentFloorPlan = null;
+    Integer mCurrentFloorLevel = null;
+    Float mCurrentCertainty = null;
+    IALocation loc = null;
+
+
+    double latitude;
+    double longitude;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_doc);
+
+        mManager = IALocationManager.create(this);
+        mManager.registerRegionListener(this);
+        mManager.requestLocationUpdates(IALocationRequest.create(), this);
+
+
+        System.out.println("Created");
 
         requestAllPermissions();
         restoreAllFields();
@@ -380,12 +408,37 @@ public class SearchDocumentActivity extends AppCompatActivity {
             }*/
 
             JSONArray jsonArray = new JSONArray(jsonString);
+
+            ArrayList<String> foundPois = new ArrayList<>();
+            Location currLocation = new Location("");
+            currLocation.setLatitude(latitude);
+            currLocation.setLongitude(longitude);
+
+
+
             for(int i=0; i < jsonArray.length(); i++) {
                 JSONObject docInfo = (JSONObject)jsonArray.get(i);
+                System.out.println("docInfo: " +docInfo);
                 String docName = (String)docInfo.get("document");
                 String docDescription = (String)docInfo.get("description");
+                Double docLatitude = (Double)docInfo.get("latitude");
+                Double docLongitude = (Double)docInfo.get("longitude");
+//                System.out.println("WORKS?????");
+//                System.out.println(mCurrentVenue);
                 String fileType = (String)docInfo.get("filetype");
                 String id = (String)docInfo.get("id");
+                System.out.println("docLatitude" + docLatitude);
+                System.out.println("docLongitude" + docLongitude);
+
+                Location poiLocation = new Location("");
+                poiLocation.setLatitude(docLatitude);
+                poiLocation.setLongitude(docLongitude);
+                System.out.println("WORKS dist to poi " + docName + " -> "  + currLocation.distanceTo(poiLocation) + " m");
+//                docDescription += " <> " + currLocation.distanceTo(poiLocation) + " m";
+
+
+                System.out.println("latitude" + latitude);
+                System.out.println("longitude" + longitude);
                 String similarity = docInfo.get("similarity").toString();
                 if (docInfo.has("file")){
                     String fileString = (String)docInfo.get("file");
@@ -419,6 +472,51 @@ public class SearchDocumentActivity extends AppCompatActivity {
         DocumentsListAdapter adapter = new DocumentsListAdapter(this, new ArrayList<Document>());
         //set custom adapter as adapter to our list view
         itemsListView.setAdapter(adapter);
+    }
+
+
+
+
+    @Override
+    public void onLocationChanged(IALocation iaLocation) {
+        if (iaLocation == null) {
+            return;
+        }
+        System.out.println("LOCATION CHANGED");
+        mCurrentFloorLevel = iaLocation.hasFloorLevel() ? iaLocation.getFloorLevel() : null;
+        mCurrentCertainty = iaLocation.hasFloorCertainty() ? iaLocation.getFloorCertainty() : null;
+        latitude = iaLocation.getLatitude();
+        longitude = iaLocation.getLongitude();
+        loc = iaLocation;
+        System.out.println(latitude + " " + longitude);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onEnterRegion(IARegion iaRegion) {
+        System.out.println("WORKS ON ENTER REGION");
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
+        System.out.println("mCurrentVenue" + mCurrentVenue);
+
+    }
+
+    @Override
+    public void onExitRegion(IARegion iaRegion) {
+        System.out.println("WORKS ON EXIT REGION");
+
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
     }
 
 }

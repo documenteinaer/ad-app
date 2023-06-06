@@ -65,11 +65,15 @@ public class FingerprintCollection{
         itemList.add(fingerprint);
     }
 
-    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps, boolean magnetic){
+    public JSONObject toJSON(boolean ble, boolean cellular, boolean gps, boolean magnetic, double latitude, double longitude, double altitude, int floor){
         JSONObject collectionJSON = new JSONObject();
 
         try {
 
+            collectionJSON.put("latitude", latitude);
+            collectionJSON.put("longitude", longitude);
+            collectionJSON.put("altitude", altitude);
+            collectionJSON.put("floor", floor);
             collectionJSON.put("devId", devId);
             collectionJSON.put("devName", devName);
             collectionJSON.put("AndroidVersion", androidVersion);

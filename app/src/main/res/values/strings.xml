@@ -2,4 +2,7 @@
     <string name="app_name">AirDocs</string>
     <string name="defaultIP">192.168.142.123</string>
     <string name="preference_file">preference_file</string>
+
+    <string translatable="false" name="geospatial_pose">LAT/LNG: %.6f˚, %.6f˚\n\t\t\tACCURACY: %.2fm\nALTITUDE: %.2fm\n\t\t\tACCURACY: %.2fm\nHEADING: %.1f˚\n\t\t\tACCURACY: %.1f˚</string>
+    <string name="earth_state">EarthState: %1$s\nTrackingState: %2$s\nVPS: %3$s\n%4$s</string>
 </resources>

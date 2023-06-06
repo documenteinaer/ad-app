@@ -42,7 +42,7 @@
 
     <EditText
         android:id="@+id/address_user"
-        android:layout_width="153dp"
+        android:layout_width="200dp"
         android:layout_height="41dp"
         android:layout_marginTop="18dp"
         android:ems="10"

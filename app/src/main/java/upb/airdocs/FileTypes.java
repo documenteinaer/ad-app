@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FileTypes {
-    private static ArrayList<Object> types = new ArrayList<>(
+    public static ArrayList<Object> types = new ArrayList<>(
             Arrays.asList("application/pdf",
                     "application/msword",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

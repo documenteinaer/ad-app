@@ -7,10 +7,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Messenger;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -19,7 +23,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -27,39 +33,85 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.indooratlas.android.sdk.IAARSession;
+import com.indooratlas.android.sdk.IALocation;
+import com.indooratlas.android.sdk.IALocationListener;
+import com.indooratlas.android.sdk.IALocationManager;
+import com.indooratlas.android.sdk.IALocationManager.*;
+import com.indooratlas.android.sdk.IALocationRequest;
+import com.indooratlas.android.sdk.IAPOI;
+import com.indooratlas.android.sdk.IARegion;
+import com.indooratlas.android.sdk.IndoorAtlasInitProvider;
+import com.indooratlas.android.sdk.resources.IALatLng;
+import com.indooratlas.android.sdk.resources.IALocationListenerSupport;
+import com.indooratlas.android.sdk.resources.IAVenue;
+
+import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
-public class UserActivity  extends AppCompatActivity {
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import upb.airdocs.hellogeospatial.HelloGeoActivity;
+
+public class UserActivity  extends AppCompatActivity implements IALocationListener, IARegion.Listener {
     private static final String LOG_TAG = "UserActivity";
     final private static int MY_PERMISSIONS_REQUEST = 126;
     private boolean permissionGranted = false;
     Button postDocButton;
     Button searchDocButton;
+    Button testButton;
+    Button arButton;
     String devID;
     boolean mBound = false;
     boolean serviceStarted = false;
     //Messenger mMessenger = null;
     boolean firstRun;
+    private IALocationManager mIALocationManager;
+    private IALocationListener mIALocationListener;
+
+    private IAARSession arSdk;
+
+    private final String TAG = "mIALocationManager";
+    private TextView currRegion;
+    private TextView locationView;
+    private ArrayList<String> nearPois = new ArrayList<>();
+
+    private static final String API_KEY = "60bd1f86-9c8a-44e8-bec8-20ecf75688de";
+    private static final String BASE_URL = "https://api.indooratlas.com/v2/maps/";
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private OkHttpClient client = new OkHttpClient();
+
+    public UserActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-
+//        mIALocationManager = IALocationManager.create(this);
+//        currRegion = (TextView) findViewById(R.id.current_region);
+        locationView = (TextView) findViewById(R.id.location_view);
         requestAllPermissions();
 
         restoreDevID();
         restoreFirstRun();
         getDevIDAndStartService();
 
-        if (firstRun == true){
+        if (firstRun){
             firstRun = false;
             saveFirstRun();
             Intent intent = new Intent(getBaseContext(), HelperActivity.class);
             startActivity(intent);
         }
-
 
         postDocButton = (Button) findViewById(R.id.post_doc_button);
         postDocButton.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +128,198 @@ public class UserActivity  extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        arButton = (Button) findViewById(R.id.ar_button);
+        arButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+//                Intent intent = new Intent(getBaseContext(), ARActivity.class);
+                Intent intent = new Intent(getBaseContext(), HelloGeoActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
+        mManager = IALocationManager.create(this);
+        mManager.registerRegionListener(this);
+        mManager.requestLocationUpdates(IALocationRequest.create(), this);
+
+        arSdk = mManager.requestArUpdates();
+
+
+        mUiVenue = (TextView) findViewById(R.id.text_view_venue);
+        mUiVenueId = (TextView) findViewById(R.id.text_view_venue_id);
+        mUiFloorPlan = (TextView) findViewById(R.id.text_view_floor_plan);
+        mUiFloorPlanId = (TextView) findViewById(R.id.text_view_floor_plan_id);
+        mUiFloorLevel = (TextView) findViewById(R.id.text_view_floor_level);
+        mUiFloorCertainty = (TextView) findViewById(R.id.text_view_floor_certainty);
+
+
+        testButton = (Button) findViewById(R.id.test_button);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                System.out.println("It works" + latitude + ", " + longitude);
+                System.out.println("Level" + mCurrentFloorLevel);
+//                arSdk.createArPOI(latitude, longitude, mCurrentFloorLevel);
+                System.out.println("VENUE: " + mCurrentVenue.getVenue());
+
+                System.out.println("POIS: "+mCurrentVenue.getVenue().getPOIs());
+
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mManager.setLocation(new IALocation.Builder()
+                                .withLatitude(44.43493585)
+                                .withLongitude(26.047781756301177)
+                                .withAccuracy(10)
+                                .withFloorLevel(0)
+                                .build());
+
+                        mManager.lockIndoors(true);
+                    }
+                }, 5000);
+            }
+        });
+
+        updateUi();
     }
+
+    private String createPOIJson(String name, double latitude, double longitude) {
+        return "{\"name\":\"" + name + "\",\"coordinate\":{\"latitude\":" + latitude + ",\"longitude\":" + longitude + "}}"; // TODO: floor?
+    }
+
+
+    IALocationManager mManager;
+    IARegion mCurrentVenue = null;
+    IARegion mCurrentFloorPlan = null;
+    Integer mCurrentFloorLevel = null;
+    Float mCurrentCertainty = null;
+    IALocation loc = null;
+
+    TextView mUiVenue;
+    TextView mUiVenueId;
+    TextView mUiFloorPlan;
+    TextView mUiFloorPlanId;
+    TextView mUiFloorLevel;
+    TextView mUiFloorCertainty;
+
+    double latitude;
+    double longitude;
+
+    @Override
+    public void onLocationChanged(IALocation iaLocation) {
+        if (iaLocation == null) {
+            return;
+        }
+        mCurrentFloorLevel = iaLocation.hasFloorLevel() ? iaLocation.getFloorLevel() : null;
+        mCurrentCertainty = iaLocation.hasFloorCertainty() ? iaLocation.getFloorCertainty() : null;
+        latitude = iaLocation.getLatitude();
+        longitude = iaLocation.getLongitude();
+        loc = iaLocation;
+
+        ArrayList<String> foundPois = new ArrayList<>();
+        Location currLocation = new Location("");
+        currLocation.setLatitude(latitude);
+        currLocation.setLongitude(longitude);
+        if (mCurrentVenue != null) {
+            for (IAPOI iapoi : mCurrentVenue.getVenue().getPOIs()) {
+                if (iapoi.getFloor() != mCurrentFloorLevel) {
+                    continue;
+                }
+                Location poiLocation = new Location("");
+                IALatLng poiLatLng = iapoi.getLatLngFloor();
+                poiLocation.setLatitude(poiLatLng.latitude);
+                poiLocation.setLongitude(poiLatLng.longitude);
+                System.out.println("dist to poi " + iapoi.getName() + " -> "  + currLocation.distanceTo(poiLocation) + " m");
+//                if (currLocation.distanceTo(poiLocation) < 10) {
+                    foundPois.add(iapoi.getName() + " -> "  + currLocation.distanceTo(poiLocation) + " m");
+//                }
+            }
+        }
+
+        nearPois = foundPois;
+
+        updateUi();
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
+
+    @Override
+    public void onEnterRegion(IARegion iaRegion) {
+
+
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
+        updateUi();
+    }
+
+
+
+    @Override
+    public void onExitRegion(IARegion iaRegion) {
+        if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+            mCurrentVenue = iaRegion;
+        } else if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+            mCurrentFloorPlan = iaRegion;
+        }
+        updateUi();
+    }
+
+    void updateUi() {
+        String venue = "Outside mapped area";
+        String venueId = "";
+        String floorPlan = "";
+        String floorPlanId = "";
+        String level = "";
+        String certainty = "";
+        if (mCurrentVenue != null) {
+            venue = "In venue";
+            venueId = mCurrentVenue.getId();
+            if (mCurrentFloorPlan != null) {
+                floorPlan = mCurrentFloorPlan.getName();
+                floorPlanId = mCurrentFloorPlan.getId();
+            } else {
+                floorPlan = "No floor plan";
+            }
+        }
+        if (mCurrentFloorLevel != null) {
+            level = mCurrentFloorLevel.toString();
+        }
+        if (mCurrentCertainty != null) {
+            certainty = "Certainty: " +mCurrentCertainty;
+        }
+
+        String poisText = "Available documents: "+ nearPois.toString();
+
+        setText(locationView, latitude + ", " + longitude, true);
+        setText(mUiVenue, venue, true);
+        setText(mUiVenueId, venueId, true);
+        setText(mUiFloorPlan, floorPlan, true);
+        setText(mUiFloorPlanId, poisText, false);
+        setText(mUiFloorLevel, level, true);
+        setText(mUiFloorCertainty, certainty, false); // do not animate as changes can be frequent
+    }
+
+    /**
+     * Set the text of a TextView and make a animation to notify when the value has changed
+     */
+    void setText(@NonNull TextView view, @NonNull String text, boolean animateWhenChanged) {
+        if (!view.getText().toString().equals(text)) {
+            view.setText(text);
+            if (animateWhenChanged) {
+                view.startAnimation(AnimationUtils.loadAnimation(this, R.anim.notify_change));
+            }
+        }
+    }
+
+
 
     @Override
     protected void onStart() {
@@ -97,6 +340,7 @@ public class UserActivity  extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         stopService();
+        mManager.destroy();
         super.onDestroy();
     }
 
@@ -242,6 +486,40 @@ public class UserActivity  extends AppCompatActivity {
         }
         return null;
     }
+
+//    @Override
+//    public void onLocationChanged(IALocation iaLocation) {
+//        System.out.println("[mIALocationManager] on location changed: "+iaLocation);
+//        System.out.printf("[mIALocationManager] on location changed %f,%f, accuracy: %.2f\n", iaLocation.getLatitude(),
+//                iaLocation.getLongitude(), iaLocation.getAccuracy());
+//    }
+//
+//    @Override
+//    public void onStatusChanged(String s, int i, Bundle bundle) {
+//        System.out.println("[mIALocationManager] onStatusChanged: " + s + " -> " + i);
+//    }
+//
+//    @Override
+//    public void onEnterRegion(IARegion iaRegion) {
+//
+//        if (iaRegion.getType() == IARegion.TYPE_FLOOR_PLAN) {
+//            // triggered when entering the mapped area of the given floor plan
+//            Log.d(TAG, "Entered " + iaRegion.getName());
+//            Log.d(TAG, "floor plan ID: " + iaRegion.getId());
+////            mCurrentFloorPlan = iaRegion;
+//        }
+//        else if (iaRegion.getType() == IARegion.TYPE_VENUE) {
+//            // triggered when near a new location
+//            Log.d(TAG, "Location changed to " + iaRegion.getId());
+//        } else {
+//            Log.d(TAG, "whereAmI? "+iaRegion.getName());
+//        }
+//    }
+//
+//    @Override
+//    public void onExitRegion(IARegion iaRegion) {
+//
+//    }
 
     private class AsyncTaskRunner extends AsyncTask<String, String, String> {
         @Override

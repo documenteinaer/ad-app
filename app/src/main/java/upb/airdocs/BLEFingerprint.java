@@ -46,7 +46,7 @@ public class BLEFingerprint {
         try {
             if (name != null) jsonObject.put("name", name);
             for (int i = 0; i < rssiArray.size(); i++) {
-                jsonArray.put(rssiArray.get(i).toString());
+                jsonArray.put(rssiArray.get(i));
             }
             jsonObject.put("rssi", jsonArray);
         }

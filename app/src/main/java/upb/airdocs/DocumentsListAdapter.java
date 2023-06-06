@@ -80,12 +80,13 @@ public class DocumentsListAdapter extends BaseAdapter {
         final Document currentItem = (Document) getItem(position);
         String docName = currentItem.getItemName();
         final String docDescription = currentItem.getItemDescription();
+        final String docSimilarity = currentItem.getSimilarity();
         if (!docName.equals("-")) {
             viewHolder.itemName.setText(docName);
         }else{
             viewHolder.itemName.setVisibility(View.GONE);
         }
-        viewHolder.itemDescription.setText(docDescription);
+        viewHolder.itemDescription.setText(docDescription + " -> " + docSimilarity);
         String fileString = currentItem.getFileString();
         String fileType = currentItem.getFileType();
         if (fileString != null){

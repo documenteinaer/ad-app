@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.media.ToneGenerator;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -147,13 +149,8 @@ public class WiFiScan {
     }
 
     private void beep(){
-        try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(mContext, notification);
-            r.play();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 200);
+        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
     }
 
     public void unregisterReceiver(){

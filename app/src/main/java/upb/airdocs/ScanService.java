@@ -1,5 +1,6 @@
 package upb.airdocs;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,6 +9,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -126,6 +129,7 @@ public class ScanService extends Service  implements IALocationListener, IARegio
     String file;
     String fileType;
     String delId;
+    String activity;
 
 
     IALocationManager mManager;
@@ -448,7 +452,17 @@ public class ScanService extends Service  implements IALocationListener, IARegio
                     numberOfTotalScans = 0;
                     sent = 1;
                     Log.d(LOG_TAG, "Success (send doc)");
-                    announceSendDone(null);
+                    restoreActivityName();
+                    Log.d(LOG_TAG, "Activity name: "+activity);
+                    if (activity != null && activity.equals("Testing")){
+                        displayNumberOfScans();
+                        displaySendStatus();
+                    }
+                    else {
+                        announceSendDone(null);
+                    }
+                    saveActivityName(null);
+
                 } else if (type == TYPE_SEARCH_DOC) {
                     collectionsList = new ArrayList<FingerprintCollection>();
                     numberOfCollections = 0;
@@ -497,7 +511,6 @@ public class ScanService extends Service  implements IALocationListener, IARegio
                 case MSG_SEND:
                     Log.d(LOG_TAG, "Send test fingerprints");
                     Log.d(LOG_TAG, "address=" + address + " port=" + port);
-                    sendFingerprintsToServer(TYPE_TESTING);
                     break;
                 case MSG_START_SCAN:
                     restoreFieldsTesting();
@@ -701,4 +714,19 @@ public class ScanService extends Service  implements IALocationListener, IARegio
             mCurrentFloorPlan = iaRegion;
         }
     }
+    private void restoreActivityName() {
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        activity = sharedPref.getString("activity", null);
+    }
+    private void saveActivityName(String name){
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("activity", name);
+        editor.apply();
+    }
+
 }

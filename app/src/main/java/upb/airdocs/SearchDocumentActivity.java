@@ -439,13 +439,13 @@ public class SearchDocumentActivity extends AppCompatActivity implements IALocat
 
                 System.out.println("latitude" + latitude);
                 System.out.println("longitude" + longitude);
+                String similarity = docInfo.get("similarity").toString();
                 if (docInfo.has("file")){
                     String fileString = (String)docInfo.get("file");
-//                    TODO HERE
-                    list.add(new Document(docName, docDescription, fileString, fileType, id));
+                    list.add(new Document(docName, docDescription, fileString, fileType, id, similarity));
                 }
                 else {
-                    list.add(new Document(docName, docDescription, fileType, id));
+                    list.add(new Document(docName, docDescription, fileType, id, similarity));
                 }
 
             }

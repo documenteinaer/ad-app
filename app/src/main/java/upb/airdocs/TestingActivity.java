@@ -181,7 +181,8 @@ public class TestingActivity extends AppCompatActivity {
     public void onSendButton() {
         if (mBound) {
             // Create and send a message to the service, using a supported 'what' value
-            Message msg = Message.obtain(null, ScanService.MSG_SEND, 0, 0);
+            saveActivityName("Testing");
+            Message msg = Message.obtain(null, ScanService.MSG_ACTUAL_SEND_DOC, 0, 0);
             try {
                 mMessenger.send(msg);
             } catch (RemoteException e) {
@@ -195,7 +196,7 @@ public class TestingActivity extends AppCompatActivity {
         if (mBound) {
             Message msg;
             // Create and send a message to the service, using a supported 'what' value
-            msg = Message.obtain(null, ScanService.MSG_START_SCAN, 0, 0);
+            msg = Message.obtain(null, ScanService.MSG_SCAN_TO_POST_DOC, 0, 0);
 
             try {
                 mMessenger.send(msg);
@@ -633,6 +634,16 @@ public class TestingActivity extends AppCompatActivity {
 
         commentEditText.setText(comment);
         devIDTextView.setText(devID);
+    }
+
+    private void saveActivityName(String name){
+
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putString("activity", name);
+        editor.apply();
     }
 
 }

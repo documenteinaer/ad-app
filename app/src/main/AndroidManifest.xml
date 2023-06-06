@@ -41,17 +41,17 @@
         <meta-data android:name="com.google.ar.core" android:value="required" />
         <meta-data
             android:name="com.google.android.ar.API_KEY"
-            android:value="AIzaSyDCxq2tBwTi60y7ZhXZTkijHW127g6ji4c"/>
+            android:value="TODO"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDCxq2tBwTi60y7ZhXZTkijHW127g6ji4c" />
+            android:value="TODO" />
 
         <meta-data
             android:name="com.indooratlas.android.sdk.API_KEY"
-            android:value="60bd1f86-9c8a-44e8-bec8-20ecf75688de" />
+            android:value="TODO" />
         <meta-data
             android:name="com.indooratlas.android.sdk.API_SECRET"
-            android:value="szaN1IuMnaJr4CfryXScrCI1lvYSrUPpexKhFc9CnN4J+/0PwbvN8NLnu7QO552OJ1PWiIjQ/X8kPumaf/Zsb9pHB8Jyom87BMNbnjp/EjGDRhGR3yeCBq+4qvvB8w==" />
+            android:value="TODO" />
 
         <activity
             android:name=".TestingActivity"

@@ -18,6 +18,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -67,6 +69,7 @@ public class PostDocumentActivity extends AppCompatActivity{
     Messenger mMessenger = null;
 
     Button scanSendDocButton;
+    Button selectSendDocButton;
     TextView postDocTitle;
     EditText postDocumentDescription;
     TextView scanSendStatus;
@@ -109,6 +112,22 @@ public class PostDocumentActivity extends AppCompatActivity{
         handleIntent(intent);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBarPostDoc);
+//        int FILE_SELECT_CODE = 2;
+//        selectSendDocButton = (Button) findViewById(R.id.select_send_doc);
+//        selectSendDocButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//
+//                intent.setType("*/*");      //all files
+////                intent.setType("text/xml");   //XML file only
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                startActivityForResult(intent, FILE_SELECT_CODE);
+////                startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+//            }
+//
+//
+//        });
 
         scanSendDocButton = (Button) findViewById(R.id.scan_send_doc);
 
@@ -135,10 +154,25 @@ public class PostDocumentActivity extends AppCompatActivity{
         });
     }
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        System.out.println("VLAD: got reqCode" + requestCode)   ;
+//        System.out.println("VLAD: got resultCode" + resultCode);
+//        System.out.println("VLAD: got data" + data);
+//        System.out.println("VLAD: got data.getAction()" + data.getAction());
+//        System.out.println("VLAD: got data.getType()" + data.getType());
+//
+//    }
+
     private void handleIntent(Intent intent){
         String action = intent.getAction();
         String type = intent.getType();
-
+//        System.out.println(intent);
+//
+//        System.out.println("VLAD: intent " + intent);
+//        System.out.println("VLAD: action " + action);
+//        System.out.println("VLAD: type " + type);
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
                 fileType = "text/plain";

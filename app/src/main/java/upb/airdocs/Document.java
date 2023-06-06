@@ -6,6 +6,9 @@ public class Document {
     private String fileString = null;
     private String fileType = null;
     private String id = null;
+    public Double latitude = 0.0;
+    public Double longitude = 0.0;
+    public Double altitude = 0.0;
 
     public Document(String name, String description, String fileType, String id) {
         this.itemName = name;
@@ -14,12 +17,34 @@ public class Document {
         this.id = id;
     }
 
+    public Document(String name, String description, String fileType, String id, Double latitude, Double longitude, Double altitude) {
+        this.itemName = name;
+        this.itemDescription = description;
+        this.fileType = fileType;
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+    }
+
     public Document(String name, String description, String fileString, String fileType, String id) {
         this.itemName = name;
         this.itemDescription = description;
         this.fileString = fileString;
         this.fileType = fileType;
         this.id = id;
+    }
+
+    public Document(String name, String description, String fileString, String fileType, String id, Double latitude, Double longitude, Double altitude) {
+        this.itemName = name;
+        this.itemDescription = description;
+        this.fileString = fileString;
+        this.fileType = fileType;
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+
     }
 
     public String getItemName() {

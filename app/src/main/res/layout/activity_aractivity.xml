@@ -1,20 +1,103 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ARActivity">
 
-<!--    <com.google.ar.sceneform.ArSceneView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
+    <android.opengl.GLSurfaceView
+        android:id="@+id/surfaceview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="top" />
 
-<!--    </com.google.ar.sceneform.ArSceneView>-->
-    <fragment
-        android:id="@+id/fragment"
-        android:name="com.google.ar.sceneform.ux.ArFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
+<!--    <upb.airdocs.arhelpers.MapTouchWrapper-->
+<!--        android:id="@+id/map_wper"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:layout_alignParentBottom="true">-->
+
+<!--        <fragment-->
+<!--            android:id="@+id/map"-->
+<!--            android:name="com.google.android.gms.maps.SupportMapFragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            tools:context=".ARActivity" />-->
+
+<!--    </upb.airdocs.arhelpers.MapTouchWrapper>-->
+    <TextView
+        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:background="#AAFFFFFF"
+        android:layout_width="wrap_content"
+        android:fontFamily="monospace"
+        android:layout_height="wrap_content"
+        android:id="@+id/statusText"
+        />
+<!--    TODO: re-enable -->
+    <TextView
+        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:background="#AAFFFFFF"
+        android:layout_width="wrap_content"
+        android:fontFamily="monospace"
+        android:layout_toEndOf="@+id/statusText"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/iatlasText"
+        />
+
+    <Button
+        android:id="@+id/postARDoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="2dp"
+        android:background="#AAFFFFFF"
+        android:fontFamily="monospace"
+        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:text="Post doc"/>
+
+    <Button
+        android:id="@+id/getARDocs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginEnd="2dp"
+        android:background="#AAFFFFFF"
+        android:fontFamily="monospace"
+        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:text="Get docs"/>
+
+    <Button
+        android:id="@+id/viewARDoc"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="2dp"
+        android:background="#AAFFFFFF"
+        android:fontFamily="monospace"
+        android:padding="8dp"
+        android:textColor="@android:color/black"/>
+
+
+    <!--    <fragment-->
+<!--        android:id="@+id/fragment"-->
+<!--        android:name="com.google.ar.sceneform.ux.ArFragment"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/button2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Button" />-->
 
 
 </RelativeLayout>

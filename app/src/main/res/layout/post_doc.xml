@@ -28,17 +28,32 @@
         app:layout_constraintStart_toStartOf="@+id/scan_send_doc"
         app:layout_constraintTop_toBottomOf="@+id/scan_send_doc" />
 
+
     <Button
-        android:id="@+id/scan_send_doc"
+        android:id="@+id/select_send_doc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="200dp"
         android:layout_marginEnd="224dp"
-        android:text="Post Document"
+        android:text="Select Document"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/post_document_description"
         app:layout_constraintTop_toBottomOf="@+id/post_document_description" />
+
+
+    <Button
+        android:id="@+id/scan_send_doc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="22dp"
+        android:text="Post Document"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/select_send_doc"
+        app:layout_constraintTop_toBottomOf="@+id/select_send_doc" />
+
 
     <TextView
         android:id="@+id/textView2"

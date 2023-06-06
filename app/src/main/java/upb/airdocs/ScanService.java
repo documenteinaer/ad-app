@@ -43,8 +43,22 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import upb.airdocs.hellogeospatial.HelloGeoActivity;
+import upb.airdocs.hellogeospatial.HelloGeoRenderer;
 
 public class ScanService extends Service  implements IALocationListener, IARegion.Listener  {
     private static final String LOG_TAG = "ScanService";
@@ -336,11 +350,49 @@ public class ScanService extends Service  implements IALocationListener, IARegio
 
     /* Install this mini JSON server: https://gist.github.com/nitaku/10d0662536f37a087e1b */
 
-    public void sendJSONtoServer(JSONObject jsonObject, int type){
+    /**
+     * Disables the SSL certificate checking for new instances of {@link HttpsURLConnection} This has been created to
+     * aid testing on a local box, not for use on production.
+     */
+    public static void disableSSLCertificateChecking() {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                // Not implemented
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                // Not implemented
+            }
+        } };
 
         try {
-            URL url = new URL("http://" + address + ":" + port);
+            SSLContext sc = SSLContext.getInstance("TLS");
+
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() { @Override public boolean verify(String hostname, SSLSession session) { return true; } });
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendJSONtoServer(JSONObject jsonObject, int type){
+        disableSSLCertificateChecking();
+        try {
+            URL url = new URL(address + ":" + port);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//            URL url = new URL("http://" + address + ":" + port);
+//            URL url = new URL("https://" + address + ":" + port);
+//            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
             con.setRequestProperty("Accept", "application/json");
@@ -511,7 +563,11 @@ public class ScanService extends Service  implements IALocationListener, IARegio
         try{
             for (int i = 0; i < collectionsList.size(); i++) {
                 FingerprintCollection fingerprintCollection = collectionsList.get(i);
-                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic, latitude, longitude, mCurrentFloorLevel));
+//                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic, latitude, longitude, mCurrentFloorLevel));
+                System.out.println("VLAD: HelloGeoRenderer.Companion.getStaticLatitude: "+ HelloGeoRenderer.Companion.getStaticLatitude());
+                System.out.println("VLAD: HelloGeoRenderer.Companion.getStaticLongitude: "+ HelloGeoRenderer.Companion.getStaticLongitude());
+                System.out.println("VLAD: HelloGeoRenderer.Companion.getStaticAltitude: "+ HelloGeoRenderer.Companion.getStaticAltitude());
+                jsonObject.put("collection"+i, fingerprintCollection.toJSON(ble, cellular, gps, magnetic, HelloGeoRenderer.Companion.getStaticLatitude(), HelloGeoRenderer.Companion.getStaticLongitude(), HelloGeoRenderer.Companion.getStaticAltitude(), mCurrentFloorLevel));
             }
         }
         catch(JSONException e){

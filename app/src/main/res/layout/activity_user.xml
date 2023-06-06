@@ -60,7 +60,7 @@
         android:id="@+id/ar_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test AR"
+        android:text="AR Docs"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.129"

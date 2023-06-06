@@ -434,7 +434,7 @@ public class SearchDocumentActivity extends AppCompatActivity implements IALocat
                 poiLocation.setLatitude(docLatitude);
                 poiLocation.setLongitude(docLongitude);
                 System.out.println("WORKS dist to poi " + docName + " -> "  + currLocation.distanceTo(poiLocation) + " m");
-                docDescription += " <> " + currLocation.distanceTo(poiLocation) + " m";
+//                docDescription += " <> " + currLocation.distanceTo(poiLocation) + " m";
 
 
                 System.out.println("latitude" + latitude);

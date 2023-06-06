@@ -35,17 +35,23 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <meta-data android:name="com.google.ar.core" android:value="required" />
         <activity
-            android:name=".ARActivity"
+            android:name=".hellogeospatial.HelloGeoActivity"
             android:label="AirDocs" />
+        <meta-data android:name="com.google.ar.core" android:value="required" />
+        <meta-data
+            android:name="com.google.android.ar.API_KEY"
+            android:value="AIzaSyDCxq2tBwTi60y7ZhXZTkijHW127g6ji4c"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDCxq2tBwTi60y7ZhXZTkijHW127g6ji4c" />
 
         <meta-data
             android:name="com.indooratlas.android.sdk.API_KEY"
-            android:value="01e2ffb8-fba6-4ef7-a9da-deabc075e063" />
+            android:value="60bd1f86-9c8a-44e8-bec8-20ecf75688de" />
         <meta-data
             android:name="com.indooratlas.android.sdk.API_SECRET"
-            android:value="w1JsHXO90BHIp2XFx30O8gyGF68YK51+ON23x/MpTw2NJ9Drw/uLMpUgUTmsO2HHdc4bRjIPurs/3iyzp3K0ysQxkIp7/1QqygtADN1FMWStcLkpzYdWLornxIPwQQ==" />
+            android:value="szaN1IuMnaJr4CfryXScrCI1lvYSrUPpexKhFc9CnN4J+/0PwbvN8NLnu7QO552OJ1PWiIjQ/X8kPumaf/Zsb9pHB8Jyom87BMNbnjp/EjGDRhGR3yeCBq+4qvvB8w==" />
 
         <activity
             android:name=".TestingActivity"

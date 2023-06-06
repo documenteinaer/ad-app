@@ -60,6 +60,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import upb.airdocs.hellogeospatial.HelloGeoActivity;
 
 public class UserActivity  extends AppCompatActivity implements IALocationListener, IARegion.Listener {
     private static final String LOG_TAG = "UserActivity";
@@ -84,7 +85,7 @@ public class UserActivity  extends AppCompatActivity implements IALocationListen
     private TextView locationView;
     private ArrayList<String> nearPois = new ArrayList<>();
 
-    private static final String API_KEY = "01e2ffb8-fba6-4ef7-a9da-deabc075e063";
+    private static final String API_KEY = "60bd1f86-9c8a-44e8-bec8-20ecf75688de";
     private static final String BASE_URL = "https://api.indooratlas.com/v2/maps/";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private OkHttpClient client = new OkHttpClient();
@@ -131,7 +132,8 @@ public class UserActivity  extends AppCompatActivity implements IALocationListen
         arButton = (Button) findViewById(R.id.ar_button);
         arButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), ARActivity.class);
+//                Intent intent = new Intent(getBaseContext(), ARActivity.class);
+                Intent intent = new Intent(getBaseContext(), HelloGeoActivity.class);
                 startActivity(intent);
             }
         });
